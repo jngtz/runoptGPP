@@ -87,3 +87,26 @@ getRndWalkOptParams(workspace = getwd(),
                     n_train = rw_settings$n_train,
                     measure = median)
 
+
+# SPCV RW ###########################################################################
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+# Load saga gpp random walk settings
+load("gridsearch_rw_settings.Rd")
+
+rwexp_vec <- rw_settings$vec_rwexp
+rwper_vec <- rw_settings$vec_rwper
+rwslp_vec <- rw_settings$vec_rwslp
+
+#polyid.vec <- 1:rw_settings$n_train
+
+spcvRndWalk(slide_plys = slide_poly_vec,
+            n_folds = 3,
+            repetitions = 3,
+            rwslp_vec = rw_settings$vec_rwslp,
+            rwexp_vec = rw_settings$vec_rwexp,
+            rwper_vec = rw_settings$vec_rwper)
+
+
+
+
+
