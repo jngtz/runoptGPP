@@ -8,7 +8,7 @@
 #' r_ecdf <- RasterCdf(r)
 #' plot(r_ecdf)
 
-RasterCdf <- function(x){
+rasterCdf <- function(x){
 
   x_ecdf <- ecdf(raster::getValues(x))
   prob_x <- raster::setValues(x, x_ecdf(raster::getValues(x)))
@@ -28,7 +28,7 @@ RasterCdf <- function(x){
 #' r_minmax <- RasterMinMaxRescale(r)
 #' plot(r_minmax)
 
-RasterMinMaxRescale <- function(x){
+rasterMinMaxRescale <- function(x){
 
   ( x - min(raster::getValues(x), na.rm=TRUE)) / (max(raster::getValues(x), na.rm=TRUE) -  min(raster::getValues(x), na.rm=TRUE) )
 
