@@ -4,7 +4,7 @@
 \alias{runoutGeom}
 \title{Runout Geometry}
 \usage{
-runoutGeom(runout_plys, elev, ID = NULL, plot.bbox = FALSE)
+runoutGeom(runout_plys, elev, ID = NULL)
 }
 \arguments{
 \item{runout_plys}{A SpatialPolygonsDataFrame of runout tracks}
@@ -12,13 +12,11 @@ runoutGeom(runout_plys, elev, ID = NULL, plot.bbox = FALSE)
 \item{elev}{A RasterLayer DEM}
 
 \item{ID}{NOT SURE...}
-
-\item{plot.bbox}{(logical) Plot bounding box associated with width and length calc.}
 }
 \value{
-A SpatialPolygonsDataFrame with corresponding bounding boxes
+A data frame containing runout geometries
 }
 \description{
-Computes runnout attributes: width, length, area, max. elevation,
-    min. elevation, and using Spatial Polygons and an DEM
+Computes runnout attributes: width, length, area, max.
+    min. elevation, and surface area using Spatial Polygons and a DEM
 }

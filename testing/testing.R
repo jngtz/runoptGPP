@@ -144,3 +144,5 @@ ggplot(freqRW, aes(x=per, y=exp)) +
 
 
 # PCM MODEL OPTIMIZATION #######################
+workspace_dir <- "/home/jason/Scratch/F_Testing"
+
