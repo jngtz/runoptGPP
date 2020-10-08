@@ -20,8 +20,3 @@ A vector containing numeric labels defining each fold
 Divides a spatial sample of polygons into irregularly shaped spatial partitions
     using k-means clustring. It uses the spatial coordinates defined by the polygon centroids.
 }
-\examples{
-r <- raster(system.file("external/test.grd", package="raster"))
-r_ecdf <- RasterCdf(r)
-plot(r_ecdf)
-}

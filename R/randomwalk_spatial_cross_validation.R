@@ -27,11 +27,16 @@ spcvFoldsPoly <- function(x, n_folds = 5, seed_cv = 11082017){
 }
 
 
+
+
 #' Perform (repeated) spatial cross-validation of random walk optimization
 #'
 #' @param x A SpatialPolygonsDataframe
 #' @param n_folds The number of cross-validated folds (i.e. partitions)
-#' @param seed_cv The random seed defined to reproduce results
+#' @param repetitions Number of cross-validation repetitions
+#' @param rwslp_vec The vector of random walk slope thresholds used in the grid search
+#' @param rwexp_vec The vector or random walk exponents used in the grid search
+#' @param rwper_vec The vector or random walk persistence factors used in the grid search
 #' @return A vector containing numeric labels defining each fold
 
 spcvRndWalk <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper_vec){
@@ -198,5 +203,57 @@ spcvRndWalk <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, 
 
 
 }
+
+
+
+
+
+#' Pool random walk spatial cross-validation results
+#'
+#' Creates a summary of the frequency and performance (AUROC) of optimal parameter
+#'     sets across spatial cross-validation repetitions.
+#' @param x The (list) result of spcvRndWalk()
+#' @return A data frame summarizing the frequency and performance of each
+#'     optimal parameter sets
+
+
+pool_spcvRndWalk <- function(x){
+
+  pool_rw <- do.call(rbind, x)
+
+  # summarize by frequency and median score for optimal parameter sets
+  opt_sets <- data.frame(slp = pool_rw$rw_slp_opt, per = pool_rw$rw_per_opt, exp = pool_rw$rw_exp_opt)
+  freq_sets <- table(opt_sets)
+
+  slp_nm <- as.numeric(attributes(freq_sets)$dimnames$slp)
+  per_nm <- as.numeric(attributes(freq_sets)$dimnames$per)
+  exp_nm <- as.numeric(attributes(freq_sets)$dimnames$exp)
+
+  # Get array index of pairs
+  set_ind <- which(freq_sets !=0, arr.ind = TRUE)
+  sets <- data.frame(slp = slp_nm[set_ind[,1]],
+                     per = per_nm[set_ind[,2]],
+                     exp = exp_nm[set_ind[,3]],
+                     freq = freq_sets[set_ind])
+
+  sets$rel_freq <- sets$freq/nrow(pool_rw) * 100
+
+  #Find median AUROC values
+  set_id <- paste(sets$slp, sets$per, sets$exp)
+  pool_rw$set_id <- paste(pool_rw$rw_slp_opt, pool_rw$rw_per_opt, pool_rw$rw_exp_opt)
+
+  for(i in 1:length(set_id)){
+
+    auroc_i <- pool_rw$test_auroc_median[which(pool_rw$set_id == set_id[i])]
+    sets$median_auroc[i] <- median(auroc_i, na.rm = TRUE)
+    sets$iqr_auroc[i] <- IQR(auroc_i, na.rm = TRUE)
+
+  }
+
+  sets
+
+}
+
+
 
 

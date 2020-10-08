@@ -1,3 +1,4 @@
+setwd("/home/jason/R/runout.opt/")
 
 setwd("/home/jason/Data/Chile/")
 # elevation model
@@ -78,6 +79,7 @@ Sys.time()
 
 
 # GET RW OPTIMAL VALUES #############################################################
+
 (load("gridsearch_rw_settings.Rd"))
 
 getRndWalkOptParams(workspace = getwd(),
@@ -89,6 +91,7 @@ getRndWalkOptParams(workspace = getwd(),
 
 
 # SPCV RW ###########################################################################
+
 setwd("/home/jason/Scratch/GPP_RW_Paper")
 # Load saga gpp random walk settings
 load("gridsearch_rw_settings.Rd")
@@ -99,14 +102,14 @@ rwslp_vec <- rw_settings$vec_rwslp
 
 #polyid.vec <- 1:rw_settings$n_train
 
-spcvRndWalk(slide_plys = slide_poly_vec,
+spcvRW_res <- spcvRndWalk(slide_plys = slide_poly_vec,
             n_folds = 3,
-            repetitions = 3,
+            repetitions = 5,
             rwslp_vec = rw_settings$vec_rwslp,
             rwexp_vec = rw_settings$vec_rwexp,
             rwper_vec = rw_settings$vec_rwper)
 
-
+pool_spcvRndWalk(spcvRW_res)
 
 
 
