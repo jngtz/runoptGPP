@@ -114,6 +114,8 @@ freqRW <- pool_spcvRndWalk(spcvRW_res)
 
 # VISUALIZE RW SPCV OPT PARAM SET FREQ #######################
 
+#Pick a slope threshold (slice) of grid search space
+slope_thresh <- 40
 freqRW <- freqRW[order(freqRW$rel_freq, decreasing = TRUE),]
 
 require(ggplot2)
@@ -121,13 +123,11 @@ breaks_bubble <- c(round(min(freqRW$rel_freq)),
                    round(median(freqRW$rel_freq)),
                    round(max(freqRW$rel_freq)))
 
-#Pick a slope threshold (slice) of grid search space
-slope_thresh <- 40
 gg_freqRW <- freqRW[freqRW$slp == slope_thresh,]
 
 ggplot(freqRW, aes(x=per, y=exp)) +
   ggtitle(paste("Slope threshold:", slope_thresh ))+
-  # Can improve by making different colors for different slope tresholds...
+  # Can improve by making different colors for different slope thresholds...
 
   geom_point(alpha=0.7, aes(colour = median_auroc, size = rel_freq)) +
   scale_size(range = c(2, 10), name="Relative\nfrequency (%)",
@@ -142,3 +142,5 @@ ggplot(freqRW, aes(x=per, y=exp)) +
   theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 9),
         axis.text = element_text(size = 8), title = element_text(size = 8))
 
+
+# PCM MODEL OPTIMIZATION #######################
