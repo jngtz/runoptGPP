@@ -109,7 +109,36 @@ spcvRW_res <- spcvRndWalk(slide_plys = slide_poly_vec,
             rwexp_vec = rw_settings$vec_rwexp,
             rwper_vec = rw_settings$vec_rwper)
 
-pool_spcvRndWalk(spcvRW_res)
+freqRW <- pool_spcvRndWalk(spcvRW_res)
 
 
+# VISUALIZE RW SPCV OPT PARAM SET FREQ #######################
+
+freqRW <- freqRW[order(freqRW$rel_freq, decreasing = TRUE),]
+
+require(ggplot2)
+breaks_bubble <- c(round(min(freqRW$rel_freq)),
+                   round(median(freqRW$rel_freq)),
+                   round(max(freqRW$rel_freq)))
+
+#Pick a slope threshold (slice) of grid search space
+slope_thresh <- 40
+gg_freqRW <- freqRW[freqRW$slp == slope_thresh,]
+
+ggplot(freqRW, aes(x=per, y=exp)) +
+  ggtitle(paste("Slope threshold:", slope_thresh ))+
+  # Can improve by making different colors for different slope tresholds...
+
+  geom_point(alpha=0.7, aes(colour = median_auroc, size = rel_freq)) +
+  scale_size(range = c(2, 10), name="Relative\nfrequency (%)",
+             breaks = breaks_bubble) +
+  scale_colour_gradient(low = "#1B4F72", high = "#85C1E9",
+                        name = "Median AUROC") +
+  scale_x_continuous(expression(paste("Persistence factor")),
+                     limits = c(min(rwper_vec), max = max(rwper_vec))) +
+  scale_y_continuous(expression(paste("Exponent of divergence")),
+                     limits = c(min(rwexp_vec), max = max(rwexp_vec)+.1)) +
+  theme_light() +
+  theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8), title = element_text(size = 8))
 

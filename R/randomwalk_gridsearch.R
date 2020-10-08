@@ -132,17 +132,4 @@ getRndWalkOptParams <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper
 
 
 
-ggplot(sets, aes(x=per, y=exp)) +
-  geom_point(alpha=0.7, aes(colour = median_auroc, size = rel_freq)) +
-  scale_size(range = c(2, 10), name="Relative\nfrequency (%)",
-             breaks = c(5, 15, 60)) +
-  scale_colour_gradient(low = "#1B4F72", high = "#85C1E9",
-                        name = "Median AUROC") +
-  scale_x_continuous(expression(paste("Persistence factor")),
-                     limits = c(min(rwper_vec), max = max(rwper_vec))) +
-  scale_y_continuous(expression(paste("Exponent of divergence")),
-                     limits = c(min(rwexp_vec), max = max(rwexp_vec)+.1)) +
-  theme_light() +
-  theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8))
 
