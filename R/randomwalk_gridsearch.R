@@ -24,7 +24,7 @@
 #' @examples
 
 
-gridOptRndWalk <- function(dem, workspace = getwd(), steps = 1, slide_plys, source_pnts,
+gridOptRndWalk <- function(dem, workspace = getwd(), slide_plys, source_pnts,
                       slide_id, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                       plot_eval = FALSE)
