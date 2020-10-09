@@ -9,7 +9,7 @@
 
 errMinBboxLength <- function(obs_poly, pred_raster, dem){
   #Calculates the relative error b/w bbox length estimates of slides
-  sp.pred <- rasterToPolygons(pred_raster, n = 4, dissolve = TRUE, na.rm=TRUE)
+  sp.pred <- raster::rasterToPolygons(pred_raster, n = 4, dissolve = TRUE, na.rm=TRUE)
   geom_pred <- runoutGeom(sp.pred, elev = dem)
   geom_act <- runoutGeom(obs_poly, elev = dem)
 
@@ -20,7 +20,7 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
   return(
     list(rel_error = rel_err,
          rel_difference = rel_diff,
-         error = error
+         error = err
     ))
 }
 
@@ -117,19 +117,19 @@ performancePCM <- function(dem, slide_plys, source_pnts, slide_id = 1,
 
   # Length loss
   errMinBox <- errMinBboxLength(obs_poly = slide_poly_single,
-                                predraster = pred_thres,
+                                pred_raster = pred_thres,
                                 dem = dem)
 
-  length_relerrr <- errMinBox[["rel_error"]]
-  length_reldiff <- errMinBox[["rel_diff"]]
+  length_relerr <- errMinBox[["rel_error"]]
+  length_reldiff <- errMinBox[["rel_difference"]]
   length_error <- errMinBox[["error"]]
 
   # Plot evaluation results
   if(plot_eval){
     sp::plot(rescale_process_area,
-         main = paste("id", poly_id,
+         main = paste("id", slide_id,
                       "roc", round(roc, digits=2), "\n",
-                      "err.L", round(length_relerror, digits = 2),
+                      "err.L", round(length_relerr, digits = 2),
                       "Ex", rw_ex, "Pr", rw_per, "Mu", pcm_mu, "Md", pcm_md),
          cex.main = 0.7, cex.axis = 0.7, cex=0.7)
     sp::plot(slide_poly_single, add=TRUE)
@@ -140,7 +140,7 @@ performancePCM <- function(dem, slide_plys, source_pnts, slide_id = 1,
     return(
       list(id = slide_id,
            roc = roc,
-           length.relerr = length_relerror,
+           length.relerr = length_relerr,
            length.reldiff = length_reldiff,
            length.error = length_error,
            dem = dem_grid,
@@ -154,7 +154,7 @@ performancePCM <- function(dem, slide_plys, source_pnts, slide_id = 1,
     return(
       list(id =  slide_id,
            roc = roc,
-           length.relerr = length_relerror,
+           length.relerr = length_relerr,
            length.reldiff = length_reldiff,
            length.error = length_error))
   }

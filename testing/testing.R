@@ -145,4 +145,8 @@ ggplot(freqRW, aes(x=per, y=exp)) +
 
 # PCM MODEL OPTIMIZATION #######################
 workspace_dir <- "/home/jason/Scratch/F_Testing"
-
+performancePCM(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+               slide_id = 8, rw_slp = 33, rw_ex = 3, rw_per = 2,
+               pcm_mu = 0.11, pcm_md = 20,
+               gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
+               plot_eval = TRUE, return_features = TRUE)
