@@ -46,7 +46,7 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #'      point to a source area
 #' @param predict_threshold A cutoff value to define what quantile of simulated runout
 #'      frequencies is the predicted runout.
-#' @param plot_eval If TRUE, will plot random walk path and runout polygon
+#' @param plot_eval If TRUE, will plot simulated runout and runout polygon
 #' @param return_features If TRUE, returned list will include GPP input and output
 #' data, in addition to a list of error measures.
 #' @return A list of runout distance performance measures.

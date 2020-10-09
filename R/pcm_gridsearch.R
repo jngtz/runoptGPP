@@ -1,4 +1,30 @@
-
+#' Grid search optimization for PCM runout distance
+#'
+#' Computes performance measures for
+#'      runout paths simuluated using the random walk and PCM model components of the
+#'      GPP tool in SAGA-GIS.
+#' @param dem A DEM as a RasterLayer object
+#' @param workspace The file path where to save performance results for each runout polygon
+#' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
+#' @param source_pnts Source points as a SpatialPointsDataFrame
+#' @param slide_id Selects a single runout polygon from slide_plys by row
+#' @param rw_slp Random walk slope threshold - below lasteral spreading is modelled
+#' @param rw_ex Random walk exponent controlling lateral spread
+#' @param rw_per Random walk persistence factor to weight flow direction consistency
+#' @param pcm_mu_v A vector of PCM model sliding friction coefficients
+#' @param pcm_md_v A vector of PCM model mass-to-drag ratios (m)
+#' @param gpp_iter Number of random walk model iterations
+#' @param buffer_ext Defines buffer distance (in meters) around runout polygon
+#'      to crop source DEM. This helps to reduce computational time
+#' @param buffer_source Can define a buffer distance (in meters) to extend source
+#'      point to a source area
+#' @param predict_threshold A cutoff value to define what quantile of simulated runout
+#'      frequencies is the predicted runout.
+#' @param plot_eval If TRUE, will plot simulated runout and runout polygon
+#' @return A list with performances for each parameter combinations across grid search space.
+#'      The performances measures include relative error, relative difference, error and AUROC.
+#' @details Runout is either simulated from a single source point or a buffered
+#'      area round the source point.
 
 gridOptPCM <- function(dem, workspace = getwd(),
                        slide_plys, source_pnts, slide_id,
@@ -8,11 +34,6 @@ gridOptPCM <- function(dem, workspace = getwd(),
                        buffer_ext = 500, buffer_source = NULL,
                        predict_threshold = 0.5,
                        plot_eval = FALSE){
-
-  roc_result.nm <- paste("result_roc_", slide_id, ".Rd", sep="")
-  relerr_length_result.nm <- paste("result_relerr_length_", slide_id, ".Rd", sep="")
-  reldiff_length_result.nm <- paste("result_reldiff_length_", slide_id, ".Rd", sep="")
-  err_length_result.nm <- paste("result_err_length_", slide_id, ".Rd", sep="")
 
   column.names <- pcm_md_v
   row.names <- pcm_mu_v
@@ -51,17 +72,15 @@ gridOptPCM <- function(dem, workspace = getwd(),
       #roc_result[k, i] <- paste(pcmmd[i], pcmmu[k])
     }}
 
-  save(roc_result, file=roc_result.nm)
-  save(relerr_length_result, file=relerr_length_result.nm)
-  save(reldiff_length_result, file=reldiff_length_result.nm)
-  save(err_length_result, file=err_length_result.nm)
-
-  result_list <- list(
+  result_pcm <- list(
     auroc = roc_result,
     relerr = relerr_length_result,
     reldiff = reldiff_length_result,
     error = err_length_result)
 
-  return(result_list)
+  save(result_pcm, file = paste("result_pcm_gridsearch_", slide_id, ".Rd", sep=""))
+
+  return(result_pcm_gridsearch)
+
 }
 

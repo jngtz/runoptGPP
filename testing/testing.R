@@ -155,7 +155,7 @@ result <- performancePCM(dem, slide_plys = slide_poly_vec, source_pnts = slide_p
 pcmmd_vec <- seq(50, 150, by=50)
 pcmmu_vec <- seq(0.04, 0.6, by=0.25)
 
-gridOptPCM(dem, workspace = workspace_dir,
+pcm_result <- gridOptPCM(dem, workspace = workspace_dir,
                        slide_plys = slide_poly_vec, source_pnts = slide_point_vec, slide_id = 5,
                        rw_slp = 40, rw_ex = 1.8, rw_per = 2,
                        pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,

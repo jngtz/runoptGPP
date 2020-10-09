@@ -7,7 +7,6 @@
 gridOptRndWalk(
   dem,
   workspace = getwd(),
-  steps = 1,
   slide_plys,
   source_pnts,
   slide_id,
