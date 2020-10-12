@@ -26,7 +26,7 @@
 #' @details Runout is either simulated from a single source point or a buffered
 #'      area round the source point.
 
-gridOptPCM <- function(dem, workspace = getwd(),
+pcmGridsearch <- function(dem, workspace = getwd(),
                        slide_plys, source_pnts, slide_id,
                        rw_slp, rw_ex, rw_per,
                        pcm_mu_v, pcm_md_v,
@@ -34,6 +34,9 @@ gridOptPCM <- function(dem, workspace = getwd(),
                        buffer_ext = 500, buffer_source = NULL,
                        predict_threshold = 0.5,
                        plot_eval = FALSE){
+
+  revert_wd <- getwd()
+  setwd(workspace)
 
   column.names <- pcm_md_v
   row.names <- pcm_mu_v
@@ -49,7 +52,7 @@ gridOptPCM <- function(dem, workspace = getwd(),
   for(i in 1:length(pcm_md_v)){
     for(k in 1:length(pcm_mu_v)){
 
-      result <- performancePCM(dem = dem,
+      result <- pcmPerformance(dem = dem,
                                  slide_plys = slide_plys,
                                  source_pnts = source_pnts,
                                  slide_id = slide_id,
@@ -80,7 +83,64 @@ gridOptPCM <- function(dem, workspace = getwd(),
 
   save(result_pcm, file = paste("result_pcm_gridsearch_", slide_id, ".Rd", sep=""))
 
+  setwd(revert_wd)
   return(result_pcm_gridsearch)
+
 
 }
 
+
+
+
+#' Get PCM runout distance grid search optimal parameters
+#'
+#' @param workspace The file path where the performance results were saved
+#' @param slide_id Selects a single runout polygon from slide_plys by row
+#' @param pcm_mu_vec The vector of random walk slope thresholds used in the grid search
+#' @param pcm_mu_vec The vector or random walk exponents used in the grid search
+#' @param n_train Number of runout polygons processed with grid search
+#' @param performace Performance measure "relerr" relative error
+#' @param measure A measure (e.g. "median", "mean") to find optimal parameter across grid search space
+#' @return A dataframe  with the optimal parameter set and performance
+
+pcmGetOpt <- function(workspace = getwd(), pcm_md_vec, pcm_mu_vec, n_train,
+                      performance = "relerr", measure = "median"){
+  revert_wd <- getwd()
+  setwd(workspace)
+
+  err_list <- list()
+  roc_list <- list()
+
+  for(i in 1:n_train){
+
+    res_nm <- paste("result_pcm_gridsearch_", i, ".Rd", sep="")
+    load(res_nm) #res
+
+    err_list[[i]] <- result_pcm_gridsearch[[performance]]
+    roc_list[[i]] <- result_pcm_gridsearch[['auroc']]
+
+  }
+
+  err <- apply(simplify2array(err_list), 1:2, get(measure))
+  roc <- apply(simplify2array(roc_list), 1:2, get(measure))
+
+  err_wh <- which(err==min(err), arr.ind=T)
+  err_wh
+  err[err_wh]
+
+  opt_md <- pcmmd.vec[err_wh[2]]
+  opt_mu <- pcmmu.vec[err_wh[1]]
+
+  opt_gpp_par <- data.frame(
+    pcm_mu = opt_mu,
+    pcm_md = opt_md
+    )
+
+  opt_gpp_par[paste0(measure, "_", performance)] <- err[err_wh]
+  opt_gpp_par[paste0(measure, "_", "auroc")] <- roc[err_wh]
+
+  setwd(revert_wd)
+
+  return(opt_gpp_par)
+
+}

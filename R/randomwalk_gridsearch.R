@@ -24,7 +24,7 @@
 #' @examples
 
 
-gridOptRndWalk <- function(dem, workspace = getwd(), slide_plys, source_pnts,
+rwGridsearch <- function(dem, workspace = getwd(), slide_plys, source_pnts,
                       slide_id, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                       plot_eval = FALSE)
@@ -49,7 +49,7 @@ gridOptRndWalk <- function(dem, workspace = getwd(), slide_plys, source_pnts,
     for(i in 1:length(ex_v)){
       for(k in 1:length(slp_v)){
         #res[k, i, j] <- paste(pcmmd[k], rwexp[i], rwper[j] )
-        roc <- performanceRndWalk(dem,
+        roc <- rwPerformance(dem,
                              slide_plys = slide_plys,
                              source_pnts = source_pnts,
                              slide_id = slide_id,
@@ -84,8 +84,11 @@ gridOptRndWalk <- function(dem, workspace = getwd(), slide_plys, source_pnts,
 #' @param measure A measure (e.g. median, mean) to find optimal parameter across grid search space
 #' @return A dataframe  with the optimal parameter set and AUROC performance
 
-getRndWalkOptParams <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper_vec, n_train,
+rwGetOpt <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper_vec, n_train,
                                 measure = median){
+
+  revert_wd <- getwd()
+  setwd(workspace)
 
   roc_list <- list()
 
@@ -125,7 +128,8 @@ getRndWalkOptParams <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper
     rw_auroc = roc[ROCwh]
   )
 
-  opt_params
+  setwd(revert_wd)
+  return(opt_params)
 
 }
 

@@ -29,7 +29,7 @@
 #' saga <- Rsagacmd::saga_gis()
 #'
 
-performanceRndWalk <- function(dem, slide_plys, source_pnts,
+rwPerformance <- function(dem, slide_plys, source_pnts,
                           slide_id = 2, slp = 33, ex = 3, per = 2,
                           gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                           plot_eval = FALSE)
@@ -86,7 +86,7 @@ performanceRndWalk <- function(dem, slide_plys, source_pnts,
     raster::plot(rescale_process_area,
          main = paste("id", slide_id,
                       "roc", round(roc, digits=3), "\n",
-                      "Ex", rw_ex, "Pr", rw_per, "Slp", rw_slp),
+                      "Ex", ex, "Pr", per, "Slp", slp),
          cex.main = 0.7, cex.axis = 0.7, cex=0.7)
     sp::plot(slide_poly_single, add=TRUE)
   }

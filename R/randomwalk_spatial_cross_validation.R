@@ -39,7 +39,7 @@ spcvFoldsPoly <- function(x, n_folds = 5, seed_cv = 11082017){
 #' @param rwper_vec The vector or random walk persistence factors used in the grid search
 #' @return A vector containing numeric labels defining each fold
 
-spcvRndWalk <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper_vec){
+rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper_vec){
 
   rep_spcv_rw <- list()
 
@@ -217,7 +217,7 @@ spcvRndWalk <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, 
 #'     optimal parameter sets
 
 
-pool_spcvRndWalk <- function(x){
+rwPoolSPCV<- function(x){
 
   pool_rw <- do.call(rbind, x)
 

@@ -16,11 +16,10 @@ raster::crs(slide_point_vec) <- raster::crs(slide_poly_vec)
 saga <- Rsagacmd::saga_gis()
 
 
-performanceRndWalk(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+rwPerformance(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                    slide_id = 2, slp = 33, ex = 3, per = 2,
                    gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
                    plot_eval = TRUE)
-
 
 
 steps <- 3
@@ -30,7 +29,7 @@ rwslp_vec <- seq(20, 40, len=steps)
 
 workspace_dir <- "/home/jason/Scratch/F_Testing"
 
-gridOptRndWalk(dem, workspace = workspace_dir, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+rwGridsearch(dem, workspace = workspace_dir, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                slide_id = 2, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
                gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
                plot_eval = TRUE)
@@ -69,7 +68,7 @@ doParallel::registerDoParallel(cl)
 Sys.time()
 results.list <-
   foreach(poly_id=polyid_vec, .combine='c', .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf')) %dopar% {
-    gridOptRndWalk(dem, workspace = "/home/jason/Scratch/F_Testing", slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+    rwGridsearch(dem, workspace = "/home/jason/Scratch/F_Testing", slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                    slide_id = poly_id, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
                    gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
                    plot_eval = FALSE)
@@ -82,7 +81,7 @@ Sys.time()
 
 (load("gridsearch_rw_settings.Rd"))
 
-getRndWalkOptParams(workspace = getwd(),
+rwGetOpt(workspace = getwd(),
                     rwslp_vec = rw_settings$vec_rwslp,
                     rwexp_vec = rw_settings$vec_rwexp,
                     rwper_vec = rw_settings$vec_rwper,
@@ -102,30 +101,30 @@ rwslp_vec <- rw_settings$vec_rwslp
 
 #polyid.vec <- 1:rw_settings$n_train
 
-spcvRW_res <- spcvRndWalk(slide_plys = slide_poly_vec,
+rw_spcv <- rwSPCV(slide_plys = slide_poly_vec,
             n_folds = 3,
             repetitions = 5,
             rwslp_vec = rw_settings$vec_rwslp,
             rwexp_vec = rw_settings$vec_rwexp,
             rwper_vec = rw_settings$vec_rwper)
 
-freqRW <- pool_spcvRndWalk(spcvRW_res)
+freq_rw <- rwPoolSPCV(rw_spcv)
 
 
 # VISUALIZE RW SPCV OPT PARAM SET FREQ #######################
 
 #Pick a slope threshold (slice) of grid search space
 slope_thresh <- 40
-freqRW <- freqRW[order(freqRW$rel_freq, decreasing = TRUE),]
+freq_rw <- freq_rw[order(freq_rw$rel_freq, decreasing = TRUE),]
 
 require(ggplot2)
-breaks_bubble <- c(round(min(freqRW$rel_freq)),
-                   round(median(freqRW$rel_freq)),
-                   round(max(freqRW$rel_freq)))
+breaks_bubble <- c(round(min(freq_rw$rel_freq)),
+                   round(median(freq_rw$rel_freq)),
+                   round(max(freq_rw$rel_freq)))
 
-gg_freqRW <- freqRW[freqRW$slp == slope_thresh,]
+gg_freqRW <- freqRW[freq_rw$slp == slope_thresh,]
 
-ggplot(freqRW, aes(x=per, y=exp)) +
+ggplot(freq_rw, aes(x=per, y=exp)) +
   ggtitle(paste("Slope threshold:", slope_thresh ))+
   # Can improve by making different colors for different slope thresholds...
 
@@ -145,17 +144,17 @@ ggplot(freqRW, aes(x=per, y=exp)) +
 
 # PCM MODEL OPTIMIZATION #######################
 workspace_dir <- "/home/jason/Scratch/F_Testing"
-result <- performancePCM(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+
+result <- pcmPerformance(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                slide_id = 8, rw_slp = 33, rw_ex = 3, rw_per = 2,
                pcm_mu = 0.11, pcm_md = 20,
                gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
-               plot_eval = FALSE, return_features = FALSE)
-
+               plot_eval = TRUE, return_features = TRUE)
 
 pcmmd_vec <- seq(50, 150, by=50)
 pcmmu_vec <- seq(0.04, 0.6, by=0.25)
 
-pcm_result <- gridOptPCM(dem, workspace = workspace_dir,
+pcm_result <- pcmGridsearch(dem, workspace = workspace_dir,
                        slide_plys = slide_poly_vec, source_pnts = slide_point_vec, slide_id = 5,
                        rw_slp = 40, rw_ex = 1.8, rw_per = 2,
                        pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
@@ -163,3 +162,68 @@ pcm_result <- gridOptPCM(dem, workspace = workspace_dir,
                        buffer_ext = 500, buffer_source = NULL,
                        predict_threshold = 0.5,
                        plot_eval = FALSE)
+
+for(i in 1:10){
+  pcmGridsearch(dem, workspace = workspace_dir,
+             slide_plys = slide_poly_vec, source_pnts = slide_point_vec, slide_id = i,
+             rw_slp = 40, rw_ex = 1.8, rw_per = 2,
+             pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
+             gpp_iter = 1000,
+             buffer_ext = 500, buffer_source = NULL,
+             predict_threshold = 0.5,
+             plot_eval = FALSE)
+}
+
+# GET PCM OPTIMAL PARAMETERS #######################################
+
+# This is results of 2 parameter optimization of PCM with MD and Mu
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+setwd("D:/Scratch/GPP_PCM")
+
+(load("gridsearch_pcm_settings.Rd"))
+
+polyid.vec <- 1:pcm_settings$n_train
+pcmmu.vec <- pcm_settings$vec_pcmmu
+pcmmd.vec <- pcm_settings$vec_pcmmd
+
+measure = mean
+
+relerr_list <- list()
+
+for(i in 1:pcm_settings$n_train){
+
+
+  res_nm <- paste("result_relerr_length_", i, ".Rd", sep="")
+  load(res_nm) #res
+  res <- relerr_length_result
+  relerr_list[[i]] <- res
+  # calc median for these using apply
+
+}
+
+
+rel_err <- apply(simplify2array(relerr_list), 1:2, measure)
+
+rel_err_wh <- which(rel_err==min(rel_err), arr.ind=T)
+rel_err_wh
+rel_err[rel_err_wh]
+
+opt_md <- pcmmd.vec[rel_err_wh[2]]
+opt_mu <- pcmmu.vec[rel_err_wh[1]]
+
+opt_gpp_par <- list(
+  #rw_per = rw_per_opt,
+  #rw_exp = rw_exp_opt,
+  #rw_slp = rw_slp_opt,
+  pcm_mu = opt_mu,
+  pcm_md = opt_md
+)
+
+
+# TRY WITH NEW FUNCTION FUNCTION
+setwd(workspace_dir)
+
+
+
+pcmGetOpt(pcm_md_vec = pcmmd_vec, pcm_mu_vec = pcmmu_vec, n_train = 10,
+          performance = "relerr", measure = "median")

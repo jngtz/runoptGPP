@@ -57,7 +57,7 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #' # Initalize a saga object
 #' saga <- Rsagacmd::saga_gis()
 
-performancePCM <- function(dem, slide_plys, source_pnts, slide_id = 1,
+pcmPerformance <- function(dem, slide_plys, source_pnts, slide_id = 1,
                              rw_slp = 33, rw_ex = 3, rw_per = 2,
                              pcm_mu = 0.3, pcm_md = 75,
                              buffer_ext = 500, buffer_source = 50, gpp_iter = 1000,
