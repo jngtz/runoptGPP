@@ -4,7 +4,7 @@
 \alias{rwPoolSPCV}
 \title{Pool random walk spatial cross-validation results}
 \usage{
-rwPoolSPCV(x)
+rwPoolSPCV(x, plot.freq = FALSE)
 }
 \arguments{
 \item{x}{The (list) result of spcvRndWalk()}

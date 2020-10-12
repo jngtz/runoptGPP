@@ -176,9 +176,17 @@ for(i in 1:10){
 
 # GET PCM OPTIMAL PARAMETERS #######################################
 
-# This is results of 2 parameter optimization of PCM with MD and Mu
+setwd(workspace_dir)
+
+pcmGetOpt(pcm_md_vec = pcmmd_vec, pcm_mu_vec = pcmmu_vec, n_train = 10,
+          performance = "relerr", measure = "median")
+
+pcm_spcv <- pcmSPCV(slide_plys = slide_poly_vec[1:10,],
+                    n_folds = 3, repetitions = 100, pcm_mu_v = pcmmu.vec,
+                    pcm_md_v = pcmmd.vec)
+
+# Test pooling
 setwd("/home/jason/Scratch/GPP_PCM_Paper")
-setwd("D:/Scratch/GPP_PCM")
 
 (load("gridsearch_pcm_settings.Rd"))
 
@@ -186,44 +194,8 @@ polyid.vec <- 1:pcm_settings$n_train
 pcmmu.vec <- pcm_settings$vec_pcmmu
 pcmmd.vec <- pcm_settings$vec_pcmmd
 
-measure = mean
+(load("repeated_spcv_PCM.Rd"))
 
-relerr_list <- list()
-
-for(i in 1:pcm_settings$n_train){
+freq_pcm <- pcmPoolSPCV(rep_spcv_pcm)
 
 
-  res_nm <- paste("result_relerr_length_", i, ".Rd", sep="")
-  load(res_nm) #res
-  res <- relerr_length_result
-  relerr_list[[i]] <- res
-  # calc median for these using apply
-
-}
-
-
-rel_err <- apply(simplify2array(relerr_list), 1:2, measure)
-
-rel_err_wh <- which(rel_err==min(rel_err), arr.ind=T)
-rel_err_wh
-rel_err[rel_err_wh]
-
-opt_md <- pcmmd.vec[rel_err_wh[2]]
-opt_mu <- pcmmu.vec[rel_err_wh[1]]
-
-opt_gpp_par <- list(
-  #rw_per = rw_per_opt,
-  #rw_exp = rw_exp_opt,
-  #rw_slp = rw_slp_opt,
-  pcm_mu = opt_mu,
-  pcm_md = opt_md
-)
-
-
-# TRY WITH NEW FUNCTION FUNCTION
-setwd(workspace_dir)
-
-
-
-pcmGetOpt(pcm_md_vec = pcmmd_vec, pcm_mu_vec = pcmmu_vec, n_train = 10,
-          performance = "relerr", measure = "median")

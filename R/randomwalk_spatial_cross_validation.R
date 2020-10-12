@@ -217,7 +217,7 @@ rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper
 #'     optimal parameter sets
 
 
-rwPoolSPCV<- function(x){
+rwPoolSPCV<- function(x, plot.freq = FALSE){
 
   pool_rw <- do.call(rbind, x)
 

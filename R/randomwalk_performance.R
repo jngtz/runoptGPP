@@ -1,6 +1,4 @@
 
-
-
 #' Random walk runout path performance
 #'
 #' Computes the area under the receiver operating characteristic curve (AUROC) for
