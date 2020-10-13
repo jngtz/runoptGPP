@@ -175,4 +175,4 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
   return(bbDf)
 }
 
-test <- runoutGeom(slide_poly_vec[1:2,], dem)
+

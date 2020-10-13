@@ -31,15 +31,36 @@ spcvFoldsPoly <- function(x, n_folds = 5, seed_cv = 11082017){
 
 #' Perform (repeated) spatial cross-validation of random walk optimization
 #'
-#' @param x A SpatialPolygonsDataframe
+#' @param x Random walk grid search results (list) from multiple runouts
+#' @param slide_plys A SpatialPolygonsDataframe
 #' @param n_folds The number of cross-validated folds (i.e. partitions)
 #' @param repetitions Number of cross-validation repetitions
 #' @param rwslp_vec The vector of random walk slope thresholds used in the grid search
 #' @param rwexp_vec The vector or random walk exponents used in the grid search
 #' @param rwper_vec The vector or random walk persistence factors used in the grid search
+#' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A vector containing numeric labels defining each fold
 
-rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper_vec){
+rwSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
+
+  if(from_save){
+
+    x <- list()
+
+    files <- list.files(pattern = "result_rw_roc")
+
+    for(i in 1:length(files)){
+      res_nm <- paste("result_rw_roc_", i, ".Rd", sep="")
+      load(res_nm)
+      x[[i]] <- roc_result
+    }
+
+  }
+
+
+  rwslp_vec <- as.numeric(dimnames(x[[1]])[[1]])
+  rwexp_vec <- as.numeric(dimnames(x[[1]])[[2]])
+  rwper_vec <- as.numeric(dimnames(x[[1]])[[3]])
 
   rep_spcv_rw <- list()
 
@@ -68,13 +89,7 @@ rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper
 
         for(i in 1:length(polyid_train.vec)){
           obj.id <- polyid_train.vec[i]
-          res_nm <- paste("result_rw_roc_", obj.id, ".Rd", sep="")
-          load(res_nm) #res
-
-          # res is the result of different parameters tested for a single
-          # landslide
-
-          res <- roc_result
+          res <- x[[obj.id]]
           per_list[[i]] <- as.matrix(res[,,PER])
 
         }
@@ -134,9 +149,7 @@ rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper
 
         for(i in 1:length(polyid_test.vec)){
           obj.id <- polyid_test.vec[i]
-          res_nm <- paste("result_rw_roc_", obj.id, ".Rd", sep="")
-          load(res_nm) #res
-          res <- roc_result
+          res <- x[[obj.id]]
           per_list[[i]] <- as.matrix(res[,,PER])
 
         }
@@ -199,8 +212,7 @@ rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper
 
   }
 
-  rep_spcv_rw
-
+  return(rep_spcv_rw)
 
 }
 
@@ -213,6 +225,8 @@ rwSPCV <- function(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper
 #' Creates a summary of the frequency and performance (AUROC) of optimal parameter
 #'     sets across spatial cross-validation repetitions.
 #' @param x The (list) result of spcvRndWalk()
+#' @param plot.freq (Logical) if TRUE, will a create bubble plot of optimal parameter
+#'      set frequencies across grid search space
 #' @return A data frame summarizing the frequency and performance of each
 #'     optimal parameter sets
 
@@ -250,7 +264,26 @@ rwPoolSPCV<- function(x, plot.freq = FALSE){
 
   }
 
-  sets
+  if(plot.freq){
+    gg <- ggplot2::ggplot(sets, ggplot2::aes(x=per, y=exp)) +
+      # Can improve by making different colors for different slope thresholds...
+
+      ggplot2::geom_point(alpha=0.5, ggplot2::aes(col = as.factor(slp), size = rel_freq)) +
+
+      ggplot2::labs(size = "Relative\nfrequency (%)", col = "Slope threshold") +
+
+      ggplot2::scale_x_continuous(expression(paste("Persistence factor")),
+                         limits = c(min(sets$per), max = max(sets$per))) +
+      ggplot2:: scale_y_continuous(expression(paste("Exponent of divergence")),
+                         limits = c(min(sets$exp), max = max(sets$exp)+.1)) +
+      ggplot2::theme_light() +
+      ggplot2::theme(text = ggplot2::element_text(family = "Arial", size = 8), axis.title = ggplot2::element_text(size = 9),
+            axis.text = ggplot2::element_text(size = 8))
+
+    print(gg)
+  }
+
+  return(sets)
 
 }
 

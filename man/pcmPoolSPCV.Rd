@@ -4,7 +4,7 @@
 \alias{pcmPoolSPCV}
 \title{Pool PCM spatial cross-validation results}
 \usage{
-pcmPoolSPCV(x, plot.freq = FALSE)
+pcmPoolSPCV(x)
 }
 \arguments{
 \item{x}{The (list) result of pcmSPCV()}

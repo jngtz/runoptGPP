@@ -128,8 +128,8 @@ pcmGetOpt <- function(workspace = getwd(), pcm_md_vec, pcm_mu_vec, n_train,
   err_wh
   err[err_wh]
 
-  opt_md <- pcmmd.vec[err_wh[2]]
-  opt_mu <- pcmmu.vec[err_wh[1]]
+  opt_md <- pcm_md_vec[err_wh[2]]
+  opt_mu <- pcm_mu_vec[err_wh[1]]
 
   opt_gpp_par <- data.frame(
     pcm_mu = opt_mu,
@@ -144,3 +144,9 @@ pcmGetOpt <- function(workspace = getwd(), pcm_md_vec, pcm_mu_vec, n_train,
   return(opt_gpp_par)
 
 }
+
+
+
+
+
+

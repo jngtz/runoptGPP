@@ -5,7 +5,6 @@
 #'      GPP tool in SAGA-GIS. The AUROC compares a runout polygon to the simulated
 #'      path.
 #' @param dem A DEM as a RasterLayer object
-#' @param workspace The file path where to save performance results for each runout polygon
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
 #' @param source_pnts Source points as a SpatialPointsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
@@ -17,6 +16,8 @@
 #'      to crop source DEM. This helps to reduce computational time
 #' @param buffer_source Can define a buffer distance (in meters) to extend source
 #'      point to a source area
+#' @param workspace The file path where to save performance results for each runout polygon
+#' @param save_res (logical), if TRUE, will save results in workspace
 #' @param plot_eval If TRUE, will plot random walk path and runout polygon
 #' @return the area under the receiver operating characteristic
 #' @details Runout is either simulated from a single source point or a buffered
@@ -24,12 +25,13 @@
 #' @examples
 
 
-rwGridsearch <- function(dem, workspace = getwd(), slide_plys, source_pnts,
+rwGridsearch <- function(dem, slide_plys, source_pnts,
                       slide_id, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
-                      plot_eval = FALSE)
+                      workspace = getwd(), save_res = FALSE, plot_eval = FALSE)
 
 {
+
 
   revert_wd <- getwd()
   setwd(workspace)
@@ -65,41 +67,54 @@ rwGridsearch <- function(dem, workspace = getwd(), slide_plys, source_pnts,
 
       }}}
 
-  save(roc_result, file=roc_result.nm)
+
+  if(save_res){
+    save(roc_result, file=roc_result.nm)
+  }
+
+
   setwd(revert_wd)
+
+  return(roc_result)
 }
-
-
-
 
 
 #' Get random walk grid search optimal parameters
 #'
-#' @param workspace The file path where the performance results were saved
-#' @param slide_id Selects a single runout polygon from slide_plys by row
-#' @param rwslp_vec The vector of random walk slope thresholds used in the grid search
-#' @param rwexp_vec The vector or random walk exponents used in the grid search
-#' @param rwper_vec The vector or random walk persistence factors used in the grid search
-#' @param n_train Number of runout polygons processed with grid search
+#' @param x A list of rw grid search values
 #' @param measure A measure (e.g. median, mean) to find optimal parameter across grid search space
+#' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A dataframe  with the optimal parameter set and AUROC performance
 
-rwGetOpt <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper_vec, n_train,
-                                measure = median){
+rwGetOpt <- function(x, measure = median, from_save = FALSE){
 
-  revert_wd <- getwd()
-  setwd(workspace)
+  if(from_save){
+
+    x <- list()
+
+    files <- list.files(pattern = "result_rw_roc")
+
+    for(i in 1:length(files)){
+      res_nm <- paste("result_rw_roc_", i, ".Rd", sep="")
+      load(res_nm)
+      x[[i]] <- roc_result
+    }
+
+
+  }
+
+  rwslp_vec <- as.numeric(dimnames(x[[1]])[[1]])
+  rwexp_vec <- as.numeric(dimnames(x[[1]])[[2]])
+  rwper_vec <- as.numeric(dimnames(x[[1]])[[3]])
 
   roc_list <- list()
 
-  for(PER in 1:length(rwper_vec)){
+  for(PER in 1:length(per_vec)){
 
     per_list <- list()
 
-    for(i in 1:n_train){
-      res_nm <- paste("result_rw_roc_", i, ".Rd", sep="")
-      load(res_nm) #res
-      res <- roc_result
+    for(i in 1:length(x)){
+      res <- x[[i]]
       per_list[[i]] <- as.matrix(res[,,PER])
 
     }
@@ -128,7 +143,6 @@ rwGetOpt <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper_vec, n_tra
     rw_auroc = roc[ROCwh]
   )
 
-  setwd(revert_wd)
   return(opt_params)
 
 }
@@ -136,4 +150,27 @@ rwGetOpt <- function(workspace = getwd(), rwslp_vec, rwexp_vec, rwper_vec, n_tra
 
 
 
+#' Get RW runout distance grid search optimal parameters for single event
+#'
+#' @param x the results of the grid search
+#' @return A dataframe  with the optimal parameter set and performance
+
+rwGetOpt_single <- function(x){
+
+  slp_vec <- as.numeric(dimnames(x)[[1]])
+  ex_vec <- as.numeric(dimnames(x)[[2]])
+  per_vec <- as.numeric(dimnames(x)[[3]])
+
+  wh_opt <- which(x==max(x), arr.ind = TRUE)
+
+  opt_param <- data.frame(
+    rw_slp_opt = slp_vec[wh_opt][1],
+    rw_exp_opt = ex_vec[wh_opt][2],
+    rw_per_opt = per_vec[wh_opt][3],
+    rw_auroc = x[wh_opt]
+  )
+
+  return(opt_param)
+
+}
 

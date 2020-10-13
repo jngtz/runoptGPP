@@ -1,7 +1,8 @@
 setwd("/home/jason/R/runout.opt/")
 
+
+# Load Data ####################################################################
 setwd("/home/jason/Data/Chile/")
-# elevation model
 dem <- raster::raster("dem_alos_12_5m _no sinks.tif")
 
 # slide start/source points
@@ -15,22 +16,21 @@ raster::crs(slide_point_vec) <- raster::crs(slide_poly_vec)
 
 saga <- Rsagacmd::saga_gis(opt_lib = "sim_geomorphology")
 
-#saga <- saga_gis(saga_bin = "D:/Software/saga-6.4.0_x64/saga_cmd.exe", temp_path = 'D:/Temp/SAGAtmp', opt_lib = "sim_geomorphology")
 
-libary(runout.opt)
+
+# Example of GPP random walk simulation using R ################################
+
+library(runout.opt)
 
 rwPerformance(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                    slide_id = 2, slp = 33, ex = 3, per = 2,
                    gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
                    plot_eval = TRUE)
 
-
 steps <- 3
 rwexp_vec <- seq(1.3, 3, len=steps)
 rwper_vec <- seq(1.5, 2, len=steps)
 rwslp_vec <- seq(20, 40, len=steps)
-
-workspace_dir <- "/home/jason/Scratch/F_Testing"
 
 rw_gridsearch <- rwGridsearch(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                slide_id = 2, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
@@ -42,35 +42,17 @@ rw_gridsearch
 
 rwGetOpt_single(rw_gridsearch)
 
-# RUN OPTIMIZATION #############################################################
 
-# Define which runout polygons to run grid search for
+# Run RW optimization for multiple runout tracks  ##############################
 
-polyid_vec <- 1:length(slide_poly_vec)
-polyid_vec <- 1:4
-
-# Save RW GridSearch Settings
-
-setwd(workspace_dir)
-
-rw_settings <- list(
-  n_train = length(polyid_vec),
-  vec_rwexp = rwexp_vec,
-  vec_rwper = rwper_vec,
-  vec_rwslp = rwslp_vec
-)
-
-save(rw_settings, file = "gridsearch_rw_settings.Rd")
-
-
-# Run in parellel
+# Use parallel processing for faster computations
 
 library(foreach)
 cl <- parallel::makeCluster(4)
 doParallel::registerDoParallel(cl)
 
 Sys.time()
-results.list <-
+rw_grisearch_multi <-
   foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
 
     .GlobalEnv$saga <- saga
@@ -86,20 +68,35 @@ parallel::stopCluster(cl)
 Sys.time()
 
 
-# GET RW OPTIMAL VALUES #############################################################
+# Get optimal random walk parameter set ########################################
 
-(load("gridsearch_rw_settings.Rd"))
+# from object
+rwGetOpt(rw_gridsearch_multi, measure = median)
 
-rwGetOpt(workspace = getwd(),
-                    rwslp_vec = rw_settings$vec_rwslp,
-                    rwexp_vec = rw_settings$vec_rwexp,
-                    rwper_vec = rw_settings$vec_rwper,
-                    n_train = rw_settings$n_train,
-                    measure = median)
+# from saved files
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+rwGetOpt(measure = median, from_save = TRUE)
 
 
-# SPCV RW ###########################################################################
 
+# Validate transferability using spatial cross validation ######################
+
+
+rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = slide_poly_vec[1:4,],
+       n_folds = 3, repetitions = 10)
+
+
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+
+rw_spcv <- rwSPCV(slide_plys = slide_poly_vec,
+            n_folds = 5,
+            repetitions = 10,
+            from_save = TRUE)
+
+freq_rw <- rwPoolSPCV(rw_spcv, plot.freq = TRUE)
+
+
+# Visualize freq of SPCV optimal parameter sets ################################
 setwd("/home/jason/Scratch/GPP_RW_Paper")
 # Load saga gpp random walk settings
 load("gridsearch_rw_settings.Rd")
@@ -108,38 +105,25 @@ rwexp_vec <- rw_settings$vec_rwexp
 rwper_vec <- rw_settings$vec_rwper
 rwslp_vec <- rw_settings$vec_rwslp
 
-#polyid.vec <- 1:rw_settings$n_train
 
-rw_spcv <- rwSPCV(slide_plys = slide_poly_vec,
-            n_folds = 3,
-            repetitions = 5,
-            rwslp_vec = rw_settings$vec_rwslp,
-            rwexp_vec = rw_settings$vec_rwexp,
-            rwper_vec = rw_settings$vec_rwper)
-
-freq_rw <- rwPoolSPCV(rw_spcv)
-
-
-# VISUALIZE RW SPCV OPT PARAM SET FREQ #######################
+library(ggplot2)
 
 #Pick a slope threshold (slice) of grid search space
 slope_thresh <- 40
 freq_rw <- freq_rw[order(freq_rw$rel_freq, decreasing = TRUE),]
 
-require(ggplot2)
-breaks_bubble <- c(round(min(freq_rw$rel_freq)),
-                   round(median(freq_rw$rel_freq)),
-                   round(max(freq_rw$rel_freq)))
+library(ggplot2)
+breaks_bubble <- c(10, 30, 60)
 
-gg_freqRW <- freqRW[freq_rw$slp == slope_thresh,]
+gg_freq_rw <- freq_rw[freq_rw$slp == slope_thresh,]
 
-ggplot(freq_rw, aes(x=per, y=exp)) +
+ggplot(gg_freq_rw, aes(x=per, y=exp)) +
   ggtitle(paste("Slope threshold:", slope_thresh ))+
   # Can improve by making different colors for different slope thresholds...
 
   geom_point(alpha=0.7, aes(colour = median_auroc, size = rel_freq)) +
-  scale_size(range = c(2, 10), name="Relative\nfrequency (%)",
-             breaks = breaks_bubble) +
+  scale_size(name="Relative\nfrequency (%)",
+            breaks = breaks_bubble) +
   scale_colour_gradient(low = "#1B4F72", high = "#85C1E9",
                         name = "Median AUROC") +
   scale_x_continuous(expression(paste("Persistence factor")),
@@ -152,7 +136,11 @@ ggplot(freq_rw, aes(x=per, y=exp)) +
 
 
 # PCM MODEL OPTIMIZATION #######################
+# Adapt pcm results similar to RW to work with object or saved files
+
+
 workspace_dir <- "/home/jason/Scratch/F_Testing"
+setwd(workspace_dir)
 
 result <- pcmPerformance(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
                slide_id = 8, rw_slp = 33, rw_ex = 3, rw_per = 2,
@@ -202,6 +190,10 @@ setwd("/home/jason/Scratch/GPP_PCM_Paper")
 polyid.vec <- 1:pcm_settings$n_train
 pcmmu.vec <- pcm_settings$vec_pcmmu
 pcmmd.vec <- pcm_settings$vec_pcmmd
+
+pcm_spcv <- pcmSPCV(slide_plys = slide_poly_vec[1:10,],
+                    n_folds = 3, repetitions = 10, pcm_mu_v = pcmmu.vec,
+                    pcm_md_v = pcmmd.vec)
 
 (load("repeated_spcv_PCM.Rd"))
 

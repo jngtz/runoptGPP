@@ -83,7 +83,7 @@ rwPerformance <- function(dem, slide_plys, source_pnts,
   if(plot_eval){
     raster::plot(rescale_process_area,
          main = paste("id", slide_id,
-                      "roc", round(roc, digits=3), "\n",
+                      "auroc", round(roc, digits=3), "\n",
                       "Ex", ex, "Pr", per, "Slp", slp),
          cex.main = 0.7, cex.axis = 0.7, cex=0.7)
     sp::plot(slide_poly_single, add=TRUE)

@@ -34,7 +34,7 @@ pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
         obj.id <- polyid_train.vec[i]
         res_nm <- paste("result_pcm_gridsearch_", obj.id, ".Rd", sep="")
         load(res_nm) #res
-        res <- result_pcm_gridsearch[['relerr']]
+        res <- result_pcm[['relerr']]
         train_relerr_list[[i]] <- res
         # calc median for these using apply
 
@@ -63,7 +63,7 @@ pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
         obj.id <- polyid_test.vec[i]
         res_nm <- paste("result_pcm_gridsearch_", obj.id, ".Rd", sep="")
         load(res_nm) #res
-        res <- result_pcm_gridsearch[['relerr']]
+        res <- result_pcm[['relerr']]
         test_relerr_list[[i]] <- res
         # calc median for these using apply
 
