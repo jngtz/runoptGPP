@@ -99,10 +99,11 @@ pcmGridsearch <- function(dem,
 #' @param performace Performance measure "relerr" relative error
 #' @param measure A measure (e.g. "median", "mean") to find optimal parameter across grid search space
 #' @param from_save (logical) if TRUE, will load save files form current working directory
+#' @param plot_opt (logical) if TRUE, will plot performance across grid search space
 #' @return A dataframe  with the optimal parameter set and performance
 
 pcmGetOpt <- function(x, performance = "relerr", measure = "median",
-                      from_save = FALSE){
+                      from_save = FALSE, plot_opt = FALSE){
 
   if(from_save){
     x <- list()
@@ -154,12 +155,80 @@ pcmGetOpt <- function(x, performance = "relerr", measure = "median",
   opt_gpp_par[paste0(measure, "_", performance)] <- err[err_wh[1], err_wh[2]]
   opt_gpp_par[paste0(measure, "_", "auroc")] <- roc[err_wh[1], err_wh[2]]
 
+  if(plot_opt){
+
+    err_df <- reshape2::melt(err)
+
+    gg <- ggplot2::ggplot(data = err_df, ggplot2::aes(x=Var2, y=Var1, z=value)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = value)) +
+
+      ggplot2::ylab(expression(paste("Sliding friction coefficient"))) +
+      ggplot2::xlab("Mass-to-drag ratio (m)") +
+
+      ggplot2::labs(fill="Median relative\nrunout distance\nerror") +
+
+      ggplot2::scale_fill_viridis_c(direction = 1) +
+      ggplot2::theme_light() +
+      ggplot2::theme(text = ggplot2::element_text(family = "Arial", size = 8),
+                     axis.title = ggplot2::element_text(size = 9),
+                     axis.text = ggplot2::element_text(size = 8))
+
+   print(gg)
+  }
+
   return(opt_gpp_par)
 
 }
 
 
 
+#' Get PCM runout distance grid search values
+#'
+#' @param x A list of PCM grid search values
+#' @param slide_id Selects a single runout polygon from slide_plys by row
+#' @param pcm_mu_vec The vector of random walk slope thresholds used in the grid search
+#' @param pcm_mu_vec The vector or random walk exponents used in the grid search
+#' @param n_train Number of runout polygons processed with grid search
+#' @param performace Performance measure "relerr" relative error
+#' @param measure A measure (e.g. "median", "mean") to find optimal parameter across grid search space
+#' @param from_save (logical) if TRUE, will load save files form current working directory
+#' @param plot_opt (logical) if TRUE, will plot performance across grid search space
+#' @return A matrix of grid search space with summary values
+
+pcmGetGrid <- function(x, performance = "relerr", measure = "median",
+                      from_save = FALSE){
+
+  if(from_save){
+    x <- list()
+
+    files <- list.files(pattern = "result_pcm_gridsearch_")
+
+    for(i in 1:length(files)){
+      res_nm <- paste("result_pcm_gridsearch_", i, ".Rd", sep="")
+      load(res_nm)
+      x[[i]] <- result_pcm
+    }
+
+  }
+
+  pcm_md_vec <- as.numeric(colnames(x[[1]][[1]]))
+  pcm_mu_vec <- as.numeric(rownames(x[[1]][[1]]))
+
+  n_train <- length(x)
+
+  err_list <- list()
+  roc_list <- list()
+
+  for(i in 1:n_train){
+
+    err_list[[i]] <- x[[i]][[performance]]
+
+  }
+
+  err <- apply(simplify2array(err_list), 1:2, get(measure))
+
+  err
+}
 
 
 

@@ -209,6 +209,9 @@ rwSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 
   }
 
+  rep_spcv_rw$settings <- list(rwslp_vec = rwslp_vec, rwexp_vec = rwexp_vec, rwper_vec = rwper_vec)
+
+
   return(rep_spcv_rw)
 
 }
@@ -230,7 +233,11 @@ rwSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 
 rwPoolSPCV<- function(x, plot_freq = FALSE){
 
-  pool_rw <- do.call(rbind, x)
+  pool_rw <- do.call(rbind, x[1:(length(x) - 1)])
+
+  rwslp_vec <- x$settings$rwslp_vec
+  rwexp_vec <- x$settings$rwexp_vec
+  rwper_vec <- x$settings$rwper_vec
 
   # summarize by frequency and median score for optimal parameter sets
   opt_sets <- data.frame(slp = pool_rw$rw_slp_opt, per = pool_rw$rw_per_opt, exp = pool_rw$rw_exp_opt)
@@ -270,9 +277,9 @@ rwPoolSPCV<- function(x, plot_freq = FALSE){
       ggplot2::labs(size = "Relative\nfrequency (%)", col = "Slope threshold") +
 
       ggplot2::scale_x_continuous(expression(paste("Persistence factor")),
-                         limits = c(min(sets$per), max = max(sets$per))) +
+                         limits = c(min(rwper_vec), max = max(rwper_vec))) +
       ggplot2:: scale_y_continuous(expression(paste("Exponent of divergence")),
-                         limits = c(min(sets$exp), max = max(sets$exp)+.1)) +
+                         limits = c(min(rwexp_vec), max = max(rwexp_vec)+.1)) +
       ggplot2::theme_light() +
       ggplot2::theme(text = ggplot2::element_text(family = "Arial", size = 8), axis.title = ggplot2::element_text(size = 9),
             axis.text = ggplot2::element_text(size = 8))

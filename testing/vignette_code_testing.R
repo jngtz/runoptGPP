@@ -187,30 +187,30 @@ parallel::stopCluster(cl)
 
 # GET PCM OPTIMAL PARAMETERS #######################################
 
-pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median")
+pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE)
+
+library(ggplot2)
+library(metR)
+library(reshape2)
+
+pcm_grid <- pcmGetGrid(pcm_gridsearch_multi, performance = "auroc", measure = "IQR")
+pcm_grid_df <- melt(pcm_grid)
+
+ggplot(data = pcm_grid_df, aes(x=Var2, y=Var1, z=value)) +
+  geom_tile(aes(fill = value)) +
+  ylab(expression(paste("Sliding friction coefficient"))) +
+  xlab("Mass-to-drag ratio (m)") +
+  labs(fill="Median relative\nrunout distance\nerror") +
+  scale_fill_viridis_c(direction = 1) +
+  theme_light() +
+  theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),legend.position = "right")
+
+
+# PCM spatial cross validation #######################################
 
 pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = runout_polygons,
                     n_folds = 3, repetitions = 100, from_save = FALSE)
 
 freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
-
-# Test pooling
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
-
-(load("gridsearch_pcm_settings.Rd"))
-
-polyid.vec <- 1:pcm_settings$n_train
-pcmmu.vec <- pcm_settings$vec_pcmmu
-pcmmd.vec <- pcm_settings$vec_pcmmd
-
-
-
-pcm_spcv <- pcmSPCV(slide_plys = runout_polygons[1:100,],
-                    n_folds = 3, repetitions = 10, pcm_mu_v = pcmmu.vec,
-                    pcm_md_v = pcmmd.vec)
-
-(load("repeated_spcv_PCM.Rd"))
-
-freq_pcm <- pcmPoolSPCV(pcm_spcv)
-
 
