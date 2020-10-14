@@ -32,7 +32,7 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #'      and PCM model components of the GPP tool in SAGA-GIS.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param slide_src Source points as a SpatialPointsDataFrame
+#' @param slide_src Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
 #' @param rw_slp Random walk slope threshold - below lasteral spreading is modelled
 #' @param rw_ex Random walk exponent controlling lateral spread
@@ -154,6 +154,7 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
                       "Ex", rw_ex, "Pr", rw_per, "Mu", pcm_mu, "Md", pcm_md),
          cex.main = 0.7, cex.axis = 0.7, cex=0.7)
     sp::plot(slide_poly_single, add=TRUE)
+    sp::plot(source_plot, add = TRUE)
   }
 
 

@@ -35,9 +35,6 @@ spcvFoldsPoly <- function(x, n_folds = 5, seed_cv = 11082017){
 #' @param slide_plys A SpatialPolygonsDataframe
 #' @param n_folds The number of cross-validated folds (i.e. partitions)
 #' @param repetitions Number of cross-validation repetitions
-#' @param rwslp_vec The vector of random walk slope thresholds used in the grid search
-#' @param rwexp_vec The vector or random walk exponents used in the grid search
-#' @param rwper_vec The vector or random walk persistence factors used in the grid search
 #' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A vector containing numeric labels defining each fold
 
@@ -225,13 +222,13 @@ rwSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 #' Creates a summary of the frequency and performance (AUROC) of optimal parameter
 #'     sets across spatial cross-validation repetitions.
 #' @param x The (list) result of spcvRndWalk()
-#' @param plot.freq (Logical) if TRUE, will a create bubble plot of optimal parameter
+#' @param plot_freq (Logical) if TRUE, will a create bubble plot of optimal parameter
 #'      set frequencies across grid search space
 #' @return A data frame summarizing the frequency and performance of each
 #'     optimal parameter sets
 
 
-rwPoolSPCV<- function(x, plot.freq = FALSE){
+rwPoolSPCV<- function(x, plot_freq = FALSE){
 
   pool_rw <- do.call(rbind, x)
 
@@ -264,7 +261,7 @@ rwPoolSPCV<- function(x, plot.freq = FALSE){
 
   }
 
-  if(plot.freq){
+  if(plot_freq){
     gg <- ggplot2::ggplot(sets, ggplot2::aes(x=per, y=exp)) +
       # Can improve by making different colors for different slope thresholds...
 

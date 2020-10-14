@@ -1,3 +1,6 @@
+
+# Merge PCM relerr and auroc into one object ################
+
 setwd("/home/jason/Scratch/GPP_PCM_Paper")
 # Load saga gpp random walk settings
 load("gridsearch_pcm_settings.Rd")
@@ -19,6 +22,48 @@ for(i in 1:n_train){
   )
 
   save(result_pcm, file = paste("result_pcm_gridsearch_", i, ".Rd", sep=""))
+}
+
+# Create a list of all PCM results ###########
+
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+# Load saga gpp random walk settings
+load("gridsearch_pcm_settings.Rd")
+
+n_train <- 100
+
+pcm_gridsearch_multi <- list()
+
+for(i in 1:n_train){
+  roc_res_nm <- paste("result_roc_", i, ".Rd", sep="")
+  load(roc_res_nm) #res
+  roc_res <- roc_result
+
+  relerr_res_nm <- paste("result_relerr_length_", i, ".Rd", sep="")
+  (load(relerr_res_nm)) #res
+  relerr_res <- relerr_length_result
+
+  result_pcm <- list(
+    auroc = roc_result,
+    relerr = relerr_res
+  )
+
+  pcm_gridsearch_multi[[i]] <- result_pcm
+}
+
+
+# Create a list of all RW results ############
+
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+
+n_train <- 100
+
+rw_gridsearch_multi <- list()
+
+for(i in 1:n_train){
+  roc_res_nm <- paste("result_rw_roc_", i, ".Rd", sep="")
+  load(roc_res_nm) #res
+  rw_gridsearch_multi[[i]] <- roc_result
 }
 
 # Create source area as polygon ##############

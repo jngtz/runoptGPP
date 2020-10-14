@@ -5,11 +5,27 @@
 #' @param x A SpatialPolygonsDataframe
 #' @param n_folds The number of cross-validated folds (i.e. partitions)
 #' @param repetitions Number of cross-validation repetitions
-#' @param pcm_mu_v A vector of PCM model sliding friction coefficients
-#' @param pcm_md_v A vector of PCM model mass-to-drag ratios (m)
+#' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A vector containing numeric labels defining each fold
 
-pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
+pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
+
+
+  if(from_save){
+    x <- list()
+
+    files <- list.files(pattern = "result_pcm_gridsearch_")
+
+    for(i in 1:length(files)){
+      res_nm <- paste("result_pcm_gridsearch_", i, ".Rd", sep="")
+      load(res_nm)
+      x[[i]] <- result_pcm
+    }
+
+  }
+
+  pcm_md_vec <- as.numeric(colnames(x[[1]][[1]]))
+  pcm_mu_vec <- as.numeric(rownames(x[[1]][[1]]))
 
   rep_spcv_pcm <- list()
 
@@ -32,12 +48,8 @@ pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
 
       for(i in 1:length(polyid_train.vec)){
         obj.id <- polyid_train.vec[i]
-        res_nm <- paste("result_pcm_gridsearch_", obj.id, ".Rd", sep="")
-        load(res_nm) #res
-        res <- result_pcm[['relerr']]
+        res <- x[[obj.id]][['relerr']]
         train_relerr_list[[i]] <- res
-        # calc median for these using apply
-
       }
 
 
@@ -53,17 +65,15 @@ pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
         rel_err_wh <- rel_err_wh[1,]
       }
 
-      opt_md <- pcm_md_v[rel_err_wh[2]]
-      opt_mu <- pcm_mu_v[rel_err_wh[1]]
+      opt_md <- pcm_md_vec[rel_err_wh[2]]
+      opt_mu <- pcm_mu_vec[rel_err_wh[1]]
 
       # Test
       test_relerr_list <- list()
 
       for(i in 1:length(polyid_test.vec)){
         obj.id <- polyid_test.vec[i]
-        res_nm <- paste("result_pcm_gridsearch_", obj.id, ".Rd", sep="")
-        load(res_nm) #res
-        res <- result_pcm[['relerr']]
+        res <- x[[obj.id]][['relerr']]
         test_relerr_list[[i]] <- res
         # calc median for these using apply
 
@@ -95,7 +105,10 @@ pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
 
   }
 
+  rep_spcv_pcm$settings <- list(pcm_md_vec = pcm_md_vec, pcm_mu_vec = pcm_mu_vec)
+
   rep_spcv_pcm
+
 
 }
 
@@ -108,13 +121,18 @@ pcmSPCV <- function(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v){
 #' Creates a summary of the frequency and performance (relative error) of optimal parameter
 #'     sets across spatial cross-validation repetitions.
 #' @param x The (list) result of pcmSPCV()
+#' @param plot_freq (Logical) if TRUE, will a create bubble plot of optimal parameter
+#'      set frequencies across grid search space
 #' @return A data frame summarizing the frequency and performance of each
 #'     optimal parameter sets
 
 
-pcmPoolSPCV<- function(x){
+pcmPoolSPCV<- function(x, plot_freq = FALSE){
 
-  pool_pcm <- do.call(rbind, x)
+  pool_pcm <- do.call(rbind, x[1:(length(x) - 1)])
+
+  pcm_md_vec <- x$settings$pcm_md_vec
+  pcm_mu_vec <- x$settings$pcm_mu_vec
 
   # summarize by frequency and median score for optimal parameter sets
   opt_sets <- data.frame(mu = pool_pcm$pcm_mu, md = pool_pcm$pcm_md)
@@ -141,6 +159,27 @@ pcmPoolSPCV<- function(x){
     sets$rel_err[i] <- median(relerr_i)
     sets$iqr_relerr[i] <- IQR(relerr_i, na.rm = TRUE)
 
+  }
+
+  if(plot_freq){
+    gg <-  ggplot2::ggplot(sets, ggplot2::aes(x=md, y=mu)) +
+      ggplot2::geom_point(alpha=0.7, ggplot2::aes(colour = rel_err, size = rel_freq)) +
+
+      ggplot2::scale_colour_gradient(high = "#1B4F72", low = "#85C1E9",
+                            name = "Median relative\nerror") +
+
+      ggplot2::labs(size = "Relative\nfrequency (%)") +
+
+      ggplot2::scale_x_continuous(expression(paste("Mass-to-drag ratio (m)")),
+                         limits = c(min(pcm_md_vec), max = max(pcm_md_vec))) +
+      ggplot2::scale_y_continuous(expression(paste("Sliding friction coefficient")),
+                         limits = c(min(pcm_mu_vec), max = max(pcm_mu_vec))) +
+      ggplot2::theme_light() +
+      ggplot2::theme(text = ggplot2::element_text(family = "Arial", size = 8),
+                     axis.title = ggplot2::element_text(size = 9),
+                     axis.text = ggplot2::element_text(size = 8))
+
+    print(gg)
   }
 
   return(sets)

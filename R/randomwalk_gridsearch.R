@@ -6,9 +6,9 @@
 #'      path.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param slide_src Source points as a SpatialPointsDataFrame
+#' @param slide_src Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
-#' @param slp_v A vector of random walk slope thresholds - below lasteral spreading is modelled
+#' @param slp_v A vector of random walk slope thresholds - below lateral spreading is modeled
 #' @param ex_v A vector or random walk exponents controlling lateral spread
 #' @param per_v A vector or random walk persistence factors to weight flow direction consistency
 #' @param gpp_iter Number of random walk model iterations
@@ -16,8 +16,7 @@
 #'      to crop source DEM. This helps to reduce computational time
 #' @param buffer_source Can define a buffer distance (in meters) to extend source
 #'      point to a source area
-#' @param workspace The file path where to save performance results for each runout polygon
-#' @param save_res (logical), if TRUE, will save results in workspace
+#' @param save_res (logical), if TRUE, will save results in current working directory
 #' @param plot_eval If TRUE, will plot random walk path and runout polygon
 #' @return the area under the receiver operating characteristic
 #' @details Runout is either simulated from a single source point or a buffered
@@ -28,13 +27,10 @@
 rwGridsearch <- function(dem, slide_plys, slide_src,
                       slide_id, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
-                      workspace = getwd(), save_res = FALSE, plot_eval = FALSE)
+                      save_res = FALSE, plot_eval = FALSE)
 
 {
 
-
-  revert_wd <- getwd()
-  setwd(workspace)
 
   roc_result.nm <- paste("result_rw_roc_", slide_id, ".Rd", sep="")
 
@@ -72,9 +68,6 @@ rwGridsearch <- function(dem, slide_plys, slide_src,
     save(roc_result, file=roc_result.nm)
   }
 
-
-  setwd(revert_wd)
-
   return(roc_result)
 }
 
@@ -109,7 +102,7 @@ rwGetOpt <- function(x, measure = median, from_save = FALSE){
 
   roc_list <- list()
 
-  for(PER in 1:length(per_vec)){
+  for(PER in 1:length(rwper_vec)){
 
     per_list <- list()
 
