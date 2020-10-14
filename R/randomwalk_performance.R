@@ -7,7 +7,7 @@
 #'      path.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param source_pnts Source points as a SpatialPointsDataFrame
+#' @param slide_src Source points as a SpatialPointsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
 #' @param slp Random walk slope threshold - below lasteral spreading is modelled
 #' @param ex Random walk exponent controlling lateral spread
@@ -27,11 +27,16 @@
 #' saga <- Rsagacmd::saga_gis()
 #'
 
-rwPerformance <- function(dem, slide_plys, source_pnts,
+rwPerformance <- function(dem, slide_plys, slide_src,
                           slide_id = 2, slp = 33, ex = 3, per = 2,
                           gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                           plot_eval = FALSE)
 {
+
+  # If single runout polygon as input, assign slide_id value of 1
+  if(length(slide_plys) == 1){
+    slide_id <- 1
+  }
 
   # Subset a single slide polygon
   slide_poly_single <- slide_plys[slide_id,]
@@ -39,25 +44,39 @@ rwPerformance <- function(dem, slide_plys, source_pnts,
   # Crop dem to slide polygon
   dem_grid <- raster::crop(dem, raster::extent(slide_poly_single) + buffer_ext)
 
-  # Subset corresponding source/start point of runout
-  sel_over_start_point  <- sp::over(source_pnts, slide_poly_single)
-  sel_start_point <- source_pnts[!is.na(sel_over_start_point$objectid),]
 
-  if(!is.null(buffer_source)){
-    # Create a buffer around source point to create a source/release area
-    source_buffer <- rgeos::gBuffer(sel_start_point, width = buffer_source)
-    source_grid <- raster::rasterize(source_buffer, dem_grid, field=1 )
-    source_grid <- raster::mask(source_grid, slide_poly_single )
-  } else {
-    # Just use source point
-    source_grid <- raster::rasterize(matrix(sp::coordinates(sel_start_point)[1:2], ncol = 2), dem_grid, field = 1)
+  if(class(slide_src) == "SpatialPointsDataFrame"){
+    # Subset corresponding source/start point of runout
+    sel_over_start_point  <- sp::over(slide_src, slide_poly_single)
+    sel_start_point <- slide_src[!is.na(sel_over_start_point$objectid),]
+
+    if(!is.null(buffer_source)){
+      # Create a buffer around source point to create a source/release area
+      source_buffer <- rgeos::gBuffer(sel_start_point, width = buffer_source)
+      source_plot <- source_buffer
+      source_grid <- raster::rasterize(source_buffer, dem_grid, field=1 )
+      source_grid <- raster::mask(source_grid, slide_poly_single )
+    } else {
+      # Just use source point
+      source_plot <- sel_start_point
+      source_grid <- raster::rasterize(matrix(sp::coordinates(sel_start_point)[1:2], ncol = 2), dem_grid, field = 1)
+    }
   }
+
+  if(class(slide_src) == "SpatialPolygonsDataFrame" ){
+    sel_over_start_poly <- sp::over(slide_src, slide_poly_single)
+    sel_start_poly <- slide_src[!is.na(sel_over_start_poly$objectid),]
+    source_plot <- sel_start_poly
+    source_grid <- raster::rasterize(sel_start_poly, dem_grid, field=1 )
+
+  }
+
+
 
 
 
   # Run runout model using Rsagacmd (faster than RSAGA)
   gpp <- saga$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
-                                                                 #friction_mu_grid = mu.grid,
                                                                  process_path_model = 1,
                                                                  rw_slope_thres = slp,
                                                                  rw_exponent = ex,
@@ -87,6 +106,7 @@ rwPerformance <- function(dem, slide_plys, source_pnts,
                       "Ex", ex, "Pr", per, "Slp", slp),
          cex.main = 0.7, cex.axis = 0.7, cex=0.7)
     sp::plot(slide_poly_single, add=TRUE)
+    sp::plot(source_plot, add=TRUE)
   }
 
   return(roc)

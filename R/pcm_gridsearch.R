@@ -6,7 +6,7 @@
 #' @param dem A DEM as a RasterLayer object
 #' @param workspace The file path where to save performance results for each runout polygon
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param source_pnts Source points as a SpatialPointsDataFrame
+#' @param slide_src Source points as a SpatialPointsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
 #' @param rw_slp Random walk slope threshold - below lasteral spreading is modelled
 #' @param rw_ex Random walk exponent controlling lateral spread
@@ -27,7 +27,7 @@
 #'      area round the source point.
 
 pcmGridsearch <- function(dem, workspace = getwd(),
-                       slide_plys, source_pnts, slide_id,
+                       slide_plys, slide_src, slide_id,
                        rw_slp, rw_ex, rw_per,
                        pcm_mu_v, pcm_md_v,
                        gpp_iter = 1000,
@@ -54,7 +54,7 @@ pcmGridsearch <- function(dem, workspace = getwd(),
 
       result <- pcmPerformance(dem = dem,
                                  slide_plys = slide_plys,
-                                 source_pnts = source_pnts,
+                                 slide_src = slide_src,
                                  slide_id = slide_id,
                                  rw_slp = rw_slp,
                                  rw_ex = rw_ex,

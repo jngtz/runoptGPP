@@ -21,6 +21,34 @@ for(i in 1:n_train){
   save(result_pcm, file = paste("result_pcm_gridsearch_", i, ".Rd", sep=""))
 }
 
+# Create source area as polygon ##############
+source_list <- list()
+
+for(i in 1:10){
+  slide_poly_single <- runout_polygons[i,]
+
+  # Crop dem to slide polygon
+  dem_grid <- raster::crop(dem, raster::extent(slide_poly_single) + 500)
+
+  # Subset corresponding source/start point of runout
+  sel_over_start_point  <- sp::over(source_points, slide_poly_single)
+  sel_start_point <- source_points[!is.na(sel_over_start_point$objectid),]
+
+
+  # Create a buffer around source point to create a source/release area
+  source_buffer <- rgeos::gBuffer(sel_start_point, width = 20)
+  # Clip polygon using border of intersecting runout polygon
+  source_list[[i]]<- raster::intersect(source_buffer, slide_poly_single)
+}
+
+source_areas <- do.call(raster::bind, source_list)
+
+
+
+
+source_grid <- raster::rasterize(source_buffer, dem_grid, field=1 )
+source_grid <- raster::mask(source_grid, slide_poly_single )
+
 
 
 # For visualize rw freq testing ##########

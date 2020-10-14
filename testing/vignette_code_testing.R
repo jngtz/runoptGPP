@@ -6,25 +6,25 @@ setwd("/home/jason/Data/Chile/")
 dem <- raster::raster("dem_alos_12_5m _no sinks.tif")
 
 # slide start/source points
-slide_point_vec <- rgdal::readOGR(".", "dflow_points_v1_reposition")
+source_points <- rgdal::readOGR(".", "dflow_points_v1_reposition")
 
 # actual/mapped debris flow polygons
-slide_poly_vec <- rgdal::readOGR(".", "dflow_polygons_v1_reposition_sample_100")
-slide_poly_vec$objectid <- 1:100
+runout_polygons<- rgdal::readOGR(".", "dflow_polygons_v1_reposition_sample_100")
+runout_polygons$objectid <- 1:100
 
-raster::crs(slide_point_vec) <- raster::crs(slide_poly_vec)
+raster::crs(source_points) <- raster::crs(runout_polygons)
 
+# initalize SAGA GIS geoprocessing
 saga <- Rsagacmd::saga_gis(opt_lib = "sim_geomorphology")
-
 
 
 # Example of GPP random walk simulation using R ################################
 
 library(runout.opt)
 
-rwPerformance(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
-                   slide_id = 2, slp = 33, ex = 3, per = 2,
-                   gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
+rwPerformance(dem, slide_plys = runout_polygons, source_pnts = source_points,
+                   slide_id = 10, slp = 33, ex = 3, per = 2,
+                   gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                    plot_eval = TRUE)
 
 steps <- 3
@@ -32,7 +32,7 @@ rwexp_vec <- seq(1.3, 3, len=steps)
 rwper_vec <- seq(1.5, 2, len=steps)
 rwslp_vec <- seq(20, 40, len=steps)
 
-rw_gridsearch <- rwGridsearch(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+rw_gridsearch <- rwGridsearch(dem, slide_plys = runout_polygons, source_pnts = source_points,
                slide_id = 2, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
                gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
                save_res = FALSE, plot_eval = TRUE)
@@ -57,7 +57,7 @@ rw_grisearch_multi <-
 
     .GlobalEnv$saga <- saga
 
-    rwGridsearch(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+    rwGridsearch(dem, slide_plys = runout_polygons, source_pnts = source_points,
                    slide_id = poly_id, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
                    gpp_iter = 1000, buffer_ext = 500, buffer_source = 50, save_res = FALSE,
                    plot_eval = FALSE)
@@ -82,13 +82,13 @@ rwGetOpt(measure = median, from_save = TRUE)
 # Validate transferability using spatial cross validation ######################
 
 
-rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = slide_poly_vec[1:4,],
+rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = runout_polygons[1:4,],
        n_folds = 3, repetitions = 10)
 
 
 setwd("/home/jason/Scratch/GPP_RW_Paper")
 
-rw_spcv <- rwSPCV(slide_plys = slide_poly_vec,
+rw_spcv <- rwSPCV(slide_plys = runout_polygons,
             n_folds = 5,
             repetitions = 10,
             from_save = TRUE)
@@ -142,7 +142,7 @@ ggplot(gg_freq_rw, aes(x=per, y=exp)) +
 workspace_dir <- "/home/jason/Scratch/F_Testing"
 setwd(workspace_dir)
 
-result <- pcmPerformance(dem, slide_plys = slide_poly_vec, source_pnts = slide_point_vec,
+result <- pcmPerformance(dem, slide_plys = runout_polygons, source_pnts = source_points,
                slide_id = 8, rw_slp = 33, rw_ex = 3, rw_per = 2,
                pcm_mu = 0.11, pcm_md = 20,
                gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
@@ -152,7 +152,7 @@ pcmmd_vec <- seq(50, 150, by=50)
 pcmmu_vec <- seq(0.04, 0.6, by=0.25)
 
 pcm_result <- pcmGridsearch(dem, workspace = workspace_dir,
-                       slide_plys = slide_poly_vec, source_pnts = slide_point_vec, slide_id = 5,
+                       slide_plys = runout_polygons, source_pnts = source_points, slide_id = 5,
                        rw_slp = 40, rw_ex = 1.8, rw_per = 2,
                        pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
                        gpp_iter = 1000,
@@ -162,7 +162,7 @@ pcm_result <- pcmGridsearch(dem, workspace = workspace_dir,
 
 for(i in 1:10){
   pcmGridsearch(dem, workspace = workspace_dir,
-             slide_plys = slide_poly_vec, source_pnts = slide_point_vec, slide_id = i,
+             slide_plys = runout_polygons, source_pnts = source_points, slide_id = i,
              rw_slp = 40, rw_ex = 1.8, rw_per = 2,
              pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
              gpp_iter = 1000,
@@ -178,7 +178,7 @@ setwd(workspace_dir)
 pcmGetOpt(pcm_md_vec = pcmmd_vec, pcm_mu_vec = pcmmu_vec, n_train = 10,
           performance = "relerr", measure = "median")
 
-pcm_spcv <- pcmSPCV(slide_plys = slide_poly_vec[1:10,],
+pcm_spcv <- pcmSPCV(slide_plys = runout_polygons[1:10,],
                     n_folds = 3, repetitions = 100, pcm_mu_v = pcmmu.vec,
                     pcm_md_v = pcmmd.vec)
 
@@ -191,12 +191,14 @@ polyid.vec <- 1:pcm_settings$n_train
 pcmmu.vec <- pcm_settings$vec_pcmmu
 pcmmd.vec <- pcm_settings$vec_pcmmd
 
-pcm_spcv <- pcmSPCV(slide_plys = slide_poly_vec[1:10,],
+
+
+pcm_spcv <- pcmSPCV(slide_plys = runout_polygons[1:100,],
                     n_folds = 3, repetitions = 10, pcm_mu_v = pcmmu.vec,
                     pcm_md_v = pcmmd.vec)
 
 (load("repeated_spcv_PCM.Rd"))
 
-freq_pcm <- pcmPoolSPCV(rep_spcv_pcm)
+freq_pcm <- pcmPoolSPCV(pcm_spcv)
 
 

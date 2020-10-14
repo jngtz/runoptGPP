@@ -6,7 +6,7 @@
 #'      path.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param source_pnts Source points as a SpatialPointsDataFrame
+#' @param slide_src Source points as a SpatialPointsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
 #' @param slp_v A vector of random walk slope thresholds - below lasteral spreading is modelled
 #' @param ex_v A vector or random walk exponents controlling lateral spread
@@ -25,7 +25,7 @@
 #' @examples
 
 
-rwGridsearch <- function(dem, slide_plys, source_pnts,
+rwGridsearch <- function(dem, slide_plys, slide_src,
                       slide_id, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                       workspace = getwd(), save_res = FALSE, plot_eval = FALSE)
@@ -53,7 +53,7 @@ rwGridsearch <- function(dem, slide_plys, source_pnts,
         #res[k, i, j] <- paste(pcmmd[k], rwexp[i], rwper[j] )
         roc <- rwPerformance(dem,
                              slide_plys = slide_plys,
-                             source_pnts = source_pnts,
+                             slide_src = slide_src,
                              slide_id = slide_id,
                              slp = slp_v[k],
                              ex = ex_v[i],
