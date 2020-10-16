@@ -84,7 +84,7 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
     if(!is.null(buffer_source)){
       # Create a buffer around source point to create a source/release area
       source_buffer <- rgeos::gBuffer(sel_start_point, width = buffer_source)
-      source_plot <- source_buffer
+      source_plot <- raster::intersect(source_buffer, slide_poly_single)
       source_grid <- raster::rasterize(source_buffer, dem_grid, field=1 )
       source_grid <- raster::mask(source_grid, slide_poly_single )
     } else {

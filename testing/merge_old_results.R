@@ -83,7 +83,7 @@ for(i in 1:10){
   # Create a buffer around source point to create a source/release area
   source_buffer <- rgeos::gBuffer(sel_start_point, width = 20)
   # Clip polygon using border of intersecting runout polygon
-  source_list[[i]]<- raster::intersect(source_buffer, slide_poly_single)
+  source_list[[i]] <- raster::intersect(source_buffer, slide_poly_single)
 }
 
 source_areas <- do.call(raster::bind, source_list)
@@ -110,3 +110,34 @@ test_rw <- data.frame(
 test_freq <- rbind(test_rw, freq_rw)
 test_freq$rel_freq = test_freq$freq/sum(test_freq$freq) * 100
 freq_rw <- test_freq
+
+
+# Visualize freq of SPCV optimal parameter sets ################################
+
+library(ggplot2)
+
+#Pick a slope threshold (slice) of grid search space
+slope_thresh <- 40
+freq_rw <- freq_rw[order(freq_rw$rel_freq, decreasing = TRUE),]
+
+breaks_bubble <- c(10, 30, 60)
+
+gg_freq_rw <- freq_rw[freq_rw$slp == slope_thresh,]
+
+ggplot(gg_freq_rw, aes(x=per, y=exp)) +
+  ggtitle(paste("Slope threshold:", slope_thresh ))+
+  # Can improve by making different colors for different slope thresholds...
+
+  geom_point(alpha=0.7, aes(colour = median_auroc, size = rel_freq)) +
+  scale_size(name="Relative\nfrequency (%)",
+             breaks = breaks_bubble) +
+  scale_colour_gradient(low = "#1B4F72", high = "#85C1E9",
+                        name = "Median AUROC") +
+  scale_x_continuous(expression(paste("Persistence factor")),
+                     limits = c(min(rw_spcv$settings$rwper_vec), max = max(rw_spcv$settings$rwper_vec))) +
+  scale_y_continuous(expression(paste("Exponent of divergence")),
+                     limits = c(min(rw_spcv$settings$rwexp_vec), max = max(rw_spcv$settings$rwexp_vec)+.1)) +
+  theme_light() +
+  theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8), title = element_text(size = 8))
+
