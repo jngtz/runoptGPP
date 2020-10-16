@@ -4,6 +4,7 @@ library(devtools)
 build()
 install()
 
+
 # Load Packages and Data ####################################################################
 library(runout.opt)
 library(raster)
@@ -14,26 +15,27 @@ library(Rsagacmd)
 # Initiate a SAGA-GIS geoprocessing object
 saga <- saga_gis(opt_lib = "sim_geomorphology")
 
-# Data
+# Set workspace
 setwd("/home/jason/Data/Chile/")
+
+# Load digital elevation model (DEM)
 dem <- raster("elev_alos_12_5m.tif")
 
-# Runout source points
+# Load runout source points
 source_points <- readOGR(".", "debris_flow_source_points")
 
-# Runout track polygons
+# Load runout track polygons and assign object ID based on row number
 runout_polygons <- readOGR(".", "debris_flow_polys_sample")
-# Assign an object ID to each row of the SpatialPolygonsDataFrame
 runout_polygons$objectid <- 1:length(runout_polygons)
 
-# Select a debris flow for this example
+# Select a debris flow and source point for this example
 runout_polygon <- runout_polygons[77,]
 
-# Get corresponding source point
 sel_source_point  <- over(source_points, runout_polygon)
 source_point <- source_points[!is.na(sel_source_point$objectid),]
 
-# Example of GPP random walk simulation using R ################################
+
+# GPP random walk simulation ################################
 
 rwPerformance(dem, slide_plys = runout_polygon, slide_src = source_point,
                    slp = 30, ex = 3, per = 2,
@@ -62,7 +64,7 @@ rw_opt_single <- rwGetOpt_single(rw_gridsearch)
 rw_opt_single
 
 
-# Example of GPP PCM simulation #######################
+# GPP PCM simulation #######################
 
 pcm <- pcmPerformance(dem, slide_plys = runout_polygon, slide_src = source_point,
                rw_slp = 40, rw_ex = 3, rw_per = 1.5,
@@ -77,6 +79,7 @@ pcm$length.relerr
 gpp_output <- stack(pcm$gpp.parea, pcm$gpp.stop, pcm$gpp.maxvel)
 names(gpp_output) <- c("Process_area", "Stop_positions", "Max_velocity")
 plot(gpp_output)
+
 
 # Grid search for optimal PCM parameter set ###############
 pcmmd_vec <- seq(20, 120, by=20)
