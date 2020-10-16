@@ -39,7 +39,7 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #' @param rw_per Random walk persistence factor to weight flow direction consistency
 #' @param pcm_mu PCM model sliding friction coefficient
 #' @param pcm_md PCM model mass-to-drag ratio (m)
-#' @param gpp_iter Number of random walk model iterations
+#' @param gpp_iter Model iterations
 #' @param buffer_ext Defines buffer distance (in meters) around runout polygon
 #'      to crop source DEM. This helps to reduce computational time
 #' @param buffer_source Can define a buffer distance (in meters) to extend source

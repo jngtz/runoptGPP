@@ -6,16 +6,14 @@ install()
 
 # Load Data ####################################################################
 setwd("/home/jason/Data/Chile/")
-dem <- raster::raster("dem_alos_12_5m _no sinks.tif")
+dem <- raster::raster("elev_alos_12_5m.tif")
 
 # slide start/source points
-source_points <- rgdal::readOGR(".", "dflow_points_v1_reposition")
+source_points <- rgdal::readOGR(".", "debris_flow_source_points")
 
 # actual/mapped debris flow polygons
-runout_polygons<- rgdal::readOGR(".", "dflow_polygons_v1_reposition_sample_100")
+runout_polygons<- rgdal::readOGR(".", "debris_flow_polys_sample")
 runout_polygons$objectid <- 1:100
-
-raster::crs(source_points) <- raster::crs(runout_polygons)
 
 # initalize SAGA GIS geoprocessing
 saga <- Rsagacmd::saga_gis(opt_lib = "sim_geomorphology")
@@ -210,7 +208,43 @@ ggplot(data = pcm_grid_df, aes(x=Var2, y=Var1, z=value)) +
 # PCM spatial cross validation #######################################
 
 pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = runout_polygons,
-                    n_folds = 3, repetitions = 100, from_save = FALSE)
+                    n_folds = 5, repetitions = 100, from_save = FALSE)
 
 freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
+
+
+
+
+# STOP Vignette here ... Determine source area prediction threshold #############################
+setwd("/home/jason/Data/Chile/")
+source_pred <- raster::raster("source_area_prediction.tif")
+
+cutoffs <- seq(.5,.95, by=0.05)
+
+library(foreach)
+cl <- parallel::makeCluster(4)
+doParallel::registerDoParallel(cl)
+
+gpp_pareas <-
+  foreach(src_thrsh=cutoffs, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
+
+    .GlobalEnv$saga <- saga
+
+    runoutPareaPredict(source_pred, dem, source_threshold = src_thrsh,
+                     rw_slp, rw_exp, rw_per, pcm_mu, pcm_md,
+                     gpp_iter = 1000)
+
+  }
+
+parallel::stopCluster(cl)
+
+
+# Compute AUROC for each process area
+parea_aurocs<- rep(NA, length(cutoffs))
+
+for(i in 1:length(cutoffs)){
+  parea_aurocs[i] <- rocParea(gpp_pareas[[i]], runout_polygons)
+}
+
+# Sample size analysis #################################################
 

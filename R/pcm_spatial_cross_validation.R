@@ -187,5 +187,3 @@ pcmPoolSPCV<- function(x, plot_freq = FALSE){
 }
 
 
-
-
