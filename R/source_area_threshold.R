@@ -18,7 +18,7 @@ rasterThreshold <- function(x, value_range = c(0.9, Inf)){
 
   }
 
-  rc <- reclassify(x, rclmat)
+  rc <- raster::reclassify(x, rclmat)
   rc
 
 }
