@@ -4,32 +4,17 @@
 \alias{pcmGridsearch}
 \title{Grid search optimization for PCM runout distance}
 \usage{
-pcmGridsearch(
-  dem,
-  workspace = getwd(),
-  slide_plys,
-  source_pnts,
-  slide_id,
-  rw_slp,
-  rw_ex,
-  rw_per,
-  pcm_mu_v,
-  pcm_md_v,
-  gpp_iter = 1000,
-  buffer_ext = 500,
-  buffer_source = NULL,
-  predict_threshold = 0.5,
-  plot_eval = FALSE
-)
+pcmGridsearch(dem, slide_plys, slide_src, slide_id, rw_slp, rw_ex, rw_per,
+  pcm_mu_v, pcm_md_v, gpp_iter = 1000, buffer_ext = 500,
+  buffer_source = NULL, predict_threshold = 0.5, save_res = FALSE,
+  plot_eval = FALSE)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
 
-\item{workspace}{The file path where to save performance results for each runout polygon}
-
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{source_pnts}{Source points as a SpatialPointsDataFrame}
+\item{slide_src}{Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 
@@ -53,6 +38,8 @@ point to a source area}
 
 \item{predict_threshold}{A cutoff value to define what quantile of simulated runout
 frequencies is the predicted runout.}
+
+\item{save_res}{(logical), if TRUE, will save results in current working directory}
 
 \item{plot_eval}{If TRUE, will plot simulated runout and runout polygon}
 }

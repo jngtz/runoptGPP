@@ -4,29 +4,14 @@
 \alias{rwGetOpt}
 \title{Get random walk grid search optimal parameters}
 \usage{
-rwGetOpt(
-  workspace = getwd(),
-  rwslp_vec,
-  rwexp_vec,
-  rwper_vec,
-  n_train,
-  measure = median
-)
+rwGetOpt(x, measure = median, from_save = FALSE)
 }
 \arguments{
-\item{workspace}{The file path where the performance results were saved}
-
-\item{rwslp_vec}{The vector of random walk slope thresholds used in the grid search}
-
-\item{rwexp_vec}{The vector or random walk exponents used in the grid search}
-
-\item{rwper_vec}{The vector or random walk persistence factors used in the grid search}
-
-\item{n_train}{Number of runout polygons processed with grid search}
+\item{x}{A list of rw grid search values}
 
 \item{measure}{A measure (e.g. median, mean) to find optimal parameter across grid search space}
 
-\item{slide_id}{Selects a single runout polygon from slide_plys by row}
+\item{from_save}{(Logical) if TRUE, will load save files from current working directory}
 }
 \value{
 A dataframe  with the optimal parameter set and AUROC performance

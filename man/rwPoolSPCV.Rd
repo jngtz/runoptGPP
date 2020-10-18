@@ -4,10 +4,13 @@
 \alias{rwPoolSPCV}
 \title{Pool random walk spatial cross-validation results}
 \usage{
-rwPoolSPCV(x, plot.freq = FALSE)
+rwPoolSPCV(x, plot_freq = FALSE)
 }
 \arguments{
 \item{x}{The (list) result of spcvRndWalk()}
+
+\item{plot_freq}{(Logical) if TRUE, will a create bubble plot of optimal parameter
+set frequencies across grid search space}
 }
 \value{
 A data frame summarizing the frequency and performance of each

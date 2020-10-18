@@ -4,26 +4,16 @@
 \alias{rwPerformance}
 \title{Random walk runout path performance}
 \usage{
-rwPerformance(
-  dem,
-  slide_plys,
-  source_pnts,
-  slide_id = 2,
-  slp = 33,
-  ex = 3,
-  per = 2,
-  gpp_iter = 1000,
-  buffer_ext = 500,
-  buffer_source = NULL,
-  plot_eval = FALSE
-)
+rwPerformance(dem, slide_plys, slide_src, slide_id = 2, slp = 33,
+  ex = 3, per = 2, gpp_iter = 1000, buffer_ext = 500,
+  buffer_source = NULL, plot_eval = FALSE)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
 
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{source_pnts}{Source points as a SpatialPointsDataFrame}
+\item{slide_src}{Source points as a SpatialPointsDataFrame}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 

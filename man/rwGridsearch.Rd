@@ -4,33 +4,20 @@
 \alias{rwGridsearch}
 \title{Grid search optimization for random walk runout path}
 \usage{
-rwGridsearch(
-  dem,
-  workspace = getwd(),
-  slide_plys,
-  source_pnts,
-  slide_id,
-  slp_v,
-  ex_v,
-  per_v,
-  gpp_iter = 1000,
-  buffer_ext = 500,
-  buffer_source = NULL,
-  plot_eval = FALSE
-)
+rwGridsearch(dem, slide_plys, slide_src, slide_id, slp_v, ex_v, per_v,
+  gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
+  save_res = FALSE, plot_eval = FALSE)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
 
-\item{workspace}{The file path where to save performance results for each runout polygon}
-
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{source_pnts}{Source points as a SpatialPointsDataFrame}
+\item{slide_src}{Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 
-\item{slp_v}{A vector of random walk slope thresholds - below lasteral spreading is modelled}
+\item{slp_v}{A vector of random walk slope thresholds - below lateral spreading is modeled}
 
 \item{ex_v}{A vector or random walk exponents controlling lateral spread}
 
@@ -43,6 +30,8 @@ to crop source DEM. This helps to reduce computational time}
 
 \item{buffer_source}{Can define a buffer distance (in meters) to extend source
 point to a source area}
+
+\item{save_res}{(logical), if TRUE, will save results in current working directory}
 
 \item{plot_eval}{If TRUE, will plot random walk path and runout polygon}
 }

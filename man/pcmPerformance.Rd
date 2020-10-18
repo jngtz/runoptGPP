@@ -4,30 +4,18 @@
 \alias{pcmPerformance}
 \title{PCM runout distance performance}
 \usage{
-pcmPerformance(
-  dem,
-  slide_plys,
-  source_pnts,
-  slide_id = 1,
-  rw_slp = 33,
-  rw_ex = 3,
-  rw_per = 2,
-  pcm_mu = 0.3,
-  pcm_md = 75,
-  buffer_ext = 500,
-  buffer_source = 50,
-  gpp_iter = 1000,
-  predict_threshold = 0.5,
-  plot_eval = FALSE,
-  return_features = FALSE
-)
+pcmPerformance(dem, slide_plys, slide_src, slide_id = 1, rw_slp = 33,
+  rw_ex = 3, rw_per = 2, pcm_mu = 0.3, pcm_md = 75,
+  buffer_ext = 500, buffer_source = 50, gpp_iter = 1000,
+  predict_threshold = 0.5, plot_eval = FALSE,
+  return_features = FALSE)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
 
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{source_pnts}{Source points as a SpatialPointsDataFrame}
+\item{slide_src}{Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 
@@ -47,7 +35,7 @@ to crop source DEM. This helps to reduce computational time}
 \item{buffer_source}{Can define a buffer distance (in meters) to extend source
 point to a source area}
 
-\item{gpp_iter}{Number of random walk model iterations}
+\item{gpp_iter}{Model iterations}
 
 \item{predict_threshold}{A cutoff value to define what quantile of simulated runout
 frequencies is the predicted runout.}

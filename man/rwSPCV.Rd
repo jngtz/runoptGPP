@@ -4,20 +4,18 @@
 \alias{rwSPCV}
 \title{Perform (repeated) spatial cross-validation of random walk optimization}
 \usage{
-rwSPCV(slide_plys, n_folds, repetitions, rwslp_vec, rwexp_vec, rwper_vec)
+rwSPCV(x, slide_plys, n_folds, repetitions, from_save = FALSE)
 }
 \arguments{
+\item{x}{Random walk grid search results (list) from multiple runouts}
+
+\item{slide_plys}{A SpatialPolygonsDataframe}
+
 \item{n_folds}{The number of cross-validated folds (i.e. partitions)}
 
 \item{repetitions}{Number of cross-validation repetitions}
 
-\item{rwslp_vec}{The vector of random walk slope thresholds used in the grid search}
-
-\item{rwexp_vec}{The vector or random walk exponents used in the grid search}
-
-\item{rwper_vec}{The vector or random walk persistence factors used in the grid search}
-
-\item{x}{A SpatialPolygonsDataframe}
+\item{from_save}{(Logical) if TRUE, will load save files from current working directory}
 }
 \value{
 A vector containing numeric labels defining each fold

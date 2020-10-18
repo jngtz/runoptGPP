@@ -4,23 +4,17 @@
 \alias{pcmGetOpt}
 \title{Get PCM runout distance grid search optimal parameters}
 \usage{
-pcmGetOpt(
-  workspace = getwd(),
-  pcm_md_vec,
-  pcm_mu_vec,
-  n_train,
-  performance = "relerr",
-  measure = "median"
-)
+pcmGetOpt(x, performance = "relerr", measure = "median",
+  from_save = FALSE, plot_opt = FALSE)
 }
 \arguments{
-\item{workspace}{The file path where the performance results were saved}
-
-\item{pcm_mu_vec}{The vector or random walk exponents used in the grid search}
-
-\item{n_train}{Number of runout polygons processed with grid search}
+\item{x}{A list of PCM grid search values}
 
 \item{measure}{A measure (e.g. "median", "mean") to find optimal parameter across grid search space}
+
+\item{from_save}{(logical) if TRUE, will load save files form current working directory}
+
+\item{plot_opt}{(logical) if TRUE, will plot performance across grid search space}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 

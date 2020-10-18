@@ -4,18 +4,16 @@
 \alias{pcmSPCV}
 \title{Perform (repeated) spatial cross-validation of PCM optimization}
 \usage{
-pcmSPCV(slide_plys, n_folds, repetitions, pcm_mu_v, pcm_md_v)
+pcmSPCV(x, slide_plys, n_folds, repetitions, from_save = FALSE)
 }
 \arguments{
+\item{x}{A SpatialPolygonsDataframe}
+
 \item{n_folds}{The number of cross-validated folds (i.e. partitions)}
 
 \item{repetitions}{Number of cross-validation repetitions}
 
-\item{pcm_mu_v}{A vector of PCM model sliding friction coefficients}
-
-\item{pcm_md_v}{A vector of PCM model mass-to-drag ratios (m)}
-
-\item{x}{A SpatialPolygonsDataframe}
+\item{from_save}{(Logical) if TRUE, will load save files from current working directory}
 }
 \value{
 A vector containing numeric labels defining each fold
