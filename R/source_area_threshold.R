@@ -61,7 +61,7 @@ runoutPareaPredict <- function(source_pred, dem, source_threshold,
 
     if(!is.null(file_name)){
       write_name <- paste0(fil)
-      writeRaster(gpp$process_area, paste0(filename), format = "GTiff", overwrite = TRUE)
+      raster::writeRaster(gpp$process_area, paste0(filename), format = "GTiff", overwrite = TRUE)
     }
   }
   return(gpp$process_area)
