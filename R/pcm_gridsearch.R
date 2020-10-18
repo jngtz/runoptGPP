@@ -5,26 +5,26 @@
 #'      GPP tool in SAGA-GIS.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param slide_src Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame
+#' @param slide_src Source points as a SpatialPointsDataFrame or source areas
+#'      as a SpatialPolygonsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
-#' @param rw_slp Random walk slope threshold - below lasteral spreading is modelled
+#' @param rw_slp Random walk slope threshold - below lateral spreading is modelled
 #' @param rw_ex Random walk exponent controlling lateral spread
 #' @param rw_per Random walk persistence factor to weight flow direction consistency
 #' @param pcm_mu_v A vector of PCM model sliding friction coefficients
 #' @param pcm_md_v A vector of PCM model mass-to-drag ratios (m)
-#' @param gpp_iter Number of random walk model iterations
-#' @param buffer_ext Defines buffer distance (in meters) around runout polygon
-#'      to crop source DEM. This helps to reduce computational time
-#' @param buffer_source Can define a buffer distance (in meters) to extend source
+#' @param gpp_iter Number of model iterations
+#' @param buffer_ext (Optional) Defines buffer distance (in meters) around runout polygon
+#'      to crop source DEM. This helps to reduce computational time when working
+#'      with large regions.
+#' @param buffer_source (Optional) Can define a buffer distance (in meters) to extend source
 #'      point to a source area
 #' @param predict_threshold A cutoff value to define what quantile of simulated runout
 #'      frequencies is the predicted runout.
-#' @param save_res (logical), if TRUE, will save results in current working directory
-#' @param plot_eval If TRUE, will plot simulated runout and runout polygon
+#' @param save_res (Logical) if TRUE, will save results in current working directory
+#' @param plot_eval (Logical) ff TRUE, will plot simulated runout and runout polygon
 #' @return A list with performances for each parameter combinations across grid search space.
 #'      The performances measures include relative error, relative difference, error and AUROC.
-#' @details Runout is either simulated from a single source point or a buffered
-#'      area round the source point.
 
 pcmGridsearch <- function(dem,
                        slide_plys, slide_src, slide_id,
@@ -95,8 +95,8 @@ pcmGridsearch <- function(dem,
 #' @param slide_id Selects a single runout polygon from slide_plys by row
 #' @param performace Performance measure "relerr" relative error
 #' @param measure A measure (e.g. "median", "mean") to find optimal parameter across grid search space
-#' @param from_save (logical) if TRUE, will load save files form current working directory
-#' @param plot_opt (logical) if TRUE, will plot performance across grid search space
+#' @param from_save (Logical) if TRUE, will load save files form current working directory
+#' @param plot_opt (Logical) if TRUE, will plot performance across grid search space
 #' @return A dataframe  with the optimal parameter set and performance
 
 pcmGetOpt <- function(x, performance = "relerr", measure = "median",
@@ -220,9 +220,9 @@ pcmGetOpt_single <- function(x, performance = "relerr",
 #'
 #' @param x A list of PCM grid search values
 #' @param performace Performance measure "relerr" relative error
-#' @param measure A measure (e.g. "median", "mean") to find optimal parameter across grid search space
-#' @param from_save (logical) if TRUE, will load save files form current working directory
-#' @return A matrix of grid search space with summary values
+#' @param measure A measure (e.g. "median", "mean") to aggregate model performances from all slides
+#' @param from_save (Logical) if TRUE, will load save files form current working directory
+#' @return A matrix of grid search space with aggregated performance values
 
 pcmGetGrid <- function(x, performance = "relerr", measure = "median",
                       from_save = FALSE){

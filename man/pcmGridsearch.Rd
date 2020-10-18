@@ -14,11 +14,12 @@ pcmGridsearch(dem, slide_plys, slide_src, slide_id, rw_slp, rw_ex, rw_per,
 
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{slide_src}{Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame}
+\item{slide_src}{Source points as a SpatialPointsDataFrame or source areas
+as a SpatialPolygonsDataFrame}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 
-\item{rw_slp}{Random walk slope threshold - below lasteral spreading is modelled}
+\item{rw_slp}{Random walk slope threshold - below lateral spreading is modelled}
 
 \item{rw_ex}{Random walk exponent controlling lateral spread}
 
@@ -28,20 +29,21 @@ pcmGridsearch(dem, slide_plys, slide_src, slide_id, rw_slp, rw_ex, rw_per,
 
 \item{pcm_md_v}{A vector of PCM model mass-to-drag ratios (m)}
 
-\item{gpp_iter}{Number of random walk model iterations}
+\item{gpp_iter}{Number of model iterations}
 
-\item{buffer_ext}{Defines buffer distance (in meters) around runout polygon
-to crop source DEM. This helps to reduce computational time}
+\item{buffer_ext}{(Optional) Defines buffer distance (in meters) around runout polygon
+to crop source DEM. This helps to reduce computational time when working
+with large regions.}
 
-\item{buffer_source}{Can define a buffer distance (in meters) to extend source
+\item{buffer_source}{(Optional) Can define a buffer distance (in meters) to extend source
 point to a source area}
 
 \item{predict_threshold}{A cutoff value to define what quantile of simulated runout
 frequencies is the predicted runout.}
 
-\item{save_res}{(logical), if TRUE, will save results in current working directory}
+\item{save_res}{(Logical) if TRUE, will save results in current working directory}
 
-\item{plot_eval}{If TRUE, will plot simulated runout and runout polygon}
+\item{plot_eval}{(Logical) ff TRUE, will plot simulated runout and runout polygon}
 }
 \value{
 A list with performances for each parameter combinations across grid search space.
@@ -51,8 +53,4 @@ A list with performances for each parameter combinations across grid search spac
 Computes performance measures for
      runout paths simuluated using the random walk and PCM model components of the
      GPP tool in SAGA-GIS.
-}
-\details{
-Runout is either simulated from a single source point or a buffered
-     area round the source point.
 }

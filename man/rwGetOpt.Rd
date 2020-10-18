@@ -7,7 +7,7 @@
 rwGetOpt(x, measure = median, from_save = FALSE)
 }
 \arguments{
-\item{x}{A list of rw grid search values}
+\item{x}{A list of random walk grid search values}
 
 \item{measure}{A measure (e.g. median, mean) to find optimal parameter across grid search space}
 

@@ -11,9 +11,9 @@ rwSPCV(x, slide_plys, n_folds, repetitions, from_save = FALSE)
 
 \item{slide_plys}{A SpatialPolygonsDataframe}
 
-\item{n_folds}{The number of cross-validated folds (i.e. partitions)}
+\item{n_folds}{The number of folds (i.e. partitions)}
 
-\item{repetitions}{Number of cross-validation repetitions}
+\item{repetitions}{Number of repetitions}
 
 \item{from_save}{(Logical) if TRUE, will load save files from current working directory}
 }

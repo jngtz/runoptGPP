@@ -10,14 +10,14 @@ pcmGetGrid(x, performance = "relerr", measure = "median",
 \arguments{
 \item{x}{A list of PCM grid search values}
 
-\item{measure}{A measure (e.g. "median", "mean") to find optimal parameter across grid search space}
+\item{measure}{A measure (e.g. "median", "mean") to aggregate model performances from all slides}
 
-\item{from_save}{(logical) if TRUE, will load save files form current working directory}
+\item{from_save}{(Logical) if TRUE, will load save files form current working directory}
 
 \item{performace}{Performance measure "relerr" relative error}
 }
 \value{
-A matrix of grid search space with summary values
+A matrix of grid search space with aggregated performance values
 }
 \description{
 Get PCM runout distance grid search values

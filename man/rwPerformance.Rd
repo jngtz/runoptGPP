@@ -13,9 +13,10 @@ rwPerformance(dem, slide_plys, slide_src, slide_id = 2, slp = 33,
 
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{slide_src}{Source points as a SpatialPointsDataFrame}
+\item{slide_src}{Source points as a SpatialPointsDataFrame or source areas
+as a SpatialPolygonsDataFrame}
 
-\item{slide_id}{Selects a single runout polygon from slide_plys by row}
+\item{slide_id}{Selects a single runout polygon from slide_plys by row to run GPP model}
 
 \item{slp}{Random walk slope threshold - below lasteral spreading is modelled}
 
@@ -23,18 +24,18 @@ rwPerformance(dem, slide_plys, slide_src, slide_id = 2, slp = 33,
 
 \item{per}{Random walk persistence factor to weight flow direction consistency}
 
-\item{gpp_iter}{Number of random walk model iterations}
+\item{gpp_iter}{Number of model iterations}
 
-\item{buffer_ext}{Defines buffer distance (in meters) around runout polygon
+\item{buffer_ext}{(Optional) Defines buffer distance (in meters) around runout polygon
 to crop source DEM. This helps to reduce computational time}
 
-\item{buffer_source}{Can define a buffer distance (in meters) to extend source
+\item{buffer_source}{(Optional) Can define a buffer distance (in meters) to extend source
 point to a source area}
 
-\item{plot_eval}{If TRUE, will plot random walk path and runout polygon}
+\item{plot_eval}{(Logical) if TRUE, will plot random walk path and runout polygon}
 }
 \value{
-the area under the receiver operating characteristic
+The area under the receiver operating characteristic
 }
 \description{
 Computes the area under the receiver operating characteristic curve (AUROC) for
@@ -43,12 +44,5 @@ Computes the area under the receiver operating characteristic curve (AUROC) for
      path.
 }
 \details{
-Runout is either simulated from a single source point or a buffered
-     area round the source point.
-}
-\examples{
-## Not run:
-# Initalize a saga object
-saga <- Rsagacmd::saga_gis()
-
+Runout source can be either point or area.
 }

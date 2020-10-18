@@ -13,7 +13,8 @@ rwGridsearch(dem, slide_plys, slide_src, slide_id, slp_v, ex_v, per_v,
 
 \item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
 
-\item{slide_src}{Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame}
+\item{slide_src}{SSource points as a SpatialPointsDataFrame or source areas
+as a SpatialPolygonsDataFrame}
 
 \item{slide_id}{Selects a single runout polygon from slide_plys by row}
 
@@ -23,12 +24,12 @@ rwGridsearch(dem, slide_plys, slide_src, slide_id, slp_v, ex_v, per_v,
 
 \item{per_v}{A vector or random walk persistence factors to weight flow direction consistency}
 
-\item{gpp_iter}{Number of random walk model iterations}
+\item{gpp_iter}{Number of model iterations}
 
-\item{buffer_ext}{Defines buffer distance (in meters) around runout polygon
+\item{buffer_ext}{(Optional) Defines buffer distance (in meters) around runout polygon
 to crop source DEM. This helps to reduce computational time}
 
-\item{buffer_source}{Can define a buffer distance (in meters) to extend source
+\item{buffer_source}{(Optional) Can define a buffer distance (in meters) to extend source
 point to a source area}
 
 \item{save_res}{(logical), if TRUE, will save results in current working directory}

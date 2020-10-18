@@ -2,7 +2,7 @@
 % Please edit documentation in R/randomwalk_gridsearch.R
 \name{rwGetOpt_single}
 \alias{rwGetOpt_single}
-\title{Get RW runout distance grid search optimal parameters for single event}
+\title{Get random walk runout distance grid search optimal parameters for single event}
 \usage{
 rwGetOpt_single(x)
 }
@@ -10,8 +10,8 @@ rwGetOpt_single(x)
 \item{x}{the results of the grid search}
 }
 \value{
-A dataframe  with the optimal parameter set and performance
+A dataframe with the optimal parameter set and performance
 }
 \description{
-Get RW runout distance grid search optimal parameters for single event
+Get random walk runout distance grid search optimal parameters for single event
 }

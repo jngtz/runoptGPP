@@ -7,25 +7,21 @@
 #'      path.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param slide_src Source points as a SpatialPointsDataFrame
-#' @param slide_id Selects a single runout polygon from slide_plys by row
+#' @param slide_src Source points as a SpatialPointsDataFrame or source areas
+#'      as a SpatialPolygonsDataFrame
+#' @param slide_id Selects a single runout polygon from slide_plys by row to run GPP model
 #' @param slp Random walk slope threshold - below lasteral spreading is modelled
 #' @param ex Random walk exponent controlling lateral spread
 #' @param per Random walk persistence factor to weight flow direction consistency
-#' @param gpp_iter Number of random walk model iterations
-#' @param buffer_ext Defines buffer distance (in meters) around runout polygon
+#' @param gpp_iter Number of model iterations
+#' @param buffer_ext (Optional) Defines buffer distance (in meters) around runout polygon
 #'      to crop source DEM. This helps to reduce computational time
-#' @param buffer_source Can define a buffer distance (in meters) to extend source
+#' @param buffer_source (Optional) Can define a buffer distance (in meters) to extend source
 #'      point to a source area
-#' @param plot_eval If TRUE, will plot random walk path and runout polygon
-#' @return the area under the receiver operating characteristic
-#' @details Runout is either simulated from a single source point or a buffered
-#'      area round the source point.
-#' @examples
-#' ## Not run:
-#' # Initalize a saga object
-#' saga <- Rsagacmd::saga_gis()
-#'
+#' @param plot_eval (Logical) if TRUE, will plot random walk path and runout polygon
+#' @return The area under the receiver operating characteristic
+#' @details Runout source can be either point or area.
+
 
 rwPerformance <- function(dem, slide_plys, slide_src,
                           slide_id = 2, slp = 33, ex = 3, per = 2,

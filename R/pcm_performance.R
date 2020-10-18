@@ -32,30 +32,25 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #'      and PCM model components of the GPP tool in SAGA-GIS.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param slide_src Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame
+#' @param slide_src Source points as a SpatialPointsDataFrame or source areas
+#'      as a SpatialPolygonsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
-#' @param rw_slp Random walk slope threshold - below lasteral spreading is modelled
+#' @param rw_slp Random walk slope threshold - below lateral spreading is modelled
 #' @param rw_ex Random walk exponent controlling lateral spread
 #' @param rw_per Random walk persistence factor to weight flow direction consistency
 #' @param pcm_mu PCM model sliding friction coefficient
 #' @param pcm_md PCM model mass-to-drag ratio (m)
-#' @param gpp_iter Model iterations
-#' @param buffer_ext Defines buffer distance (in meters) around runout polygon
+#' @param gpp_iter Number of model iterations
+#' @param buffer_ext (Optional) Defines buffer distance (in meters) around runout polygon
 #'      to crop source DEM. This helps to reduce computational time
-#' @param buffer_source Can define a buffer distance (in meters) to extend source
+#' @param buffer_source (Optional) Can define a buffer distance (in meters) to extend source
 #'      point to a source area
 #' @param predict_threshold A cutoff value to define what quantile of simulated runout
 #'      frequencies is the predicted runout.
-#' @param plot_eval If TRUE, will plot simulated runout and runout polygon
-#' @param return_features If TRUE, returned list will include GPP input and output
+#' @param plot_eval (Logical) if TRUE, will plot simulated runout and runout polygon
+#' @param return_features (Logical) if TRUE, returned list will include GPP input and output
 #' data, in addition to a list of error measures.
 #' @return A list of runout distance performance measures.
-#' @details Runout is either simulated from a single source point or a buffered
-#'      area round the source point.
-#' @examples
-#' ## Not run:
-#' # Initalize a saga object
-#' saga <- Rsagacmd::saga_gis()
 
 pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
                              rw_slp = 33, rw_ex = 3, rw_per = 2,

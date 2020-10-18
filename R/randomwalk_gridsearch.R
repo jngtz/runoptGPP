@@ -6,15 +6,16 @@
 #'      path.
 #' @param dem A DEM as a RasterLayer object
 #' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
-#' @param slide_src Source points or polygons as a SpatialPointsDataFrame or SpatialPolygonsDataFrame
+#' @param slide_src SSource points as a SpatialPointsDataFrame or source areas
+#'      as a SpatialPolygonsDataFrame
 #' @param slide_id Selects a single runout polygon from slide_plys by row
 #' @param slp_v A vector of random walk slope thresholds - below lateral spreading is modeled
 #' @param ex_v A vector or random walk exponents controlling lateral spread
 #' @param per_v A vector or random walk persistence factors to weight flow direction consistency
-#' @param gpp_iter Number of random walk model iterations
-#' @param buffer_ext Defines buffer distance (in meters) around runout polygon
+#' @param gpp_iter Number of model iterations
+#' @param buffer_ext (Optional) Defines buffer distance (in meters) around runout polygon
 #'      to crop source DEM. This helps to reduce computational time
-#' @param buffer_source Can define a buffer distance (in meters) to extend source
+#' @param buffer_source (Optional) Can define a buffer distance (in meters) to extend source
 #'      point to a source area
 #' @param save_res (logical), if TRUE, will save results in current working directory
 #' @param plot_eval If TRUE, will plot random walk path and runout polygon
@@ -74,7 +75,7 @@ rwGridsearch <- function(dem, slide_plys, slide_src,
 
 #' Get random walk grid search optimal parameters
 #'
-#' @param x A list of rw grid search values
+#' @param x A list of random walk grid search values
 #' @param measure A measure (e.g. median, mean) to find optimal parameter across grid search space
 #' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A dataframe  with the optimal parameter set and AUROC performance
@@ -143,10 +144,10 @@ rwGetOpt <- function(x, measure = median, from_save = FALSE){
 
 
 
-#' Get RW runout distance grid search optimal parameters for single event
+#' Get random walk runout distance grid search optimal parameters for single event
 #'
 #' @param x the results of the grid search
-#' @return A dataframe  with the optimal parameter set and performance
+#' @return A dataframe with the optimal parameter set and performance
 
 rwGetOpt_single <- function(x){
 

@@ -3,7 +3,7 @@
 #' Divides a spatial sample of polygons into irregularly shaped spatial partitions
 #'     using k-means clustring. It uses the spatial coordinates defined by the polygon centroids.
 #' @param x A SpatialPolygonsDataframe
-#' @param n_folds The number of cross-validated folds (i.e. partitions)
+#' @param n_folds The number of folds (i.e. partitions)
 #' @param seed_cv The random seed defined to reproduce results
 #' @return A vector containing numeric labels defining each fold
 
@@ -33,8 +33,8 @@ spcvFoldsPoly <- function(x, n_folds = 5, seed_cv = 11082017){
 #'
 #' @param x Random walk grid search results (list) from multiple runouts
 #' @param slide_plys A SpatialPolygonsDataframe
-#' @param n_folds The number of cross-validated folds (i.e. partitions)
-#' @param repetitions Number of cross-validation repetitions
+#' @param n_folds The number of folds (i.e. partitions)
+#' @param repetitions Number of repetitions
 #' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A vector containing numeric labels defining each fold
 

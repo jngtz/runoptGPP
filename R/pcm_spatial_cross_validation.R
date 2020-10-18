@@ -3,8 +3,8 @@
 #' Perform (repeated) spatial cross-validation of PCM optimization
 #'
 #' @param x A SpatialPolygonsDataframe
-#' @param n_folds The number of cross-validated folds (i.e. partitions)
-#' @param repetitions Number of cross-validation repetitions
+#' @param n_folds The number of folds (i.e. partitions)
+#' @param repetitions Number of repetitions
 #' @param from_save (Logical) if TRUE, will load save files from current working directory
 #' @return A vector containing numeric labels defining each fold
 

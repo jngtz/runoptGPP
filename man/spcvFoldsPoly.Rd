@@ -9,7 +9,7 @@ spcvFoldsPoly(x, n_folds = 5, seed_cv = 11082017)
 \arguments{
 \item{x}{A SpatialPolygonsDataframe}
 
-\item{n_folds}{The number of cross-validated folds (i.e. partitions)}
+\item{n_folds}{The number of folds (i.e. partitions)}
 
 \item{seed_cv}{The random seed defined to reproduce results}
 }
