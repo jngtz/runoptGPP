@@ -44,7 +44,7 @@ runoutPareaPredict <- function(source_pred, dem, source_threshold,
 
   dem_grid <- dem
 
-  source_threshold <- rasterThreshold(source_grid, prob_range = c(source_threshold[i], Inf))
+  source_threshold <- rasterThreshold(source_grid, value_range = c(source_threshold[i], Inf))
 
   #just in case no source cells are present...
   if(freq(source_threshold, value = 1) != 0) {
