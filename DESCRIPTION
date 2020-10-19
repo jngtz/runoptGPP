@@ -1,6 +1,6 @@
 Package: runout.opt
 Type: Package
-Title: GPP Runout model optimization
+Title: GPP runout model optimization in R
 Version: 0.1.0
 Author: Jason Goetz
 Maintainer: Jason Goetz <jason.goetz@uni-jena.de>
@@ -8,5 +8,6 @@ Description: Automatic parameter selection and validation tools for the
     Gravitational Process Path (GPP) model in SAGA-GIS
 License: GPL-3
 Encoding: UTF-8
+Imports: raster, rgdal, rgeos, sf, ggplot2, reshape2
 LazyData: true
 RoxygenNote: 7.1.1

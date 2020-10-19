@@ -4,7 +4,7 @@ author: "Jason Goetz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
- %\VignetteIndexEntry{Single event runout grid search optimization}
+ %\VignetteIndexEntry{Regional runout grid search optimization}
  %\VignetteEngine{knitr::rmarkdown}
  %\VignetteEncoding{UTF-8}
  \usepackage[utf8]{inputenc}

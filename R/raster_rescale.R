@@ -23,10 +23,6 @@ rasterCdf <- function(x){
 #' Rescale a raster values in the range from 0 to 1 using min-max normalization.
 #' @param x A RasterLayer object
 #' @return RasterLayer
-#' @examples
-#' r <- raster(system.file("external/test.grd", package="raster"))
-#' r_minmax <- RasterMinMaxRescale(r)
-#' plot(r_minmax)
 
 rasterMinMaxRescale <- function(x){
 
