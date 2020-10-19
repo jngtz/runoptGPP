@@ -51,6 +51,7 @@ for(i in 1:n_train){
   pcm_gridsearch_multi[[i]] <- result_pcm
 }
 
+save(pcm_gridsearch_multi, file="pcm_gridsearch_multi.Rd")
 
 # Create a list of all RW results ############
 

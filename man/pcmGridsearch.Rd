@@ -4,10 +4,23 @@
 \alias{pcmGridsearch}
 \title{Grid search optimization for PCM runout distance}
 \usage{
-pcmGridsearch(dem, slide_plys, slide_src, slide_id, rw_slp, rw_ex, rw_per,
-  pcm_mu_v, pcm_md_v, gpp_iter = 1000, buffer_ext = 500,
-  buffer_source = NULL, predict_threshold = 0.5, save_res = FALSE,
-  plot_eval = FALSE)
+pcmGridsearch(
+  dem,
+  slide_plys,
+  slide_src,
+  slide_id = NULL,
+  rw_slp,
+  rw_ex,
+  rw_per,
+  pcm_mu_v,
+  pcm_md_v,
+  gpp_iter = 1000,
+  buffer_ext = 500,
+  buffer_source = NULL,
+  predict_threshold = 0.5,
+  save_res = FALSE,
+  plot_eval = FALSE
+)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}

@@ -4,9 +4,19 @@
 \alias{rwPerformance}
 \title{Random walk runout path performance}
 \usage{
-rwPerformance(dem, slide_plys, slide_src, slide_id = 2, slp = 33,
-  ex = 3, per = 2, gpp_iter = 1000, buffer_ext = 500,
-  buffer_source = NULL, plot_eval = FALSE)
+rwPerformance(
+  dem,
+  slide_plys,
+  slide_src,
+  slide_id = 2,
+  slp = 33,
+  ex = 3,
+  per = 2,
+  gpp_iter = 1000,
+  buffer_ext = 500,
+  buffer_source = NULL,
+  plot_eval = FALSE
+)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}

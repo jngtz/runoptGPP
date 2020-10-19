@@ -1,0 +1,225 @@
+---
+title: "Using R for regional optimizaiton of runout with the GPP tool in SAGA-GIS"
+author: "Jason Goetz"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+ %\VignetteIndexEntry{Single event runout grid search optimization}
+ %\VignetteEngine{knitr::rmarkdown}
+ %\VignetteEncoding{UTF-8}
+ \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+comment = "#>")
+knitr::opts_knit$set(root.dir = "/home/jason/Data/Chile/")
+```
+
+The runout.opt package was developed for automatic parameter selection for
+single event and regional runout modeling using the random walk and PCM components of the [Gravitational 
+Process Path (GPP) Model](https://gmd.copernicus.org/articles/10/3309/2017/) tool in [SAGA-GIS](http://www.saga-gis.org). The optimization procedure uses a two-stage approach,
+where we first optimize the random walk model to find the 'best' simulation of runout path,
+and then plug-in these values to the PCM model to optimize for runout distance. The performance
+of the runout path is based on the area under the receiver operating characteristic curve (AUROC),
+and runout distance is based on a measure of relative error.
+
+This vignette
+
+* Provides an example of regionally mapping debris flow runout 
+* Shows how to setup and run grid search for regional optimization
+* Demonstrates the use of parallel computing for faster results
+* Illustrates the use of spatial cross-validation to validate model performance
+
+
+### Load packages and data
+
+To start, we will load all the necessary packages and data. The `runout.opt` functions
+are made to work with `RasterLayer`, `SpatialPointsDataFrame` and `SpatialPolygonsDataFrame`
+objects from the `raster` and `sp` packages. 
+
+We are using an 12.5 m spatial resolution DEM. The debris-flow
+runout track and source point that we will use for runout model optimization are one 
+of many stored in shapefile. So, we select a single runout track, and the corresponding 
+source point for this example.
+
+```{r, fig.height=6, fig.width = 6}
+library(runout.opt)
+library(raster)
+library(rgdal)
+library(sp)
+library(Rsagacmd)
+
+# Load digital elevation model (DEM)
+dem <- raster("elev_alos_12_5m.tif")
+
+# Load runout source points
+source_points <- readOGR(".", "debris_flow_source_points")
+
+# Load runout track polygons and assign object ID based on row number
+runout_polygons <- readOGR(".", "debris_flow_polys_sample")
+runout_polygons$objectid <- 1:length(runout_polygons)
+
+plot(dem)
+plot(runout_polygons, add=TRUE)
+```
+
+### Initiate a SAGA-GIS geoprocessor object
+
+The runout simulation is computed in SAGA-GIS. To do this, we are coupling
+R with SAGA-GIS using the [`Rsagacmd`](https://github.com/stevenpawley/Rsagacmd) package.
+Each time we load this package we need to initiate a SAGA-GIS geoprocessor object, 
+which generates functions in R to SAGA-GIS libraries and tools. We only need to load the
+Geomorphology library (i.e., sim_geomorphology) to access the GPP tool. This is also
+faster than loading all of the SAGA-GIS libraries (e.g., `saga_gis()`)
+
+```{r}
+saga <- saga_gis(opt_lib = "sim_geomorphology")
+```
+
+### Regional GPP random walk grid search optimziation (runout path)
+
+In our first stage of optimization, we will set up vectors to define our grid 
+search space for the random walk runout path model component. This is an exhaustive
+list of the parameters that will be tested.
+
+```{r}
+steps <- 11
+rwexp_vec <- seq(1.3, 3, len=steps)
+rwper_vec <- seq(1.5, 2, len=steps)
+rwslp_vec <- seq(20, 40, len=steps)
+
+rwexp_vec
+rwper_vec
+rwslp_vec
+
+```
+
+We will use parallelization to speed up our computations using the `foreach` package. This loop
+will compute performances for all possible parameter combinations for each runout polygon
+and store them as a list. In our case, this is our `rw_grid_search_multi` object. Depending on
+the number of runout events and the grid search space size, this computation can take some time.
+The `rwGridsearch` function has an option `save_res = TRUE` that allows us to save the grid search
+results for each runout individually. This is useful in the case where processing fails since it avoids
+the need to re-run the grid search for all runout events.
+
+```{r, eval=FALSE}
+library(foreach)
+
+# Define which runout polygons are used for optimization
+polyid_vec <- 1:100
+
+# Set up cluster
+cl <- parallel::makeCluster(7)
+doParallel::registerDoParallel(cl)
+
+# Run grid search loop
+rw_grisearch_multi <-
+  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
+
+    .GlobalEnv$saga <- saga
+
+    rwGridsearch(dem, slide_plys = runout_polygons, slide_src = source_points,
+                   slide_id = poly_id, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
+                   gpp_iter = 1000, buffer_ext = 500, buffer_source = 50, save_res = FALSE,
+                   plot_eval = FALSE)
+
+  }
+
+parallel::stopCluster(cl)
+```
+
+```{r, echo=FALSE}
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+(load("rw_gridsearch_multi.Rd"))
+```
+
+To find the optimal parameter set, we will aggregate the performance values
+of each runout event across grid search space using the median value.
+
+```{r}
+rw_opt <- rwGetOpt(rw_gridsearch_multi, measure = median)
+rw_opt
+```
+
+### Validate random walk parameters' transferability using spatial cross validation 
+
+We can perform spatial cross-validation to test the transferability of optimal parameter sets.
+This is done using the k-means partitioning approach from the [`sperrorest`](https://github.com/cran/sperrorest)
+package. In our example, we will perform 5-fold spatial cross-validation with 10 repetitions.
+
+Additionally, we can visualize (`plot_freq = TRUE`) the relative frequency of optimal parameter sets from
+all spatial cross-validation iterations.
+
+```{r, fig.height=4, fig.width = 6}
+rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = runout_polygons,
+                  n_folds = 5, repetitions = 10)
+
+freq_rw <- rwPoolSPCV(rw_spcv, plot_freq = TRUE)
+freq_rw
+```
+
+### Regional GPP PCM model grid search optimzation (runout distance)
+
+We can now plug-in the random walk optimal parameter set, and optimize for
+runout distance using the PCM model component.
+
+```{r}
+# Define PCM model grid seach space
+pcmmd_vec <- seq(20, 150, by=5) # mass-to-drag ratio (m)
+pcmmu_vec <- seq(0.04, 0.6, by=0.01) # sliding friction coefficient 
+
+pcmmd_vec
+pcmmu_vec
+```
+
+```{r, eval=FALSE}
+# Run using parallelization
+cl <- parallel::makeCluster(4)
+doParallel::registerDoParallel(cl)
+
+pcm_gridsearch_multi <-
+  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
+
+    .GlobalEnv$saga <- saga
+
+    pcmGridsearch(dem,
+                  slide_plys = runout_polygons, slide_src = source_points, slide_id = poly_id,
+                  rw_slp = rw_opt$rw_slp_opt, rw_ex = rw_opt$rw_exp_opt, rw_per = rw_opt$rw_per_opt,
+                  pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
+                  gpp_iter = 1000,
+                  buffer_ext = 500, buffer_source = NULL,
+                  predict_threshold = 0.5,
+                  plot_eval = FALSE)
+
+  }
+
+parallel::stopCluster(cl)
+```
+
+```{r, echo=FALSE}
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+(load("pcm_gridsearch_multi.Rd"))
+```
+
+Next, we apply the `pcmGetOpt` function to find the regionally optimal PCM model parameters.
+In our example, we are looking for the parameter set that results in the lowest median 
+relative error across all runout events. The median model performances across grid search
+space can be visualized using `plot_opt=TRUE`.
+
+```{r, fig.height=4, fig.width = 6}
+pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE)
+```
+
+### Validate PCM model parameters' transferability using spatial cross validation 
+
+Similar to the random walk model, we can explore the spatial transferability
+of optimal parameters for the PCM model, and visualize the results.
+
+```{r, fig.height=4, fig.width = 6}
+pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = runout_polygons,
+                    n_folds = 5, repetitions = 10, from_save = FALSE)
+
+freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
+freq_pcm
+```

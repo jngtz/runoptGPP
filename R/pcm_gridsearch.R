@@ -27,13 +27,17 @@
 #'      The performances measures include relative error, relative difference, error and AUROC.
 
 pcmGridsearch <- function(dem,
-                       slide_plys, slide_src, slide_id,
+                       slide_plys, slide_src, slide_id = NULL,
                        rw_slp, rw_ex, rw_per,
                        pcm_mu_v, pcm_md_v,
                        gpp_iter = 1000,
                        buffer_ext = 500, buffer_source = NULL,
                        predict_threshold = 0.5,
                        save_res = FALSE, plot_eval = FALSE){
+
+  if(is.null(slide_id)){
+    slide_id = 1
+  }
 
   column.names <- pcm_md_v
   row.names <- pcm_mu_v

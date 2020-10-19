@@ -26,12 +26,15 @@
 
 
 rwGridsearch <- function(dem, slide_plys, slide_src,
-                      slide_id, slp_v, ex_v, per_v,
+                      slide_id = NULL, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
                       save_res = FALSE, plot_eval = FALSE)
 
 {
 
+  if(is.null(slide_id)){
+    slide_id = 1
+  }
 
   roc_result.nm <- paste("result_rw_roc_", slide_id, ".Rd", sep="")
 

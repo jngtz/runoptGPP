@@ -30,6 +30,12 @@ runout_polygons$objectid <- 1:length(runout_polygons)
 
 # Run RW optimization for multiple runout tracks  ##############################
 
+polyid.vec <- 1:100
+steps <- 11
+rwexp_vec <- seq(1.3, 3, len=steps)
+rwper_vec <- seq(1.5, 2, len=steps)
+rwslp_vec <- seq(20, 40, len=steps)
+
 ## DO NOT RUN
 polyid_vec <- 1:100
 
@@ -74,6 +80,9 @@ freq_rw <- rwPoolSPCV(rw_spcv, plot_freq = TRUE)
 
 # Apply grid search to multiple events #########
 
+pcmmd_vec <- seq(20, 150, by=5)
+pcmmu_vec <- seq(0.04, 0.6, by=0.01)
+
 polyid_vec <- 1:100
 
 library(foreach)
@@ -97,6 +106,11 @@ pcm_gridsearch_multi <-
   }
 
 parallel::stopCluster(cl)
+
+## HIDE
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+(load("pcm_gridsearch_multi.Rd"))
+##
 
 
 # GET PCM OPTIMAL PARAMETERS #######################################

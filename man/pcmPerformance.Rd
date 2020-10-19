@@ -4,11 +4,23 @@
 \alias{pcmPerformance}
 \title{PCM runout distance performance}
 \usage{
-pcmPerformance(dem, slide_plys, slide_src, slide_id = 1, rw_slp = 33,
-  rw_ex = 3, rw_per = 2, pcm_mu = 0.3, pcm_md = 75,
-  buffer_ext = 500, buffer_source = 50, gpp_iter = 1000,
-  predict_threshold = 0.5, plot_eval = FALSE,
-  return_features = FALSE)
+pcmPerformance(
+  dem,
+  slide_plys,
+  slide_src,
+  slide_id = 1,
+  rw_slp = 33,
+  rw_ex = 3,
+  rw_per = 2,
+  pcm_mu = 0.3,
+  pcm_md = 75,
+  buffer_ext = 500,
+  buffer_source = 50,
+  gpp_iter = 1000,
+  predict_threshold = 0.5,
+  plot_eval = FALSE,
+  return_features = FALSE
+)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
