@@ -60,6 +60,8 @@ parallel::stopCluster(cl)
 # Get RW optimal parameter set
 rw_opt <- rwGetOpt(rw_gridsearch_multi, measure = median)
 save(rw_opt, file = "rw_opt_params.Rd")
+save(rw_gridsearch_multi, file = "rw_gridsearch_multi.Rd")
+
 
 # RW PARAM VALIDATION W SPATIAL CV #############################################
 
@@ -97,6 +99,8 @@ parallel::stopCluster(cl)
 # Get PCM optimal parameter set
 pcm_opt <- pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE)
 save(pcm_opt, file = "pcm_opt_params.Rd")
+save(pcm_gridsearch_multi, file = "pcm_gridsearch_multi.Rd")
+
 
 # PCM PARAM VALIDATION W SPATIAL CV #############################################
 

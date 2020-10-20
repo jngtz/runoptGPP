@@ -8,6 +8,6 @@ Description: Automatic parameter selection and validation tools for the
     Gravitational Process Path (GPP) model in SAGA-GIS
 License: GPL-3
 Encoding: UTF-8
-Imports: raster, rgdal, rgeos, sf, ggplot2, reshape2
+Imports: raster, rgdal, rgeos, sf, ggplot2, reshape2, ROCR, sperrorest
 LazyData: true
 RoxygenNote: 7.1.1

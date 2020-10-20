@@ -234,6 +234,13 @@ save(cutoffs_df, file="performance_sourcearea_thresholds.Rd")
 
 # PLOT RESULTS #################################################################
 
+setwd("/home/jason/Scratch/Figures")
+
+(load("performance_sourcearea_thresholds.Rd"))
+
+png(filename="src_area_auroc_threshold.png", res = 300, width = 7.5, height = 3,
+    units = "in", pointsize = 11)
+
 par(family = "Arial", mfrow = c(1,2), mar = c(4, 3.5, 1, 1),
     mgp = c(2.1, 0.75, 0))
 
