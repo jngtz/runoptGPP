@@ -1,10 +1,10 @@
 ---
-title: "Using R to optimize runout simulation of a single event based on the GPP tool in SAGA-GIS"
+title: "Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS"
 author: "Jason Goetz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
- %\VignetteIndexEntry{Single event runout grid search optimization}
+ %\VignetteIndexEntry{Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS}
  %\VignetteEngine{knitr::rmarkdown}
  %\VignetteEncoding{UTF-8}
  \usepackage[utf8]{inputenc}

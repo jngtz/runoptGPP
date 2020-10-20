@@ -4,14 +4,18 @@
 \alias{rocParea}
 \title{Compute area under ROC curve for process areas}
 \usage{
-rocParea(process_area, slide_polys, smp_size = 1000)
+rocParea(process_area, slide_area, smp_mask, smp_size = 1000, seed = 1234)
 }
 \arguments{
 \item{process_area}{RasterLayer of GPP process area}
 
-\item{slide_polys}{Runout tracks as a SpatialPolygonsDataFrame}
+\item{slide_area}{Runout tracks as a RasterLayer}
+
+\item{smp_mask}{A mask of sample areas as a RasterLayer}
 
 \item{smp_size}{Size of random sample of runount and non-runout cells}
+
+\item{seed}{Specific specific random seed}
 }
 \value{
 AUROC

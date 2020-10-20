@@ -15,8 +15,3 @@ RasterLayer
 \description{
 Rescale a raster values in the range from 0 to 1 using min-max normalization.
 }
-\examples{
-r <- raster(system.file("external/test.grd", package="raster"))
-r_minmax <- RasterMinMaxRescale(r)
-plot(r_minmax)
-}

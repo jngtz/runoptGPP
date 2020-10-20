@@ -1,5 +1,5 @@
 ---
-title: "Regional optimizaiton of runout with the GPP tool in SAGA-GIS"
+title: "Source area prediction threshold"
 author: "Jason Goetz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

@@ -71,20 +71,25 @@ runoutPareaPredict <- function(source_pred, dem, source_threshold,
 #' Compute area under ROC curve for process areas
 #'
 #' @param process_area RasterLayer of GPP process area
-#' @param slide_polys Runout tracks as a SpatialPolygonsDataFrame
+#' @param slide_area Runout tracks as a RasterLayer
+#' @param smp_mask A mask of sample areas as a RasterLayer
 #' @param smp_size Size of random sample of runount and non-runout cells
+#' @param seed Specific specific random seed
 #' @return AUROC
 
-rocParea <- function(process_area, slide_polys, smp_size = 1000){
+rocParea <- function(process_area, slide_area, smp_mask, smp_size = 1000, seed = 1234){
 
+  set.seed(seed)
   rescale_process_area <- rasterCdf(process_area)
   # AUROC
 
-  slide_area <- raster::rasterize(slide_polys, process_area, field=1, background = NA)
-  noslide_area <- raster::rasterize(slide_polys, dem, field=NA, background = 1)
-  noslide_area <- raster::mask(noslide_area, dem)
+
+  #noslide_area <- raster::rasterize(slide_polys, dem, field=NA, background = 1)
+  #noslide_area <- raster::mask(noslide_area, dem)
+  noslide_area <- smp_mask
   names(noslide_area) <- "mask"
 
+  set.seed(seed)
   noslide_smp <- raster::sampleRandom(noslide_area, smp_size, sp=TRUE)
   noslide_smp$act = 0
   noslide_smp$mask = NULL
@@ -104,5 +109,23 @@ rocParea <- function(process_area, slide_polys, smp_size = 1000){
 
   return(roc)
 
+}
+
+
+#' Compute percent area covered by process areas
+#'
+#' @param process_area RasterLayer of GPP process area
+#' @param dem A DEM as a RasterLayer
+#' @return Area covered by process area
+
+areaPerParea <- function(process_area, dem){
+  v_dem <- getValues(dem)
+  n_dem_cells <- length( v_dem[!is.na(v_dem)] )
+
+  v_all <- getValues(process_area) # process area
+  v_parea <- v_all[!is.na(v_all)]
+  n_parea_cells <- length(v_parea)
+  per_area <- n_parea_cells / n_dem_cells *100
+  per_area
 }
 

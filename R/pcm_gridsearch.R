@@ -141,8 +141,13 @@ pcmGetOpt <- function(x, performance = "relerr", measure = "median",
   err[err_wh]
 
   # Use AUROC for tie breaking
-  if(length(err_wh) > 1){
+  if(length(err_wh) > 2){
     err_wh <- err_wh[which(roc[err_wh]==max(roc[err_wh]), arr.ind=TRUE),]
+  }
+
+  # If still no tie break, take first one...
+  if(length(err_wh) > 2){
+    err_wh <- err_wh[1,]
   }
 
   opt_md <- pcm_md_vec[err_wh[2]] #col
@@ -201,12 +206,18 @@ pcmGetOpt_single <- function(x, performance = "relerr",
   err[err_wh]
 
   # Use AUROC for tie breaking
-  if(length(err_wh) > 1){
+  if(length(err_wh) > 2){
     err_wh <- err_wh[which(roc[err_wh]==max(roc[err_wh]), arr.ind=TRUE),]
+  }
+
+
+  if(length(err_wh) > 2){
+    err_wh <- err_wh[1,]
   }
 
   opt_md <- pcm_md_vec[err_wh[2]] #col
   opt_mu <- pcm_mu_vec[err_wh[1]] #row
+
 
   opt_gpp_par <- data.frame(
     pcm_mu = opt_mu,

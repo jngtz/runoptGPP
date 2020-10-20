@@ -22,6 +22,8 @@ devtools::install_github("jngtz/runout.opt")
 
 **Examples**
 
-[Using R to optimize runout simulation of a single event](https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements.html)
+[Optimizating for a an individual runout event](https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements.html)
 
-[Using R for regional optimizaiton of runout](https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html)
+[Regionally optimizing and validating runout models](https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html)
+
+[Mapping regional runout susceptibility from predicted source areas](https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html)
