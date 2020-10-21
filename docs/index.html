@@ -55,10 +55,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/gpp_rw_pcm_regional_optimization.html">Using R for regional optimizaiton of runout with the GPP tool in SAGA-GIS</a>
+      <a href="articles/gpp_rw_pcm_apply_regionally.html">Regionally mapping optimized runout model from predicted source areas</a>
     </li>
     <li>
-      <a href="articles/gpp_rw_pcm_single_optimization.html">Using R to optimize runout simulation of a single event based on the GPP tool in SAGA-GIS</a>
+      <a href="articles/gpp_rw_pcm_regional_optimization.html">Regional optimizaiton of runout with the GPP tool in SAGA-GIS</a>
+    </li>
+    <li>
+      <a href="articles/gpp_rw_pcm_single_optimization.html">Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS</a>
     </li>
   </ul>
 </li>
@@ -78,7 +81,19 @@
 <div id="runoutopt" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#runoutopt" class="anchor"></a>runout.opt</h1></div>
-<p>An R package for optimizing mass movement runout models</p>
+<p><strong>Description</strong></p>
+<p>This is an R package for optimizing mass movement runout models using the random walk and PCM model compenets of the <a href="https://gmd.copernicus.org/articles/10/3309/2017/">Gravitational Process Path (GPP)</a> modeling tool in <a href="http://www.saga-gis.org/en/index.html">SAGA-GIS</a>.</p>
+<p>These functions were developed for the following paper:</p>
+<p>Goetz et al…</p>
+<p><img src="https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements_files/figure-html/unnamed-chunk-4-1.png" width="500"></p>
+<p><strong>Installation</strong></p>
+<p>You can install this development version of runout.opt with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"jngtz/runout.opt"</span><span class="op">)</span></pre></div>
+<p><strong>Examples</strong></p>
+<p><a href="https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements.html">Optimizating for a an individual runout event</a></p>
+<p><a href="https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html">Regionally optimizing and validating runout models</a></p>
+<p><a href="https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html">Mapping regional runout susceptibility from predicted source areas</a></p>
 </div>
   </div>
 
