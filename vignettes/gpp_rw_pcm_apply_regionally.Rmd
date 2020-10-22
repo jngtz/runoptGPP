@@ -1,10 +1,10 @@
 ---
-title: "[Mapping regional runout susceptibility from predicted source areas"
+title: "Mapping regional runout susceptibility from predicted source areas"
 author: "Jason Goetz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
- %\VignetteIndexEntry{[Mapping regional runout susceptibility from predicted source areas}
+ %\VignetteIndexEntry{Mapping regional runout susceptibility from predicted source areas}
  %\VignetteEngine{knitr::rmarkdown}
  %\VignetteEncoding{UTF-8}
  \usepackage[utf8]{inputenc}
