@@ -6,7 +6,7 @@ This is an R package for optimizing mass movement runout models using the random
 walk and PCM model compenets of the [Gravitational Process Path (GPP)](https://gmd.copernicus.org/articles/10/3309/2017/) modeling
 tool in [SAGA-GIS](http://www.saga-gis.org/en/index.html).
 
-<img src="https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements_files/figure-html/unnamed-chunk-4-1.png" width="500">
+<img src="https://github.com/jngtz/runout.opt/blob/main/docs/articles/regional_runout_impact_map.png" width="500">
 
 **Installation**
 
