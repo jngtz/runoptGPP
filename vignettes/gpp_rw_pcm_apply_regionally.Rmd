@@ -191,7 +191,7 @@ map.parea <- ggplot() +
 
   new_scale("fill") +
   geom_tile(data=parea_df, aes(x=x, y=y, fill = gpp_process_area) ) +
-  scale_fill_viridis_c(name = "Runout impact\nfrequency (Quantiles)",  alpha = 0.6, direction = -1) +
+  scale_fill_viridis_c(name = "Debris flow\nrount frequency\n(Quantiles)",  alpha = 0.6, direction = -1) +
 
   xlab("Easting (m)") +
   ylab("Northing (m)") +

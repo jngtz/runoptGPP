@@ -1,8 +1,11 @@
 setwd("/home/jason/R/runout.opt/")
 
 library(devtools)
+document()
 build()
 install()
+
+pkgdown::build_site()
 
 
 # Load packages and data #######################################################
