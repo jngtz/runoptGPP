@@ -23,7 +23,7 @@ sub_catchments <- readOGR("sub_catchments.shp")
 # Load and crop DEM for a single sub catchment
 dem <- raster("elev_alos_12_5m.tif")
 dem <- crop(dem, sub_catchments[sub_catchments$ID == 56,])
-dem <- mask(dem_crop, sub_catchments[sub_catchments$ID == 56,])
+dem <- mask(dem, sub_catchments[sub_catchments$ID == 56,])
 
 # Load and crop source area prediction raster
 source_pred <- raster("source_pred_gam.tif")
@@ -122,7 +122,7 @@ gpp <- saga$sim_geomorphology$gravitational_process_path_model(dem = dem, releas
                                                                friction_mass_to_drag = pcm_opt$pcm_md)
 
 # Save/Export results
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
+setwd("/home/jason/Scratch/GPP_RW_Paper")
 writeRaster(gpp$process_area, filename="gpp_process_area.tif", format = "GTiff")
 writeRaster(gpp$max_velocity, filename="gpp_max_velocity.tif", format = "GTiff")
 writeRaster(gpp$stop_positions, filename="gpp_stop_positions.tif", format = "GTiff")
@@ -159,7 +159,7 @@ map.parea <- ggplot() +
 
   new_scale("fill") +
   geom_tile(data=parea_df, aes(x=x, y=y, fill = gpp_process_area) ) +
-  scale_fill_viridis_c(name = "Runout impact\nindex",  alpha = 0.6, direction = -1) +
+  scale_fill_viridis_c(name = "Debris flow\nrunout\nsusceptibility",  alpha = 0.6, direction = -1) +
 
   xlab("Easting (m)") +
   ylab("Northing (m)") +
