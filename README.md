@@ -20,6 +20,6 @@ devtools::install_github("jngtz/runout.opt")
 
 [Optimizing for a an individual runout event](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_single_optimization.html)
 
-[Regionally optimizing and validating runout models](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_regional_optimization.html)
+[Regionally optimizing and spatially validating runout models](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_regional_optimization.html)
 
 [Mapping regional runout susceptibility from predicted source areas](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_apply_regionally.html)

@@ -1,10 +1,10 @@
 ---
-title: "Regional optimizaiton of runout with the GPP tool in SAGA-GIS"
+title: "Regionally optimizing and spatially validating runout models"
 author: "Jason Goetz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
- %\VignetteIndexEntry{Regional optimizaiton of runout with the GPP tool in SAGA-GIS}
+ %\VignetteIndexEntry{Regionally optimizing and spatially validating runout models}
  %\VignetteEngine{knitr::rmarkdown}
  %\VignetteEncoding{UTF-8}
  \usepackage[utf8]{inputenc}
