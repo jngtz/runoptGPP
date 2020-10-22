@@ -1,9 +1,0 @@
-pandoc: 2.7.3
-pkgdown: 1.6.1
-pkgdown_sha: ~
-articles:
-  gpp_rw_pcm_apply_regionally: gpp_rw_pcm_apply_regionally.html
-  gpp_rw_pcm_regional_optimization: gpp_rw_pcm_regional_optimization.html
-  gpp_rw_pcm_single_optimization: gpp_rw_pcm_single_optimization.html
-last_built: 2020-10-22T09:12Z
-
