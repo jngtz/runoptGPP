@@ -8,7 +8,7 @@ tool in [SAGA-GIS](http://www.saga-gis.org/en/index.html).
 
 These functions were developed for the following paper:
 
-Goetz et al...
+Goetz et al. Optimizing debris-flow runout models for regional susceptibility mapping. Submitted (2020). 
 
 <img src="https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements_files/figure-html/unnamed-chunk-4-1.png" width="500">
 
@@ -22,8 +22,8 @@ devtools::install_github("jngtz/runout.opt")
 
 **Examples**
 
-[Optimizating for a an individual runout event](https://jngtz.github.io/map.displ.r/articles/2_Visualizing_surface_displacements.html)
+[Optimizating for a an individual runout event](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_single_optimization.html)
 
-[Regionally optimizing and validating runout models](https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html)
+[Regionally optimizing and validating runout models](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_regional_optimization.html)
 
-[Mapping regional runout susceptibility from predicted source areas](https://jngtz.github.io/map.displ.r/articles/1_BUnwarpJ_image_registration.html)
+[Mapping regional runout susceptibility from predicted source areas](https://jngtz.github.io/runout.opt/articles/gpp_rw_pcm_apply_regionally.html)

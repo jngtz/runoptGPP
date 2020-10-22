@@ -81,7 +81,7 @@
       <h1 data-toc-skip>Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS</h1>
                         <h4 class="author">Jason Goetz</h4>
             
-            <h4 class="date">2020-10-21</h4>
+            <h4 class="date">2020-10-22</h4>
       
       
       <div class="hidden name"><code>gpp_rw_pcm_single_optimization.Rmd</code></div>
@@ -156,7 +156,7 @@
                    gpp_iter <span class="op">=</span> <span class="fl">1000</span>, buffer_ext <span class="op">=</span> <span class="fl">500</span>, buffer_source <span class="op">=</span> <span class="fl">50</span>,
                    plot_eval <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
 <p><img src="gpp_rw_pcm_single_optimization_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
-<pre><code>#&gt; [1] 0.9222799</code></pre>
+<pre><code>#&gt; [1] 0.922406</code></pre>
 </div>
 <div id="gpp-random-walk-grid-search-optimization" class="section level3">
 <h3 class="hasAnchor">
@@ -186,29 +186,29 @@
 <pre><code>#&gt; , , 1.5
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849430 0.6088035 0.6084820
-#&gt; 30 0.6003607 0.8677720 0.9219063
-#&gt; 40 0.7980581 0.9476545 0.9519474
+#&gt; 20 0.5849419 0.6100283 0.6073615
+#&gt; 30 0.6016978 0.8666620 0.9219590
+#&gt; 40 0.7994175 0.9480116 0.9517892
 #&gt; 
 #&gt; , , 1.75
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849386 0.6073772 0.6084774
-#&gt; 30 0.6016273 0.8703304 0.9205813
-#&gt; 40 0.7974102 0.9476391 0.9510544
+#&gt; 20 0.5849383 0.6087682 0.6072055
+#&gt; 30 0.6003197 0.8701569 0.9221337
+#&gt; 40 0.7986107 0.9476871 0.9515544
 #&gt; 
 #&gt; , , 2
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849467 0.6074758 0.6085356
-#&gt; 30 0.6028820 0.8701352 0.9223522
-#&gt; 40 0.7982756 0.9472755 0.9515768</code></pre>
+#&gt; 20 0.5849456 0.6086816 0.6073205
+#&gt; 30 0.6015902 0.8702400 0.9219788
+#&gt; 40 0.7995276 0.9473996 0.9520131</code></pre>
 <p>And find the parameter set that resulted in the highest AUROC score.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit">
 <span class="va">rw_opt_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwGetOpt_single.html">rwGetOpt_single</a></span><span class="op">(</span><span class="va">rw_gridsearch</span><span class="op">)</span>
 <span class="va">rw_opt_single</span></pre></div>
 <pre><code>#&gt;   rw_slp_opt rw_exp_opt rw_per_opt  rw_auroc
-#&gt; 1         40          3        1.5 0.9519474</code></pre>
+#&gt; 1         40          3          2 0.9520131</code></pre>
 </div>
 <div id="gpp-pcm-model-simulation-runout-distance" class="section level3">
 <h3 class="hasAnchor">
@@ -224,7 +224,7 @@
 <div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="co"># Runout distance relative error</span>
 <span class="va">pcm</span><span class="op">$</span><span class="va">length.relerr</span></pre></div>
-<pre><code>#&gt; [1] 0.008077308</code></pre>
+<pre><code>#&gt; [1] 0.008750399</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="co"># Plot GPP PCM runout modelling ouputs</span>
 <span class="va">gpp_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html">stack</a></span><span class="op">(</span><span class="va">pcm</span><span class="op">$</span><span class="va">gpp.parea</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.stop</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.maxvel</span><span class="op">)</span>
@@ -260,8 +260,8 @@
 
 <span class="co"># Get optimal parameters</span>
 <span class="fu"><a href="../reference/pcmGetOpt_single.html">pcmGetOpt_single</a></span><span class="op">(</span><span class="va">pcm_gridsearch</span><span class="op">)</span></pre></div>
-<pre><code>#&gt;   pcm_mu pcm_md      relerr     auroc
-#&gt; 1   0.15    100 0.008077308 0.9585431</code></pre>
+<pre><code>#&gt;   pcm_mu pcm_md       relerr     auroc
+#&gt; 1   0.15    100 0.0006461131 0.9590031</code></pre>
 </div>
   </div>
 
