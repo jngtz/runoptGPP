@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Using R to optimize runout simulation of a single event based on the GPP tool in SAGA-GIS • runout.opt</title>
+<title>Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS • runout.opt</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Using R to optimize runout simulation of a single event based on the GPP tool in SAGA-GIS">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS">
 <meta property="og:description" content="runout.opt">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -54,10 +54,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/gpp_rw_pcm_regional_optimization.html">Using R for regional optimizaiton of runout with the GPP tool in SAGA-GIS</a>
+      <a href="../articles/gpp_rw_pcm_apply_regionally.html">Regionally mapping optimized runout model from predicted source areas</a>
     </li>
     <li>
-      <a href="../articles/gpp_rw_pcm_single_optimization.html">Using R to optimize runout simulation of a single event based on the GPP tool in SAGA-GIS</a>
+      <a href="../articles/gpp_rw_pcm_regional_optimization.html">Regional optimizaiton of runout with the GPP tool in SAGA-GIS</a>
+    </li>
+    <li>
+      <a href="../articles/gpp_rw_pcm_single_optimization.html">Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS</a>
     </li>
   </ul>
 </li>
@@ -75,10 +78,10 @@
       </header><script src="gpp_rw_pcm_single_optimization_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Using R to optimize runout simulation of a single event based on the GPP tool in SAGA-GIS</h1>
+      <h1 data-toc-skip>Optimizing runout simulation of a single event with the GPP tool in SAGA-GIS</h1>
                         <h4 class="author">Jason Goetz</h4>
             
-            <h4 class="date">2020-10-19</h4>
+            <h4 class="date">2020-10-22</h4>
       
       
       <div class="hidden name"><code>gpp_rw_pcm_single_optimization.Rmd</code></div>
@@ -153,7 +156,7 @@
                    gpp_iter <span class="op">=</span> <span class="fl">1000</span>, buffer_ext <span class="op">=</span> <span class="fl">500</span>, buffer_source <span class="op">=</span> <span class="fl">50</span>,
                    plot_eval <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
 <p><img src="gpp_rw_pcm_single_optimization_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
-<pre><code>#&gt; [1] 0.9207197</code></pre>
+<pre><code>#&gt; [1] 0.9211519</code></pre>
 </div>
 <div id="gpp-random-walk-grid-search-optimization" class="section level3">
 <h3 class="hasAnchor">
@@ -183,29 +186,29 @@
 <pre><code>#&gt; , , 1.5
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849426 0.6101351 0.6086554
-#&gt; 30 0.6029353 0.8628567 0.9208556
-#&gt; 40 0.8004728 0.9477402 0.9515343
+#&gt; 20 0.5849511 0.6100450 0.6059228
+#&gt; 30 0.6016460 0.8653593 0.9222031
+#&gt; 40 0.7979834 0.9478138 0.9521184
 #&gt; 
 #&gt; , , 1.75
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849320 0.6100022 0.6111001
-#&gt; 30 0.6029036 0.8669575 0.9207580
-#&gt; 40 0.8015786 0.9473727 0.9521486
+#&gt; 20 0.5849465 0.6086510 0.6085345
+#&gt; 30 0.6029152 0.8676678 0.9220328
+#&gt; 40 0.8012620 0.9475478 0.9520510
 #&gt; 
 #&gt; , , 2
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849437 0.6087046 0.6085611
-#&gt; 30 0.6003117 0.8699858 0.9223590
-#&gt; 40 0.8020831 0.9467364 0.9519641</code></pre>
+#&gt; 20 0.5849452 0.6073091 0.6073232
+#&gt; 30 0.6015982 0.8702946 0.9208770
+#&gt; 40 0.8018465 0.9471929 0.9516901</code></pre>
 <p>And find the parameter set that resulted in the highest AUROC score.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit">
 <span class="va">rw_opt_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwGetOpt_single.html">rwGetOpt_single</a></span><span class="op">(</span><span class="va">rw_gridsearch</span><span class="op">)</span>
 <span class="va">rw_opt_single</span></pre></div>
 <pre><code>#&gt;   rw_slp_opt rw_exp_opt rw_per_opt  rw_auroc
-#&gt; 1         40          3       1.75 0.9521486</code></pre>
+#&gt; 1         40          3        1.5 0.9521184</code></pre>
 </div>
 <div id="gpp-pcm-model-simulation-runout-distance" class="section level3">
 <h3 class="hasAnchor">
@@ -221,7 +224,7 @@
 <div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="co"># Runout distance relative error</span>
 <span class="va">pcm</span><span class="op">$</span><span class="va">length.relerr</span></pre></div>
-<pre><code>#&gt; [1] 0.008077308</code></pre>
+<pre><code>#&gt; [1] 0.00686124</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="co"># Plot GPP PCM runout modelling ouputs</span>
 <span class="va">gpp_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html">stack</a></span><span class="op">(</span><span class="va">pcm</span><span class="op">$</span><span class="va">gpp.parea</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.stop</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.maxvel</span><span class="op">)</span>
@@ -257,8 +260,8 @@
 
 <span class="co"># Get optimal parameters</span>
 <span class="fu"><a href="../reference/pcmGetOpt_single.html">pcmGetOpt_single</a></span><span class="op">(</span><span class="va">pcm_gridsearch</span><span class="op">)</span></pre></div>
-<pre><code>#&gt;   pcm_mu pcm_md     relerr     auroc
-#&gt; 1   0.15    100 0.00686124 0.9597343</code></pre>
+<pre><code>#&gt;   pcm_mu pcm_md      relerr     auroc
+#&gt; 1   0.15    120 0.008077308 0.9608315</code></pre>
 </div>
   </div>
 
