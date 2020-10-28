@@ -78,15 +78,14 @@ getVertices <- function(x){
 #' @param x A SpatialPolygonsDataFrame
 #' @return A SpatialPolygonsDataFrame with corresponding bounding boxes
 
-
-minBBoxSpatialPolygons <- function(spPolygons) {
+minBBoxSpatialPolygons <- function(x) {
 
   #number of features
-  n_features <- length(spPolygons@polygons)
+  n_features <- length(x@polygons)
 
   bbList <- list()
   for (i in 1:n_features) {
-    ply <- spPolygons[i,]
+    ply <- x[i,]
     #Get the vertices coordinates of from SpatialPolygons
     #pnts <- ply@polygons[[1]]@Polygons[[1]]@coords
     pnts <- getVertices(ply)
@@ -101,7 +100,7 @@ minBBoxSpatialPolygons <- function(spPolygons) {
     bbSpDf <- sp::SpatialPolygonsDataFrame(bbSp,
                                        data.frame(value = 1:length(bbList),
                                                   row.names = 1:length(bbList)))
-    sp::proj4string(bbSpDf) <- sp::proj4string(spPolygons)
+    sp::proj4string(bbSpDf) <- sp::proj4string(x)
   }
   return(bbSpDf)
 }

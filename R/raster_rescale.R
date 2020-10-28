@@ -4,8 +4,8 @@
 #' @param x A RasterLayer object
 #' @return RasterLayer
 #' @examples
-#' r <- raster(system.file("external/test.grd", package="raster"))
-#' r_ecdf <- RasterCdf(r)
+#' r <- raster(system.file("external/rlogo.grd", package="raster"))
+#' r_ecdf <- rasterCdf(logo)
 #' plot(r_ecdf)
 
 rasterCdf <- function(x){
@@ -23,6 +23,10 @@ rasterCdf <- function(x){
 #' Rescale a raster values in the range from 0 to 1 using min-max normalization.
 #' @param x A RasterLayer object
 #' @return RasterLayer
+#' @examples
+#' r <- raster(system.file("external/rlogo.grd", package="raster"))
+#' r_minmax <- rasterMinMaxRescale(logo)
+#' plot(r_minmax)
 
 rasterMinMaxRescale <- function(x){
 
