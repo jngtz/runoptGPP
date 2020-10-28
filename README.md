@@ -15,6 +15,11 @@ You can install this development version of runout.opt with:
 ```r
 devtools::install_github("jngtz/runout.opt")
 ```
+or 
+
+```r
+remotes::install_github("jngtz/runout.opt")
+```
 
 **Examples**
 
