@@ -4,23 +4,11 @@
 \alias{pcmPerformance}
 \title{PCM runout distance performance}
 \usage{
-pcmPerformance(
-  dem,
-  slide_plys,
-  slide_src,
-  slide_id = 1,
-  rw_slp = 33,
-  rw_ex = 3,
-  rw_per = 2,
-  pcm_mu = 0.3,
-  pcm_md = 75,
-  buffer_ext = 500,
-  buffer_source = 50,
-  gpp_iter = 1000,
-  predict_threshold = 0.5,
-  plot_eval = FALSE,
-  return_features = FALSE
-)
+pcmPerformance(dem, slide_plys, slide_src, slide_id = 1, rw_slp = 33,
+  rw_ex = 3, rw_per = 2, pcm_mu = 0.3, pcm_md = 75,
+  buffer_ext = 500, buffer_source = 50, gpp_iter = 1000,
+  predict_threshold = 0.5, plot_eval = FALSE,
+  return_features = FALSE)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
@@ -53,9 +41,9 @@ point to a source area}
 \item{predict_threshold}{A cutoff value to define what quantile of simulated runout
 frequencies is the predicted runout.}
 
-\item{plot_eval}{(Logical) if TRUE, will plot simulated runout and runout polygon}
+\item{plot_eval}{logical. If TRUE will plot simulated runout and runout polygon}
 
-\item{return_features}{(Logical) if TRUE, returned list will include GPP input and output
+\item{return_features}{logical. If TRUE, returned list will include GPP input and output
 data, in addition to a list of error measures.}
 }
 \value{
@@ -64,4 +52,33 @@ A list of runout distance performance measures.
 \description{
 Computes the error for runout distances simuluated using the random walk
      and PCM model components of the GPP tool in SAGA-GIS.
+}
+\examples{
+\dontrun{
+# Initialize a saga object
+saga <- Rsagacmd::saga_gis()
+
+# Load elevation model (DEM)
+dem <- raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
+
+# Load runout polygons and source points
+runout_plys <- rgdal::readOGR(system.file("extdata/dflow_runout_ply.shp", package="runout.opt"))
+source_pnts <- rgdal::readOGR(system.file("extdata/dflow_source_pnt.shp", package="runout.opt"))
+
+# Run GPP PCM model for a rounout polygon
+pcm <- pcmPerformance(dem, slide_plys = runout_plys[1,], slide_src = source_pnts,
+  rw_slp = 40, rw_ex = 3, rw_per = 1.5,
+  pcm_mu = 0.15, pcm_md = 120,
+  gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
+  plot_eval = TRUE, return_features = TRUE)
+
+# Runout distance relative error
+pcm$length.relerr
+
+# Plot GPP PCM runout modelling ouputs
+gpp_output <- stack(pcm$gpp.parea, pcm$gpp.stop, pcm$gpp.maxvel)
+names(gpp_output) <- c("Process_area", "Stop_positions", "Max_velocity")
+plot(gpp_output)
+
+}
 }

@@ -4,13 +4,8 @@
 \alias{pcmGetOpt}
 \title{Get PCM runout distance grid search optimal parameters}
 \usage{
-pcmGetOpt(
-  x,
-  performance = "relerr",
-  measure = "median",
-  from_save = FALSE,
-  plot_opt = FALSE
-)
+pcmGetOpt(x, performance = "relerr", measure = "median",
+  from_save = FALSE, plot_opt = FALSE)
 }
 \arguments{
 \item{x}{A list of PCM grid search values}

@@ -4,7 +4,8 @@
 \alias{rocParea}
 \title{Compute area under ROC curve for process areas}
 \usage{
-rocParea(process_area, slide_area, smp_mask, smp_size = 1000, seed = 1234)
+rocParea(process_area, slide_area, smp_mask, smp_size = 1000,
+  seed = 1234)
 }
 \arguments{
 \item{process_area}{RasterLayer of GPP process area}

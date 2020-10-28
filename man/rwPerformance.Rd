@@ -4,19 +4,9 @@
 \alias{rwPerformance}
 \title{Random walk runout path performance}
 \usage{
-rwPerformance(
-  dem,
-  slide_plys,
-  slide_src,
-  slide_id = 2,
-  slp = 33,
-  ex = 3,
-  per = 2,
-  gpp_iter = 1000,
-  buffer_ext = 500,
-  buffer_source = NULL,
-  plot_eval = FALSE
-)
+rwPerformance(dem, slide_plys, slide_src, slide_id = 2, slp = 33,
+  ex = 3, per = 2, gpp_iter = 1000, buffer_ext = 500,
+  buffer_source = NULL, plot_eval = FALSE)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
@@ -42,7 +32,7 @@ to crop source DEM. This helps to reduce computational time}
 \item{buffer_source}{(Optional) Can define a buffer distance (in meters) to extend source
 point to a source area}
 
-\item{plot_eval}{(Logical) if TRUE, will plot random walk path and runout polygon}
+\item{plot_eval}{logical. If TRUE will plot random walk path and runout polygon}
 }
 \value{
 The area under the receiver operating characteristic

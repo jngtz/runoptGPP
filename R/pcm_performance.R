@@ -1,7 +1,7 @@
 
 #' PCM Runout Distance Error
 #'
-#' Using min. area bouding boxes to calculate predicted length, it measures
+#' Using min. area bounding boxes to calculate predicted length, it measures
 #'     the relative error, relative difference and error.
 #' @param obs_poly The observed/mapped runout track as a SpatialPolygonsDataFrame
 #' @param pred_raster A RasterLayer object predicting runout
@@ -47,10 +47,38 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #'      point to a source area
 #' @param predict_threshold A cutoff value to define what quantile of simulated runout
 #'      frequencies is the predicted runout.
-#' @param plot_eval (Logical) if TRUE, will plot simulated runout and runout polygon
-#' @param return_features (Logical) if TRUE, returned list will include GPP input and output
-#' data, in addition to a list of error measures.
+#' @param plot_eval logical. If TRUE will plot simulated runout and runout polygon
+#' @param return_features logical. If TRUE, returned list will include GPP input and output
+#'      data, in addition to a list of error measures.
 #' @return A list of runout distance performance measures.
+#' @examples
+#' \dontrun{
+#' # Initialize a saga object
+#' saga <- Rsagacmd::saga_gis()
+#'
+#' # Load elevation model (DEM)
+#' dem <- raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
+#'
+#' # Load runout polygons and source points
+#' runout_plys <- rgdal::readOGR(system.file("extdata/dflow_runout_ply.shp", package="runout.opt"))
+#' source_pnts <- rgdal::readOGR(system.file("extdata/dflow_source_pnt.shp", package="runout.opt"))
+#'
+#' # Run GPP PCM model for a rounout polygon
+#' pcm <- pcmPerformance(dem, slide_plys = runout_plys[1,], slide_src = source_pnts,
+#'   rw_slp = 40, rw_ex = 3, rw_per = 1.5,
+#'   pcm_mu = 0.15, pcm_md = 120,
+#'   gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
+#'   plot_eval = TRUE, return_features = TRUE)
+#'
+#' # Runout distance relative error
+#' pcm$length.relerr
+#'
+#' # Plot GPP PCM runout modelling ouputs
+#' gpp_output <- stack(pcm$gpp.parea, pcm$gpp.stop, pcm$gpp.maxvel)
+#' names(gpp_output) <- c("Process_area", "Stop_positions", "Max_velocity")
+#' plot(gpp_output)
+#'
+#' }
 
 pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
                              rw_slp = 33, rw_ex = 3, rw_per = 2,
@@ -64,6 +92,7 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
     slide_id <- 1
   }
 
+  slide_plys$objectid <- 1:length(slide_plys)
   # Subset a single slide polygon
   slide_poly_single <- slide_plys[slide_id,]
 

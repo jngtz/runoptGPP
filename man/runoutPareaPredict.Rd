@@ -4,18 +4,8 @@
 \alias{runoutPareaPredict}
 \title{Runout process areas from source area prediction}
 \usage{
-runoutPareaPredict(
-  source_pred,
-  dem,
-  source_threshold,
-  rw_slp,
-  rw_exp,
-  rw_per,
-  pcm_mu,
-  pcm_md,
-  gpp_iter = 1000,
-  file_name = NULL
-)
+runoutPareaPredict(source_pred, dem, source_threshold, rw_slp, rw_exp,
+  rw_per, pcm_mu, pcm_md, gpp_iter = 1000, file_name = NULL)
 }
 \arguments{
 \item{source_pred}{RasterLayer with probability of being runout source area}

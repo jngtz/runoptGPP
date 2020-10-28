@@ -15,6 +15,6 @@ errMinBboxLength(obs_poly, pred_raster, dem)
 A list of error measures
 }
 \description{
-Using min. area bouding boxes to calculate predicted length, it measures
+Using min. area bounding boxes to calculate predicted length, it measures
     the relative error, relative difference and error.
 }

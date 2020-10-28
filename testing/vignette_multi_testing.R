@@ -1,6 +1,7 @@
 setwd("/home/jason/R/runout.opt/")
 
 library(devtools)
+document()
 build()
 install()
 

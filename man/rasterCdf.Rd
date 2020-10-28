@@ -16,7 +16,7 @@ RasterLayer
 Compute an empirical cumulative distribution function for a raster.
 }
 \examples{
-r <- raster(system.file("external/test.grd", package="raster"))
-r_ecdf <- RasterCdf(r)
-plot(r_ecdf)
+r <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
+r_ecdf <- rasterCdf(r)
+raster::plot(r_ecdf)
 }

@@ -20,3 +20,14 @@ A data frame containing runout geometries
 Computes runnout attributes: width, length, area, max.
     min. elevation, and surface area using Spatial Polygons and a DEM
 }
+\examples{
+# Load elevation model (DEM)
+dem <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
+
+# Load runout polygons
+file_nm <- system.file("extdata/dflow_runout_ply.shp", package="runout.opt")
+slide_plys <- rgdal::readOGR(file_nm)
+
+slide_geom <- runoutGeom(slide_plys, dem)
+slide_geom
+}

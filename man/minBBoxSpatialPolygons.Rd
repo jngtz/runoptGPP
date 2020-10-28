@@ -4,7 +4,7 @@
 \alias{minBBoxSpatialPolygons}
 \title{Minimum area bounding box for spatial polgyons}
 \usage{
-minBBoxSpatialPolygons(spPolygons)
+minBBoxSpatialPolygons(x)
 }
 \arguments{
 \item{x}{A SpatialPolygonsDataFrame}
@@ -14,4 +14,12 @@ A SpatialPolygonsDataFrame with corresponding bounding boxes
 }
 \description{
 Determines min. area bounding box for a single or set of spatial polygons
+}
+\examples{
+file_nm <- system.file("extdata/dflow_runout_ply.shp", package="runout.opt")
+slide_plys <- rgdal::readOGR(file_nm)
+minbb <- minBBoxSpatialPolygons(slide_plys)
+
+sp::plot(slide_plys)
+sp::plot(minbb, add = TRUE)
 }

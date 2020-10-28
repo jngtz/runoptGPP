@@ -1,1 +1,4 @@
 exportPattern("^[[:alpha:]]+")
+importFrom("grDevices", "chull")
+importFrom("methods", "as")
+importFrom("stats", "IQR", "ecdf", "median", "sd")

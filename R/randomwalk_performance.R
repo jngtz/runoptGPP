@@ -18,9 +18,31 @@
 #'      to crop source DEM. This helps to reduce computational time
 #' @param buffer_source (Optional) Can define a buffer distance (in meters) to extend source
 #'      point to a source area
-#' @param plot_eval (Logical) if TRUE, will plot random walk path and runout polygon
+#' @param plot_eval logical. If TRUE will plot random walk path and runout polygon
 #' @return The area under the receiver operating characteristic
 #' @details Runout source can be either point or area.
+#' @examples
+#' \dontrun{
+#' \dontrun{
+#' # Initialize a saga object
+#' saga <- Rsagacmd::saga_gis()
+#'
+#' # Load elevation model (DEM)
+#' dem <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
+#'
+#' # Load runout polygons and source points
+#' runout_plys <- rgdal::readOGR(system.file("extdata/dflow_runout_ply.shp", package="runout.opt"))
+#' source_pnts <- rgdal::readOGR(system.file("extdata/dflow_source_pnt.shp", package="runout.opt"))
+#'
+#' # Run GPP random walk model for a rounout polygon
+#' rw <- rwPerformance(dem, slide_plys = runout_plys[1,], slide_src = source_pnts,
+#'     slp = 30, ex = 3, per = 2,
+#'     gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
+#'     plot_eval = TRUE)
+#'
+#' rw # returns AUROC
+#'
+#' }
 
 
 rwPerformance <- function(dem, slide_plys, slide_src,
@@ -34,6 +56,7 @@ rwPerformance <- function(dem, slide_plys, slide_src,
     slide_id <- 1
   }
 
+  slide_plys$objectid <- 1:length(slide_plys)
   # Subset a single slide polygon
   slide_poly_single <- slide_plys[slide_id,]
 

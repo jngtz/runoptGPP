@@ -77,6 +77,13 @@ getVertices <- function(x){
 #' Determines min. area bounding box for a single or set of spatial polygons
 #' @param x A SpatialPolygonsDataFrame
 #' @return A SpatialPolygonsDataFrame with corresponding bounding boxes
+#' @examples
+#' file_nm <- system.file("extdata/dflow_runout_ply.shp", package="runout.opt")
+#' slide_plys <- rgdal::readOGR(file_nm)
+#' minbb <- minBBoxSpatialPolygons(slide_plys)
+#'
+#' sp::plot(slide_plys)
+#' sp::plot(minbb, add = TRUE)
 
 minBBoxSpatialPolygons <- function(x) {
 
@@ -116,18 +123,28 @@ minBBoxSpatialPolygons <- function(x) {
 #' @param elev A RasterLayer DEM
 #' @param ID NOT SURE...
 #' @return A data frame containing runout geometries
+#' @examples
+#' # Load elevation model (DEM)
+#' dem <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
+#'
+#' # Load runout polygons
+#' file_nm <- system.file("extdata/dflow_runout_ply.shp", package="runout.opt")
+#' slide_plys <- rgdal::readOGR(file_nm)
+#'
+#' slide_geom <- runoutGeom(slide_plys, dem)
+#' slide_geom
 
 runoutGeom <- function(runout_plys, elev, ID = NULL) {
   #Create a dataframe to store the ID, length, width and (landslide) area
   if(is.null(ID)){
     bbDf <- data.frame(fid = 0:(length(runout_plys)-1), id = 1:length(runout_plys),
                        width = NA, length = NA, area = NA, surfacearea = NA,
-                       maxelev = NA, minelev = NA)
+                       maxelev = NA, minelev = NA, reachangle = NA)
   }
   else{
     bbDf <- data.frame(fid = 0:(length(runout_plys)-1), id = NA,
                        width = NA, length = NA, area = NA, surfacearea = NA,
-                       maxelev = NA, minelev = NA)
+                       maxelev = NA, minelev = NA, reachangle = NA)
   }
 
 
@@ -161,6 +178,7 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
     bbDf[i,]$width <- width #planar
     bbDf[i,]$area <- rgeos::gArea(runout_ply) #area of landslide (*not area of bbox) {Rgeos}
 
+
     #Calculate the 'true' surface area
     elevCrop <- raster::crop(elev, runout_ply) #crop and mask used to speed up calculation
     elevMask <- raster::mask(elevCrop, runout_ply)
@@ -170,6 +188,8 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
     elevPnts <- raster::extract(elev, pnts)
     bbDf[i,]$maxelev <- max(elevPnts)
     bbDf[i,]$minelev <- min(elevPnts)
+    bbDf[i,]$reachangle <- 90 - (atan( bbDf[i,]$length / ( bbDf[i,]$maxelev- bbDf[i,]$minelev))*180/pi)
+
   }
   return(bbDf)
 }
