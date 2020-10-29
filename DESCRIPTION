@@ -12,6 +12,7 @@ Imports: raster, rgdal, rgeos, sf, ggplot2, reshape2, ROCR, sperrorest, Rsagacmd
 LazyData: true
 RoxygenNote: 7.1.1
 Suggests: knitr, rmarkdown, patchwork, ggnewscale
+VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
 

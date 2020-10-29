@@ -6,3 +6,5 @@
 ^analysis$
 ^testing$
 ^data-raw$
+^doc$
+^Meta$

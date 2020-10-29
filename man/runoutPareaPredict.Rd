@@ -14,6 +14,7 @@ runoutPareaPredict(
   pcm_mu,
   pcm_md,
   gpp_iter = 1000,
+  saga_lib,
   file_name = NULL
 )
 }
@@ -35,6 +36,8 @@ runoutPareaPredict(
 \item{pcm_md}{PCM model mass-to-drag ratio (m)}
 
 \item{gpp_iter}{Model iterations}
+
+\item{saga_lib}{The initiated SAGA-GIS geoprocessor object}
 
 \item{file_name}{(optional) Can give a file name to save process area raster as GeoTiff}
 }

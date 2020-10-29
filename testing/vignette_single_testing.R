@@ -5,6 +5,8 @@ document()
 build()
 install()
 
+check(vignettes = FALSE)
+
 
 # Load Packages and Data ####################################################################
 library(runout.opt)
