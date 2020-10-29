@@ -4,12 +4,12 @@
 \alias{pcmGetOpt_single}
 \title{Get PCM runout distance grid search optimal parameters for single event}
 \usage{
-pcmGetOpt_single(x, performance = "relerr", from_save = FALSE)
+pcmGetOpt_single(x, performance = "relerr")
 }
 \arguments{
 \item{x}{A list of PCM grid search values}
 
-\item{performace}{Performance measure "relerr" relative error}
+\item{performance}{Performance measure "relerr" relative error}
 }
 \value{
 A dataframe  with the optimal parameter set and performance

@@ -269,10 +269,10 @@ rwPoolSPCV<- function(x, plot_freq = FALSE){
   }
 
   if(plot_freq){
-    gg <- ggplot2::ggplot(sets, ggplot2::aes(x=per, y=exp)) +
+    gg <- ggplot2::ggplot(sets, ggplot2::aes(x=sets$per, y=sets$exp)) +
       # Can improve by making different colors for different slope thresholds...
 
-      ggplot2::geom_point(alpha=0.5, ggplot2::aes(col = as.factor(slp), size = rel_freq)) +
+      ggplot2::geom_point(alpha=0.5, ggplot2::aes(col = as.factor(sets$slp), size = sets$rel_freq)) +
 
       ggplot2::labs(size = "Relative\nfrequency (%)", col = "Slope threshold") +
 

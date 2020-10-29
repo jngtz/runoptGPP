@@ -12,6 +12,8 @@ runoutPareaPredict(source_pred, dem, source_threshold, rw_slp, rw_exp,
 
 \item{dem}{A DEM as a RasterLayer object}
 
+\item{source_threshold}{A cutoff of value of source area prediction}
+
 \item{rw_slp}{Random walk slope threshold - below lateral spreading is modeled}
 
 \item{rw_exp}{Random walk exponent controlling lateral spread}
@@ -23,6 +25,8 @@ runoutPareaPredict(source_pred, dem, source_threshold, rw_slp, rw_exp,
 \item{pcm_md}{PCM model mass-to-drag ratio (m)}
 
 \item{gpp_iter}{Model iterations}
+
+\item{file_name}{(optional) Can give a file name to save process area raster as GeoTiff}
 }
 \value{
 A RasterLayer with runout process areas

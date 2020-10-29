@@ -10,15 +10,13 @@ pcmGetOpt(x, performance = "relerr", measure = "median",
 \arguments{
 \item{x}{A list of PCM grid search values}
 
+\item{performance}{Performance measure "relerr" relative error}
+
 \item{measure}{A measure (e.g. "median", "mean") to find optimal parameter across grid search space}
 
 \item{from_save}{(Logical) if TRUE, will load save files form current working directory}
 
 \item{plot_opt}{(Logical) if TRUE, will plot performance across grid search space}
-
-\item{slide_id}{Selects a single runout polygon from slide_plys by row}
-
-\item{performace}{Performance measure "relerr" relative error}
 }
 \value{
 A dataframe  with the optimal parameter set and performance

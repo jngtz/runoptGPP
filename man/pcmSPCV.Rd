@@ -9,11 +9,13 @@ pcmSPCV(x, slide_plys, n_folds, repetitions, from_save = FALSE)
 \arguments{
 \item{x}{A SpatialPolygonsDataframe}
 
+\item{slide_plys}{Runout tracks as a SpatialPolygonsDataFrame}
+
 \item{n_folds}{The number of folds (i.e. partitions)}
 
 \item{repetitions}{Number of repetitions}
 
-\item{from_save}{(Logical) if TRUE, will load save files from current working directory}
+\item{from_save}{logical. If TRUE, will load save files from current working directory}
 }
 \value{
 A vector containing numeric labels defining each fold

@@ -3,9 +3,10 @@
 #' Perform (repeated) spatial cross-validation of PCM optimization
 #'
 #' @param x A SpatialPolygonsDataframe
+#' @param slide_plys Runout tracks as a SpatialPolygonsDataFrame
 #' @param n_folds The number of folds (i.e. partitions)
 #' @param repetitions Number of repetitions
-#' @param from_save (Logical) if TRUE, will load save files from current working directory
+#' @param from_save logical. If TRUE, will load save files from current working directory
 #' @return A vector containing numeric labels defining each fold
 
 pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
@@ -121,7 +122,7 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 #' Creates a summary of the frequency and performance (relative error) of optimal parameter
 #'     sets across spatial cross-validation repetitions.
 #' @param x The (list) result of pcmSPCV()
-#' @param plot_freq (Logical) if TRUE, will a create bubble plot of optimal parameter
+#' @param plot_freq logical. if TRUE, will a create bubble plot of optimal parameter
 #'      set frequencies across grid search space
 #' @return A data frame summarizing the frequency and performance of each
 #'     optimal parameter sets
@@ -162,8 +163,8 @@ pcmPoolSPCV<- function(x, plot_freq = FALSE){
   }
 
   if(plot_freq){
-    gg <-  ggplot2::ggplot(sets, ggplot2::aes(x=md, y=mu)) +
-      ggplot2::geom_point(alpha=0.7, ggplot2::aes(colour = rel_err, size = rel_freq)) +
+    gg <-  ggplot2::ggplot(sets, ggplot2::aes(x=sets$md, y=sets$mu)) +
+      ggplot2::geom_point(alpha=0.7, ggplot2::aes(colour = sets$rel_err, size = sets$rel_freq)) +
 
       ggplot2::scale_colour_gradient(high = "#1B4F72", low = "#85C1E9",
                             name = "Median relative\nerror") +

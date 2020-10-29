@@ -30,12 +30,14 @@ rasterThreshold <- function(x, value_range = c(0.9, Inf)){
 #' corresponding runout process areas.
 #' @param source_pred RasterLayer with probability of being runout source area
 #' @param dem A DEM as a RasterLayer object
+#' @param source_threshold A cutoff of value of source area prediction
 #' @param rw_slp Random walk slope threshold - below lateral spreading is modeled
 #' @param rw_exp Random walk exponent controlling lateral spread
 #' @param rw_per Random walk persistence factor to weight flow direction consistency
 #' @param pcm_mu PCM model sliding friction coefficient
 #' @param pcm_md PCM model mass-to-drag ratio (m)
 #' @param gpp_iter Model iterations
+#' @param file_name (optional) Can give a file name to save process area raster as GeoTiff
 #' @return A RasterLayer with runout process areas
 
 runoutPareaPredict <- function(source_pred, dem, source_threshold,
@@ -44,12 +46,12 @@ runoutPareaPredict <- function(source_pred, dem, source_threshold,
 
   dem_grid <- dem
 
-  source_threshold <- rasterThreshold(source_grid, value_range = c(source_threshold[i], Inf))
+  source_class <- rasterThreshold(source_pred, value_range = c(source_threshold, Inf))
 
   #just in case no source cells are present...
-  if(freq(source_threshold, value = 1) != 0) {
+  if(raster::freq(source_class, value = 1) != 0) {
     gpp <- saga$sim_geomorphology$gravitational_process_path_model(dem = dem_grid,
-                                                                   release_areas = source_threshold,
+                                                                   release_areas = source_class,
                                                                    process_path_model = 1,
                                                                    rw_slope_thres = rw_slp,
                                                                    rw_exponent = rw_exp,
@@ -60,8 +62,8 @@ runoutPareaPredict <- function(source_pred, dem, source_threshold,
                                                                    friction_mass_to_drag = pcm_md)
 
     if(!is.null(file_name)){
-      write_name <- paste0(fil)
-      raster::writeRaster(gpp$process_area, paste0(filename), format = "GTiff", overwrite = TRUE)
+      write_name <- paste0(file_name, ".tif")
+      raster::writeRaster(gpp$process_area, paste0(file_name), format = "GTiff", overwrite = TRUE)
     }
   }
   return(gpp$process_area)
@@ -119,10 +121,10 @@ rocParea <- function(process_area, slide_area, smp_mask, smp_size = 1000, seed =
 #' @return Area covered by process area
 
 areaPerParea <- function(process_area, dem){
-  v_dem <- getValues(dem)
+  v_dem <- raster::getValues(dem)
   n_dem_cells <- length( v_dem[!is.na(v_dem)] )
 
-  v_all <- getValues(process_area) # process area
+  v_all <- raster::getValues(process_area) # process area
   v_parea <- v_all[!is.na(v_all)]
   n_parea_cells <- length(v_parea)
   per_area <- n_parea_cells / n_dem_cells *100

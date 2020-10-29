@@ -96,8 +96,7 @@ pcmGridsearch <- function(dem,
 #' Get PCM runout distance grid search optimal parameters
 #'
 #' @param x A list of PCM grid search values
-#' @param slide_id Selects a single runout polygon from slide_plys by row
-#' @param performace Performance measure "relerr" relative error
+#' @param performance Performance measure "relerr" relative error
 #' @param measure A measure (e.g. "median", "mean") to find optimal parameter across grid search space
 #' @param from_save (Logical) if TRUE, will load save files form current working directory
 #' @param plot_opt (Logical) if TRUE, will plot performance across grid search space
@@ -165,8 +164,8 @@ pcmGetOpt <- function(x, performance = "relerr", measure = "median",
 
     err_df <- reshape2::melt(err)
 
-    gg <- ggplot2::ggplot(data = err_df, ggplot2::aes(x=Var2, y=Var1, z=value)) +
-      ggplot2::geom_tile(ggplot2::aes(fill = value)) +
+    gg <- ggplot2::ggplot(data = err_df, ggplot2::aes(x=err_df$Var2, y=err_df$Var1, z=err_df$value)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = err_df$value)) +
 
       ggplot2::ylab(expression(paste("Sliding friction coefficient"))) +
       ggplot2::xlab("Mass-to-drag ratio (m)") +
@@ -190,11 +189,10 @@ pcmGetOpt <- function(x, performance = "relerr", measure = "median",
 #' Get PCM runout distance grid search optimal parameters for single event
 #'
 #' @param x A list of PCM grid search values
-#' @param performace Performance measure "relerr" relative error
+#' @param performance Performance measure "relerr" relative error
 #' @return A dataframe  with the optimal parameter set and performance
 
-pcmGetOpt_single <- function(x, performance = "relerr",
-                      from_save = FALSE){
+pcmGetOpt_single <- function(x, performance = "relerr"){
 
   pcm_md_vec <- as.numeric(colnames(x[[1]]))
   pcm_mu_vec <- as.numeric(rownames(x[[1]]))
@@ -234,7 +232,7 @@ pcmGetOpt_single <- function(x, performance = "relerr",
 #' Get PCM runout distance grid search values
 #'
 #' @param x A list of PCM grid search values
-#' @param performace Performance measure "relerr" relative error
+#' @param performance Performance measure "relerr" relative error
 #' @param measure A measure (e.g. "median", "mean") to aggregate model performances from all slides
 #' @param from_save (Logical) if TRUE, will load save files form current working directory
 #' @return A matrix of grid search space with aggregated performance values

@@ -9,7 +9,7 @@ pcmPoolSPCV(x, plot_freq = FALSE)
 \arguments{
 \item{x}{The (list) result of pcmSPCV()}
 
-\item{plot_freq}{(Logical) if TRUE, will a create bubble plot of optimal parameter
+\item{plot_freq}{logical. if TRUE, will a create bubble plot of optimal parameter
 set frequencies across grid search space}
 }
 \value{

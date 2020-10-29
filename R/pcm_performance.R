@@ -5,6 +5,7 @@
 #'     the relative error, relative difference and error.
 #' @param obs_poly The observed/mapped runout track as a SpatialPolygonsDataFrame
 #' @param pred_raster A RasterLayer object predicting runout
+#' @param dem A DEM as a RasterLayer object
 #' @return A list of error measures
 
 errMinBboxLength <- function(obs_poly, pred_raster, dem){

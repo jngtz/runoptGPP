@@ -1,5 +1,20 @@
 # GEOMETRY CORE FUNCTIONS #######################################################
 
+#' Minimum area bounding rectangles
+#'
+#' Computes a minimum area bounding rectangle for a set of points
+#' @param pts A matrix with x and y coordinates of points
+#' @return A list including the bounding box coordinates
+#' @examples
+#' pts=cbind(runif(60),runif(60))
+#' bb=minbb(pts)
+#' plot(bb$box,type="l")
+#' points(pts)
+#' pts2=rotxy(pts,pi/1.6)
+#' bb2=minbb(pts2)
+#' plot(bb2$box,type="l")
+#' points(pts2)
+
 minbb <- function(pts){
   #Minimum area bounding rectangles
   #Code thanks to Barry Rowlingson on R-sig-Geo mailing list
@@ -36,6 +51,22 @@ minbb <- function(pts){
 }
 
 
+#' Rotate bounding box
+#'
+#' @param pts A matrix with x and y coordinates of points
+#' @param angle Angle to rotate
+#' @return A list including the bounding box coordinates
+#' @examples
+#' pts=cbind(runif(60),runif(60))
+#' bb=minbb(pts)
+#' plot(bb$box,type="l")
+#' points(pts)
+#' pts2=rotxy(pts,pi/1.6)
+#' bb2=minbb(pts2)
+#' plot(bb2$box,type="l")
+#' points(pts2)
+#' rotxy(pts, 30)
+
 rotxy = function(pts,angle){
   #Rotates bounding box
   co = cos(angle)
@@ -45,12 +76,30 @@ rotxy = function(pts,angle){
 
 
 
+#' Calculate Euclidean distance between two points
+#'
+#' @param p1x x coordinate of point 1
+#' @param p1y y coordinate of point 1
+#' @param p2x x coordinate of point 2
+#' @param p2y y coordinate of point 2
+#' @return The distance between two points
+#' @examples
+#' EuclDist(2,3,7,8)
+
 EuclDist <- function(p1x, p1y, p2x, p2y){
   #Calculate Euclidean distance between two points
   dist <- sqrt((p2x - p1x)^2 + (p2y - p1y)^2)
   return(dist)
 }
 
+
+#' Get vertices from a polygon
+#'
+#' @param x A SpatialPolygon object
+#' @return A matrix with all verticies
+#' @examples
+#' slide_plys <- rgdal::readOGR(system.file("extdata/dflow_runout_ply.shp", package="runout.opt"))
+#' getVertices(slide_plys)
 
 getVertices <- function(x){
   # Returns matrix of all the vertices in a polygon
@@ -67,6 +116,7 @@ getVertices <- function(x){
   m_coords
 
 }
+
 
 
 

@@ -10,6 +10,8 @@ errMinBboxLength(obs_poly, pred_raster, dem)
 \item{obs_poly}{The observed/mapped runout track as a SpatialPolygonsDataFrame}
 
 \item{pred_raster}{A RasterLayer object predicting runout}
+
+\item{dem}{A DEM as a RasterLayer object}
 }
 \value{
 A list of error measures
