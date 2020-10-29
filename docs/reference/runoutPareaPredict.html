@@ -142,6 +142,7 @@ corresponding runout process areas.</p>
   <span class='va'>pcm_mu</span>,
   <span class='va'>pcm_md</span>,
   gpp_iter <span class='op'>=</span> <span class='fl'>1000</span>,
+  <span class='va'>saga_lib</span>,
   file_name <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
@@ -155,6 +156,10 @@ corresponding runout process areas.</p>
     <tr>
       <th>dem</th>
       <td><p>A DEM as a RasterLayer object</p></td>
+    </tr>
+    <tr>
+      <th>source_threshold</th>
+      <td><p>A cutoff of value of source area prediction</p></td>
     </tr>
     <tr>
       <th>rw_slp</th>
@@ -179,6 +184,14 @@ corresponding runout process areas.</p>
     <tr>
       <th>gpp_iter</th>
       <td><p>Model iterations</p></td>
+    </tr>
+    <tr>
+      <th>saga_lib</th>
+      <td><p>The initiated SAGA-GIS geoprocessor object</p></td>
+    </tr>
+    <tr>
+      <th>file_name</th>
+      <td><p>(optional) Can give a file name to save process area raster as GeoTiff</p></td>
     </tr>
     </table>
 

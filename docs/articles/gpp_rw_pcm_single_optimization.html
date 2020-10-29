@@ -81,7 +81,7 @@
       <h1 data-toc-skip>Optimizing for a an individual runout event</h1>
                         <h4 class="author">Jason Goetz</h4>
             
-            <h4 class="date">2020-10-22</h4>
+            <h4 class="date">2020-10-29</h4>
       
       
       <div class="hidden name"><code>gpp_rw_pcm_single_optimization.Rmd</code></div>
@@ -154,9 +154,9 @@
 <span class="fu"><a href="../reference/rwPerformance.html">rwPerformance</a></span><span class="op">(</span><span class="va">dem</span>, slide_plys <span class="op">=</span> <span class="va">runout_polygon</span>, slide_src <span class="op">=</span> <span class="va">source_point</span>,
                    slp <span class="op">=</span> <span class="fl">30</span>, ex <span class="op">=</span> <span class="fl">3</span>, per <span class="op">=</span> <span class="fl">2</span>,
                    gpp_iter <span class="op">=</span> <span class="fl">1000</span>, buffer_ext <span class="op">=</span> <span class="fl">500</span>, buffer_source <span class="op">=</span> <span class="fl">50</span>,
-                   plot_eval <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+                   plot_eval <span class="op">=</span> <span class="cn">TRUE</span>, saga_lib <span class="op">=</span> <span class="va">saga</span><span class="op">)</span></pre></div>
 <p><img src="gpp_rw_pcm_single_optimization_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
-<pre><code>#&gt; [1] 0.9223917</code></pre>
+<pre><code>#&gt; [1] 0.9225628</code></pre>
 </div>
 <div id="gpp-random-walk-grid-search-optimization" class="section level3">
 <h3 class="hasAnchor">
@@ -180,35 +180,36 @@
                <span class="co">#Define processing extent size (m)</span>
                buffer_ext <span class="op">=</span> <span class="fl">500</span>,
                <span class="co">#(Optional) Define size of buffer to make source area from point</span>
-               buffer_source <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+               buffer_source <span class="op">=</span> <span class="fl">50</span>,
+               saga_lib <span class="op">=</span> <span class="va">saga</span><span class="op">)</span>
 
 <span class="va">rw_gridsearch</span></pre></div>
 <pre><code>#&gt; , , 1.5
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849514 0.6088008 0.6072168
-#&gt; 30 0.6004636 0.8692451 0.9221440
-#&gt; 40 0.7943184 0.9476966 0.9510681
+#&gt; 20 0.5849434 0.6086986 0.6111571
+#&gt; 30 0.6003767 0.8694033 0.9221361
+#&gt; 40 0.8004792 0.9481594 0.9517487
 #&gt; 
 #&gt; , , 1.75
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849269 0.6074294 0.6123363
-#&gt; 30 0.6016158 0.8667211 0.9210047
-#&gt; 40 0.7987351 0.9474004 0.9514144
+#&gt; 20 0.5849394 0.6137093 0.6073589
+#&gt; 30 0.5990484 0.8664688 0.9220378
+#&gt; 40 0.7998238 0.9471330 0.9520677
 #&gt; 
 #&gt; , , 2
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849474 0.6150456 0.6060206
-#&gt; 30 0.6016215 0.8704929 0.9220376
-#&gt; 40 0.8018884 0.9473881 0.9513232</code></pre>
+#&gt; 20 0.5849456 0.6112526 0.6034832
+#&gt; 30 0.5990189 0.8675144 0.9220334
+#&gt; 40 0.7994754 0.9471748 0.9511496</code></pre>
 <p>And find the parameter set that resulted in the highest AUROC score.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit">
 <span class="va">rw_opt_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwGetOpt_single.html">rwGetOpt_single</a></span><span class="op">(</span><span class="va">rw_gridsearch</span><span class="op">)</span>
 <span class="va">rw_opt_single</span></pre></div>
 <pre><code>#&gt;   rw_slp_opt rw_exp_opt rw_per_opt  rw_auroc
-#&gt; 1         40          3       1.75 0.9514144</code></pre>
+#&gt; 1         40          3       1.75 0.9520677</code></pre>
 </div>
 <div id="gpp-pcm-model-simulation-runout-distance" class="section level3">
 <h3 class="hasAnchor">
@@ -219,12 +220,12 @@
                rw_slp <span class="op">=</span> <span class="fl">40</span>, rw_ex <span class="op">=</span> <span class="fl">3</span>, rw_per <span class="op">=</span> <span class="fl">1.5</span>,
                pcm_mu <span class="op">=</span> <span class="fl">0.15</span>, pcm_md <span class="op">=</span> <span class="fl">120</span>,
                gpp_iter <span class="op">=</span> <span class="fl">1000</span>, buffer_ext <span class="op">=</span> <span class="fl">500</span>, buffer_source <span class="op">=</span> <span class="fl">50</span>,
-               plot_eval <span class="op">=</span> <span class="cn">TRUE</span>, return_features <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+               plot_eval <span class="op">=</span> <span class="cn">TRUE</span>, return_features <span class="op">=</span> <span class="cn">TRUE</span>, saga_lib <span class="op">=</span> <span class="va">saga</span><span class="op">)</span></pre></div>
 <p><img src="gpp_rw_pcm_single_optimization_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="co"># Runout distance relative error</span>
 <span class="va">pcm</span><span class="op">$</span><span class="va">length.relerr</span></pre></div>
-<pre><code>#&gt; [1] 0.009754085</code></pre>
+<pre><code>#&gt; [1] 0.01426818</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="co"># Plot GPP PCM runout modelling ouputs</span>
 <span class="va">gpp_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html">stack</a></span><span class="op">(</span><span class="va">pcm</span><span class="op">$</span><span class="va">gpp.parea</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.stop</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.maxvel</span><span class="op">)</span>
@@ -256,12 +257,13 @@
                        <span class="co">#Define processing extent size (m)</span>
                        buffer_ext <span class="op">=</span> <span class="fl">500</span>,
                        <span class="co">#(Optional) Define size of buffer to make source area from point</span>
-                       buffer_source <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+                       buffer_source <span class="op">=</span> <span class="fl">50</span>, 
+                       saga_lib <span class="op">=</span> <span class="va">saga</span><span class="op">)</span>
 
 <span class="co"># Get optimal parameters</span>
 <span class="fu"><a href="../reference/pcmGetOpt_single.html">pcmGetOpt_single</a></span><span class="op">(</span><span class="va">pcm_gridsearch</span><span class="op">)</span></pre></div>
-<pre><code>#&gt;   pcm_mu pcm_md     relerr    auroc
-#&gt; 1   0.15    100 0.00686124 0.960011</code></pre>
+<pre><code>#&gt;   pcm_mu pcm_md    relerr     auroc
+#&gt; 1   0.05     80 0.0146632 0.9579669</code></pre>
 </div>
   </div>
 

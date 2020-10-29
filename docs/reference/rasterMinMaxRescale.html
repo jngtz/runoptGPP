@@ -145,6 +145,11 @@
 
     <p>RasterLayer</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/elev_12_5m.tif"</span>, package<span class='op'>=</span><span class='st'>"runout.opt"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>r_minmax</span> <span class='op'>&lt;-</span> <span class='fu'>rasterMinMaxRescale</span><span class='op'>(</span><span class='va'>r</span><span class='op'>)</span>
+<span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>r_minmax</span><span class='op'>)</span>
+</div><div class='img'><img src='rasterMinMaxRescale-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

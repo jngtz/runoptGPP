@@ -155,6 +155,27 @@
 
     <p>A data frame containing runout geometries</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># Load elevation model (DEM)</span>
+<span class='va'>dem</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/raster.html'>raster</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/elev_12_5m.tif"</span>, package<span class='op'>=</span><span class='st'>"runout.opt"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Load runout polygons</span>
+<span class='va'>file_nm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/dflow_runout_ply.shp"</span>, package<span class='op'>=</span><span class='st'>"runout.opt"</span><span class='op'>)</span>
+<span class='va'>slide_plys</span> <span class='op'>&lt;-</span> <span class='fu'>rgdal</span><span class='fu'>::</span><span class='fu'><a href='http://rgdal.r-forge.r-project.org/reference/readOGR.html'>readOGR</a></span><span class='op'>(</span><span class='va'>file_nm</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; OGR data source with driver: ESRI Shapefile 
+#&gt; Source: "/tmp/RtmpKvCf6e/temp_libpath16cf12492c60d/runout.opt/extdata/dflow_runout_ply.shp", layer: "dflow_runout_ply"
+#&gt; with 6 features
+#&gt; It has 27 fields
+#&gt; Integer64 fields read as strings:  FID_1 OBJECTID OBJECTID_1 FID_2 OBJECTID_2 ID ID_COL Dif_rango </div><div class='output co'>#&gt; <span class='warning'>Warning: Z-dimension discarded</span></div><div class='input'>
+<span class='va'>slide_geom</span> <span class='op'>&lt;-</span> <span class='fu'>runoutGeom</span><span class='op'>(</span><span class='va'>slide_plys</span>, <span class='va'>dem</span><span class='op'>)</span>
+<span class='va'>slide_geom</span>
+</div><div class='output co'>#&gt;   fid id    width   length     area surfacearea maxelev minelev reachangle
+#&gt; 1   0  1 465.2282 2758.220 524921.5    588836.5    3635    2205   27.40450
+#&gt; 2   1  2 307.4041 2811.722 138838.5    159381.3    3755    2227   28.52140
+#&gt; 3   2  3 527.2579 3116.045 652965.1    748991.1    4000    2186   30.20575
+#&gt; 4   3  4 382.0606 2690.692 197743.9    217936.0    3577    2219   26.78021
+#&gt; 5   4  5 276.1625 2641.502 177993.7    196479.0    3479    2212   25.62477
+#&gt; 6   5  6 195.9905 1761.484 201892.2    238286.3    3194    2172   30.12198</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
