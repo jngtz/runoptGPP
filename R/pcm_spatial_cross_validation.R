@@ -19,7 +19,8 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 
     for(i in 1:length(files)){
       res_nm <- paste("result_pcm_gridsearch_", i, ".Rd", sep="")
-      load(res_nm)
+      res_obj_nm <- load(res_nm)
+      result_pcm <- get(res_obj_nm)
       x[[i]] <- result_pcm
     }
 

@@ -23,6 +23,7 @@
 #'      frequencies is the predicted runout.
 #' @param save_res (Logical) if TRUE, will save results in current working directory
 #' @param plot_eval (Logical) ff TRUE, will plot simulated runout and runout polygon
+#' @param saga_lib The initiated SAGA-GIS geoprocessor object
 #' @return A list with performances for each parameter combinations across grid search space.
 #'      The performances measures include relative error, relative difference, error and AUROC.
 
@@ -33,7 +34,7 @@ pcmGridsearch <- function(dem,
                        gpp_iter = 1000,
                        buffer_ext = 500, buffer_source = NULL,
                        predict_threshold = 0.5,
-                       save_res = FALSE, plot_eval = FALSE){
+                       save_res = FALSE, plot_eval = FALSE, saga_lib){
 
   if(is.null(slide_id)){
     slide_id = 1
@@ -66,7 +67,8 @@ pcmGridsearch <- function(dem,
                                  buffer_source = buffer_source,
                                  gpp_iter = gpp_iter,
                                  predict_threshold = predict_threshold,
-                                 plot_eval = FALSE)
+                                 plot_eval = FALSE,
+                                 saga_lib = saga_lib)
 
       roc_result[k, i] <- result$roc
       relerr_length_result[k, i] <- result$length.relerr
@@ -112,7 +114,8 @@ pcmGetOpt <- function(x, performance = "relerr", measure = "median",
 
     for(i in 1:length(files)){
       res_nm <- paste("result_pcm_gridsearch_", i, ".Rd", sep="")
-      load(res_nm)
+      res_obj_nm <- load(res_nm)
+      result_pcm <- get(res_obj_nm)
       x[[i]] <- result_pcm
     }
 
@@ -247,7 +250,8 @@ pcmGetGrid <- function(x, performance = "relerr", measure = "median",
 
     for(i in 1:length(files)){
       res_nm <- paste("result_pcm_gridsearch_", i, ".Rd", sep="")
-      load(res_nm)
+      res_obj_nm <- load(res_nm)
+      result_pcm <- get(res_obj_nm)
       x[[i]] <- result_pcm
     }
 

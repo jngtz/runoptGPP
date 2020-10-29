@@ -4,10 +4,24 @@
 \alias{pcmGridsearch}
 \title{Grid search optimization for PCM runout distance}
 \usage{
-pcmGridsearch(dem, slide_plys, slide_src, slide_id = NULL, rw_slp, rw_ex,
-  rw_per, pcm_mu_v, pcm_md_v, gpp_iter = 1000, buffer_ext = 500,
-  buffer_source = NULL, predict_threshold = 0.5, save_res = FALSE,
-  plot_eval = FALSE)
+pcmGridsearch(
+  dem,
+  slide_plys,
+  slide_src,
+  slide_id = NULL,
+  rw_slp,
+  rw_ex,
+  rw_per,
+  pcm_mu_v,
+  pcm_md_v,
+  gpp_iter = 1000,
+  buffer_ext = 500,
+  buffer_source = NULL,
+  predict_threshold = 0.5,
+  save_res = FALSE,
+  plot_eval = FALSE,
+  saga_lib
+)
 }
 \arguments{
 \item{dem}{A DEM as a RasterLayer object}
@@ -44,6 +58,8 @@ frequencies is the predicted runout.}
 \item{save_res}{(Logical) if TRUE, will save results in current working directory}
 
 \item{plot_eval}{(Logical) ff TRUE, will plot simulated runout and runout polygon}
+
+\item{saga_lib}{The initiated SAGA-GIS geoprocessor object}
 }
 \value{
 A list with performances for each parameter combinations across grid search space.

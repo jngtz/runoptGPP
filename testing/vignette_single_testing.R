@@ -41,7 +41,7 @@ source_point <- source_points[!is.na(sel_source_point$objectid),]
 rwPerformance(dem, slide_plys = runout_polygon, slide_src = source_point,
                    slp = 30, ex = 3, per = 2,
                    gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
-                   plot_eval = TRUE)
+                   plot_eval = TRUE, saga_lib = saga)
 
 # Define grid search values
 steps <- 3
@@ -57,7 +57,7 @@ rw_gridsearch <- rwGridsearch(dem, slide_plys = runout_polygon, slide_src = sour
                #Define processing extent size (m)
                buffer_ext = 500,
                #(Optional) Define size of buffer to make source area from point
-               buffer_source = 50)
+               buffer_source = 50, saga_lib = saga)
 
 rw_gridsearch
 
@@ -71,7 +71,7 @@ pcm <- pcmPerformance(dem, slide_plys = runout_polygon, slide_src = source_point
                rw_slp = 40, rw_ex = 3, rw_per = 1.5,
                pcm_mu = 0.15, pcm_md = 120,
                gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
-               plot_eval = TRUE, return_features = TRUE)
+               plot_eval = TRUE, return_features = TRUE, saga_lib = saga)
 
 # Runout distance relative error
 pcm$length.relerr
@@ -100,7 +100,7 @@ pcm_gridsearch <- pcmGridsearch(dem,
                        #Define processing extent size (m)
                        buffer_ext = 500,
                        #(Optional) Define size of buffer to make source area from point
-                       buffer_source = 50)
+                       buffer_source = 50, saga_lib = saga)
 
 # Get optimal parameters
 pcmGetOpt_single(pcm_gridsearch)

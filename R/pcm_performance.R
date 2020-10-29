@@ -51,6 +51,7 @@ errMinBboxLength <- function(obs_poly, pred_raster, dem){
 #' @param plot_eval logical. If TRUE will plot simulated runout and runout polygon
 #' @param return_features logical. If TRUE, returned list will include GPP input and output
 #'      data, in addition to a list of error measures.
+#' @param saga_lib The initiated SAGA-GIS geoprocessor object
 #' @return A list of runout distance performance measures.
 #' @examples
 #' \dontrun{
@@ -85,7 +86,8 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
                              rw_slp = 33, rw_ex = 3, rw_per = 2,
                              pcm_mu = 0.3, pcm_md = 75,
                              buffer_ext = 500, buffer_source = 50, gpp_iter = 1000,
-                             predict_threshold = 0.5, plot_eval = FALSE, return_features = FALSE)
+                             predict_threshold = 0.5, plot_eval = FALSE,
+                             return_features = FALSE, saga_lib)
 {
 
   # If single runout polygon as input, assign slide_id value of 1
@@ -131,7 +133,7 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
 
 
   # Run runout model using Rsagacmd (faster than RSAGA)
-  gpp <- saga$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
+  gpp <- saga_lib$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
                                                                  #friction_mu_grid = mu.grid,
                                                                  process_path_model = 1,
                                                                  rw_slope_thres = rw_slp,

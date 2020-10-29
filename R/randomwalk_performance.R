@@ -19,10 +19,10 @@
 #' @param buffer_source (Optional) Can define a buffer distance (in meters) to extend source
 #'      point to a source area
 #' @param plot_eval logical. If TRUE will plot random walk path and runout polygon
+#' @param saga_lib The initiated SAGA-GIS geoprocessor object
 #' @return The area under the receiver operating characteristic
 #' @details Runout source can be either point or area.
 #' @examples
-#' \dontrun{
 #' \dontrun{
 #' # Initialize a saga object
 #' saga <- Rsagacmd::saga_gis()
@@ -38,7 +38,7 @@
 #' rw <- rwPerformance(dem, slide_plys = runout_plys[1,], slide_src = source_pnts,
 #'     slp = 30, ex = 3, per = 2,
 #'     gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
-#'     plot_eval = TRUE)
+#'     plot_eval = TRUE, saga_lib = saga)
 #'
 #' rw # returns AUROC
 #'
@@ -48,7 +48,7 @@
 rwPerformance <- function(dem, slide_plys, slide_src,
                           slide_id = 2, slp = 33, ex = 3, per = 2,
                           gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
-                          plot_eval = FALSE)
+                          plot_eval = FALSE, saga_lib)
 {
 
   # If single runout polygon as input, assign slide_id value of 1
@@ -95,7 +95,7 @@ rwPerformance <- function(dem, slide_plys, slide_src,
 
 
   # Run runout model using Rsagacmd (faster than RSAGA)
-  gpp <- saga$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
+  gpp <- saga_lib$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
                                                                  process_path_model = 1,
                                                                  rw_slope_thres = slp,
                                                                  rw_exponent = ex,

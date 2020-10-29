@@ -11,5 +11,7 @@ Encoding: UTF-8
 Imports: raster, rgdal, rgeos, sf, ggplot2, reshape2, ROCR, sperrorest, Rsagacmd, sp, methods
 LazyData: true
 RoxygenNote: 7.1.1
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, patchwork, ggnewscale
+Depends: 
+    R (>= 2.10)
 

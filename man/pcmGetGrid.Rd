@@ -4,8 +4,7 @@
 \alias{pcmGetGrid}
 \title{Get PCM runout distance grid search values}
 \usage{
-pcmGetGrid(x, performance = "relerr", measure = "median",
-  from_save = FALSE)
+pcmGetGrid(x, performance = "relerr", measure = "median", from_save = FALSE)
 }
 \arguments{
 \item{x}{A list of PCM grid search values}

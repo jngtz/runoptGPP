@@ -37,12 +37,13 @@ rasterThreshold <- function(x, value_range = c(0.9, Inf)){
 #' @param pcm_mu PCM model sliding friction coefficient
 #' @param pcm_md PCM model mass-to-drag ratio (m)
 #' @param gpp_iter Model iterations
+#' @param saga_lib The initiated SAGA-GIS geoprocessor object
 #' @param file_name (optional) Can give a file name to save process area raster as GeoTiff
 #' @return A RasterLayer with runout process areas
 
 runoutPareaPredict <- function(source_pred, dem, source_threshold,
                                rw_slp, rw_exp, rw_per, pcm_mu, pcm_md,
-                               gpp_iter = 1000, file_name = NULL){
+                               gpp_iter = 1000, saga_lib, file_name = NULL){
 
   dem_grid <- dem
 
@@ -50,7 +51,7 @@ runoutPareaPredict <- function(source_pred, dem, source_threshold,
 
   #just in case no source cells are present...
   if(raster::freq(source_class, value = 1) != 0) {
-    gpp <- saga$sim_geomorphology$gravitational_process_path_model(dem = dem_grid,
+    gpp <- saga_lib$sim_geomorphology$gravitational_process_path_model(dem = dem_grid,
                                                                    release_areas = source_class,
                                                                    process_path_model = 1,
                                                                    rw_slope_thres = rw_slp,

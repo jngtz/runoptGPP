@@ -19,6 +19,7 @@
 #'      point to a source area
 #' @param save_res (logical), if TRUE, will save results in current working directory
 #' @param plot_eval If TRUE, will plot random walk path and runout polygon
+#' @param saga_lib The initiated SAGA-GIS geoprocessor object
 #' @return the area under the receiver operating characteristic
 #' @details Runout is either simulated from a single source point or a buffered
 #'      area round the source point.
@@ -28,7 +29,7 @@
 rwGridsearch <- function(dem, slide_plys, slide_src,
                       slide_id = NULL, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
-                      save_res = FALSE, plot_eval = FALSE)
+                      save_res = FALSE, plot_eval = FALSE, saga_lib)
 
 {
 
@@ -61,7 +62,8 @@ rwGridsearch <- function(dem, slide_plys, slide_src,
                              gpp_iter = gpp_iter,
                              buffer_ext = buffer_ext,
                              buffer_source = buffer_source,
-                             plot_eval = plot_eval)
+                             plot_eval = plot_eval,
+                             saga_lib = saga_lib)
 
         roc_result[k, i, j] <- roc
 
@@ -93,7 +95,8 @@ rwGetOpt <- function(x, measure = median, from_save = FALSE){
 
     for(i in 1:length(files)){
       res_nm <- paste("result_rw_roc_", i, ".Rd", sep="")
-      load(res_nm)
+      res_obj_nm <- load(res_nm)
+      roc_result <- get(res_obj_nm)
       x[[i]] <- roc_result
     }
 

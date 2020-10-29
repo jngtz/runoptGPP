@@ -15,7 +15,3 @@ A matrix with all verticies
 \description{
 Get vertices from a polygon
 }
-\examples{
-slide_plys <- rgdal::readOGR(system.file("extdata/dflow_runout_ply.shp", package="runout.opt"))
-getVertices(slide_plys)
-}

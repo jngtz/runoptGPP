@@ -97,9 +97,6 @@ EuclDist <- function(p1x, p1y, p2x, p2y){
 #'
 #' @param x A SpatialPolygon object
 #' @return A matrix with all verticies
-#' @examples
-#' slide_plys <- rgdal::readOGR(system.file("extdata/dflow_runout_ply.shp", package="runout.opt"))
-#' getVertices(slide_plys)
 
 getVertices <- function(x){
   # Returns matrix of all the vertices in a polygon
