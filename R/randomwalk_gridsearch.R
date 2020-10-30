@@ -163,11 +163,15 @@ rwGetOpt_single <- function(x){
 
   wh_opt <- which(x==max(x), arr.ind = TRUE)
 
+  if(nrow(wh_opt) > 1){
+    wh_opt <- wh_opt[1,]
+  }
+
   opt_param <- data.frame(
     rw_slp_opt = slp_vec[wh_opt][1],
     rw_exp_opt = ex_vec[wh_opt][2],
     rw_per_opt = per_vec[wh_opt][3],
-    rw_auroc = x[wh_opt]
+    rw_auroc = x[wh_opt][1]
   )
 
   return(opt_param)

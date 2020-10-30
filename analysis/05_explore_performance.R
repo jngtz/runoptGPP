@@ -112,7 +112,7 @@ m.relerr <-  ggplot() +
   geom_point(data = dflow_sf, shape = 1, size = 2, alpha = 0.9, colour="#7f8c8d", aes(x = x, y = y)) +
   xlab("") +
   ylab("") +
-  theme_light() +
+  theme_bw() +
   theme(text = element_text(family = "Arial", size = 10),
         axis.text = element_text(size = 7), legend.position = "bottom")
 
@@ -131,7 +131,7 @@ m.auroc <-  ggplot() +
   geom_point(data = dflow_sf, shape = 1, size = 2, alpha = 0.9, colour="#7f8c8d", aes(x = x, y = y)) +
   xlab("") +
   ylab("") +
-  theme_light() +
+  theme_bw() +
   theme(text = element_text(family = "Arial", size = 10),
         axis.text = element_text(size = 7), legend.position = "bottom")
 
@@ -250,6 +250,49 @@ cor(geom_gpp$est_lng, geom_gpp$rel_err, method = "spearman")
 
 # INDIVIDUAL MODEL PERFORMANCES ################################################
 
+# RW
+
+indv_rw <- rwGetOpt_single(rw_gridsearch_multi[[1]])
+
+for(i in 2:length(rw_gridsearch_multi)){
+  print(i)
+  print(rwGetOpt_single(rw_gridsearch_multi[[i]]))
+  indv_rw <- rbind(indv_rw, rwGetOpt_single(rw_gridsearch_multi[[i]]))
+}
+
+indv_rw
+
+opt_sets <- data.frame(slp = indv_rw$rw_slp_opt, per = indv_rw$rw_per_opt, exp = indv_rw$rw_exp_opt)
+freq_sets <- table(opt_sets)
+
+slp_nm <- as.numeric(attributes(freq_sets)$dimnames$slp)
+per_nm <- as.numeric(attributes(freq_sets)$dimnames$per)
+exp_nm <- as.numeric(attributes(freq_sets)$dimnames$exp)
+
+set_ind <- which(freq_sets !=0, arr.ind = TRUE)
+sets <- data.frame(slp = slp_nm[set_ind[,1]],
+                   per = per_nm[set_ind[,2]],
+                   exp = exp_nm[set_ind[,3]],
+                   freq = freq_sets[set_ind])
+
+
+sets$rel_freq <- sets$freq/nrow(indv_rw) * 100
+
+#Find median AUROC values
+set_id <- paste(sets$slp, sets$per, sets$exp)
+indv_rw$set_id <- paste(indv_rw$rw_slp_opt, indv_rw$rw_per_opt, indv_rw$rw_exp_opt)
+
+for(i in 1:length(set_id)){
+  auroc_i <- indv_rw$rw_auroc[which(indv_rw$set_id == set_id[i])]
+  sets$median_auroc[i] <- median(auroc_i, na.rm = TRUE)
+  sets$mean_auroc[i] <- mean(auroc_i, na.rm = TRUE)
+}
+
+
+# Get values for PCM
+
+# PCM
+
 indv_pcm <- pcmGetOpt_single(pcm_gridsearch_multi[[1]])
 
 for(i in 2:length(pcm_gridsearch_multi)){
@@ -287,30 +330,108 @@ for(i in 1:length(pair_id)){
 
 }
 
+
+# Plot results
+
 mybreaks <- c(1, 2, 3)
 
-ggplot(pairs, aes(x=md, y=mu)) +
+gg.rw.slope <- ggplot(sets, aes(x=per, y=exp)) +
+  # Can improve by making different colors for different slope thresholds...
+
+  geom_point(alpha=0.7, aes(col = slp, size = rel_freq)) +
+
+  scale_size(breaks = mybreaks, range = c(0.5, 3)) +
+
+  scale_colour_viridis_c(name = "Slope\nthreshold (°)", option = "cividis", direction = -1) +
+
+  labs(size = "Relative\nfrequency (%)", col = "Slope\nthreshold") +
+
+  #ggtitle("(a) Random walk") +
+
+  guides(colour = guide_coloursteps()) +
+
+  scale_x_continuous(expression(paste("Persistence factor")),
+                              limits = c(min(rwper_vec), max = max(rwper_vec))) +
+  scale_y_continuous(expression(paste("Exponent of divergence")),
+                               limits = c(min(rwexp_vec), max = max(rwexp_vec)+.1)) +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7), axis.title = element_text(size = 7),
+        axis.text = element_text(size = 7), legend.position = "bottom", legend.box="vertical",
+        legend.margin=margin(), plot.title = element_text(family = "Arial", size = 7)) +
+  guides(
+    colour = guide_colourbar(order = 1, barwidth = 5, barheight = 0.6 ,label.position = "bottom"),
+    size = guide_legend(order = 2, label.position = "bottom"))
+
+gg.rw.slope
+
+
+# Now of performance
+mybreaks <- c(1, 2, 3)
+
+gg.rw.auroc <- ggplot(sets, aes(x=per, y=exp)) +
+  # Can improve by making different colors for different slope thresholds...
+
+  geom_point(alpha=0.7, aes(col = median_auroc, size = rel_freq)) +
+
+  scale_size(breaks = mybreaks, range = c(0.5, 3)) +
+
+  scale_colour_gradient(low = "#1B4F72", high = "#85C1E9", name = "Median\nAUROC") +
+
+  labs(size = "Relative\nfrequency (%)", col = "Slope\nthreshold") +
+
+  #ggtitle("(b) Random walk") +
+
+  scale_x_continuous(expression(paste("Persistence factor")),
+                     limits = c(min(rwper_vec), max = max(rwper_vec))) +
+  scale_y_continuous(expression(paste("Exponent of divergence")),
+                     limits = c(min(rwexp_vec), max = max(rwexp_vec)+.1)) +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7), axis.title = element_text(size = 7),
+        axis.text = element_text(size = 7), legend.position = "bottom", legend.box="vertical",
+        legend.margin=margin(), plot.title = element_text(family = "Arial", size = 7)) +
+  guides(
+    colour = guide_colourbar(order = 1, barwidth = 5, barheight = 0.6 ,label.position = "bottom"),
+    size = guide_legend(order = 2, label.position = "bottom"))
+
+gg.rw.auroc
+
+
+#or
+#library(plotly)
+#plot_ly(x=sets$per, y=sets$exp, z=sets$slp, type="scatter3d", mode="markers",
+#        color=sets$mean_auroc, size =sets$rel_freq)
+
+
+mybreaks <- c(1, 2, 3)
+
+gg.ind.pcm <- ggplot(pairs, aes(x=md, y=mu)) +
   geom_point(alpha=0.7, aes(colour = rel_err, size = rel_freq)) +
 
 
-  scale_size(name="Relative\nfrequency (%)", range = c(2, 6), breaks = mybreaks) +
+  scale_size(name="Relative\nfrequency (%)", range = c(0.5, 3), breaks = mybreaks) +
 
-  scale_colour_gradient(high = "#1B4F72", low = "#85C1E9", name = "Median relative\nerror") +
+  scale_colour_gradient(high = "#1B4F72", low = "#85C1E9", name = "Median\nrelative error") +
 
+  #ggtitle("(c) PCM") +
   xlab("Mass-to-drag ratio (m)") +
   ylab("Sliding friction coefficient") +
 
 
-  theme_light() +
-  theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8)) +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7), axis.title = element_text(size = 7),
+        axis.text = element_text(size = 7), legend.position = "bottom", legend.box="vertical",
+        legend.margin=margin(), plot.title = element_text(family = "Arial", size = 7)) +
   guides(
-    colour = guide_colourbar(order = 1),
-    size = guide_legend(order = 2))
+    colour = guide_colourbar(order = 1, barwidth = 5, barheight = 0.6 ,label.position = "bottom"),
+    size = guide_legend(order = 2, label.position = "bottom"))
+gg.ind.pcm
 
-setwd("/home/jason/Scratch/Figures")
-ggsave("indv_scatter_opt_pcm.png", dpi = 300, width = 5.5, height = 3.25, units = "in")
+#setwd("/home/jason/Scratch/Figures")
+#ggsave("indv_scatter_opt_pcm.png", dpi = 300, width = 5.5, height = 3.25, units = "in")
 
+
+gg.rw.slope + gg.rw.auroc + gg.ind.pcm
+ggsave("indv_scatter_rw_pcm_perf.png", dpi = 300, width = 7.5, height = 3.25, units = "in")
 
 # MAP OF INDV PERFORMANCE ######################################################
 dflow_df$md <- indv_pcm$pcm_md
@@ -333,8 +454,8 @@ m.pcm_sol <-
   scale_size(name="Mass-to-drage\nratio (m)", range = c(1, 3), breaks = c(20, 75, 150 )) +
   xlab("") +
   ylab("") +
-  theme_light() +
-  theme(text = element_text(family = "Arial", size = 8), axis.title = element_text(size = 7),
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7), axis.title = element_text(size = 7),
         axis.text = element_text(size = 7),legend.position = "right")
 m.pcm_sol
 
