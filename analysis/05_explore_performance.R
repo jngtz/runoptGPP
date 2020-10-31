@@ -34,12 +34,98 @@ hillshade <- aggregate(hillshade, fact = 6, fun = mean)
 hillshade_df <- as.data.frame(hillshade, xy = TRUE)
 hillshade_df <- hillshade_df[!is.na(hillshade_df$hs_filtered_filled),]
 
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+(load("rw_gridsearch_multi.Rd"))
+
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+(load("pcm_gridsearch_multi.Rd"))
+
+# Get grid search space
+pcm_md_vec <- as.numeric(colnames(pcm_gridsearch_multi[[1]][[1]]))
+pcm_mu_vec <- as.numeric(rownames(pcm_gridsearch_multi[[1]][[1]]))
+
+rwslp_vec <- as.numeric(dimnames(rw_gridsearch_multi[[1]])[[1]])
+rwexp_vec <- as.numeric(dimnames(rw_gridsearch_multi[[1]])[[2]])
+rwper_vec <- as.numeric(dimnames(rw_gridsearch_multi[[1]])[[3]])
+
+# PERFORM SPATIAL CROSS VALIDATION #############################################
+
+#RW SPCV
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = slide_poly_vec,
+                  n_folds = 5, repetitions = 1000)
+
+save("rw_spcv", file = "rw_1000rep_5fld_spcv.Rd" )
+
+#PCM SPCV
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = slide_poly_vec,
+                    n_folds = 5, repetitions = 1000, from_save = FALSE)
+
+save(pcm_spcv, file = "pcm_1000rep_5fld_spcv.Rd")
+
+# Plot spatial cross validation results ########################################
+
+setwd("/home/jason/Scratch/GPP_RW_Paper")
+(load("rw_1000rep_5fld_spcv.Rd"))
+freq_rw <- rwPoolSPCV(rw_spcv, plot_freq = TRUE)
+
+setwd("/home/jason/Scratch/GPP_PCM_Paper")
+(load("pcm_1000rep_5fld_spcv.Rd"))
+freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
+
+# RW
+p.rw <- ggplot(freq_rw, aes(x=per, y=exp)) +
+  geom_point(alpha=0.7, aes(colour = median_auroc, size = rel_freq)) +
+  scale_size(range = c(0.5, 3), name="Relative\nfrequency (%)",
+             breaks = c(5, 15, 60)) +
+  scale_colour_gradient(low = "#1B4F72", high = "#85C1E9",
+                        name = "Median\nAUROC") +
+  scale_x_continuous(expression(paste("Persistence factor")),
+                     limits = c(min(rwper_vec), max = max(rwper_vec))) +
+  scale_y_continuous(expression(paste("Exponent of divergence")),
+                     limits = c(min(rwexp_vec), max = max(rwexp_vec)+.1)) +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7), axis.title = element_text(size = 7),
+        axis.text = element_text(size = 7), legend.position = "right", legend.box="vertical",
+         plot.title = element_text(family = "Arial", size = 7),
+        legend.key.size = unit(.75, 'lines')) +
+  guides(
+    colour = guide_colourbar(order = 1, barheight = 4, barwidth = 0.75),
+    size = guide_legend(order = 2))
+
+# PCM
+p.pcm <- ggplot(freq_pcm, aes(x=md, y=mu)) +
+  geom_point(alpha=0.7, aes(colour = rel_err, size = rel_freq)) +
+  scale_size(range = c(0.5, 3), name="Relative\nfrequency (%)",
+             breaks = c(5, 15, 60)) +
+  scale_colour_gradient(high = "#1B4F72", low = "#85C1E9",
+                        name = "Median\nrelative error") +
+  scale_x_continuous(expression(paste("Mass-to-drag ratio (m)")),
+                     limits = c(min(pcm_md_vec), max = max(pcm_md_vec))) +
+  scale_y_continuous(expression(paste("Sliding friction coefficient")),
+                     limits = c(min(pcm_mu_vec), max = max(pcm_mu_vec))) +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7), axis.title = element_text(size = 7),
+        axis.text = element_text(size = 7), legend.position = "right", legend.box="vertical",
+        plot.title = element_text(family = "Arial", size = 7),
+        legend.key.size = unit(.75, 'lines')) +
+  guides(
+    colour = guide_colourbar(order = 1, barheight = 4, barwidth = 0.75),
+    size = guide_legend(order = 2))
+
+
+setwd("/home/jason/Scratch/Figures")
+
+#p.rwpcm <- p.rw + p.pcm + plot_layout(ncol = 1) + plot_annotation(tag_levels = '(a)')
+p.rw + p.pcm
+
+ggsave("rwpcm_spcv_scatter.png", dpi = 300, width = 7.5, height = 2.5, units = "in")
+
 
 # GET RW AND PCM PERFORMANCE FOR INDV EVENTS ###################################
 
 # PCM
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
-(load("pcm_gridsearch_multi.Rd"))
 
 pcm_opt <- pcmGetOpt(pcm_gridsearch_multi)
 
@@ -56,9 +142,6 @@ for(i in 1:length(pcm_gridsearch_multi)){
 }
 
 # RW
-setwd("/home/jason/Scratch/GPP_RW_Paper")
-(load("rw_gridsearch_multi.Rd"))
-
 rw_opt <- rwGetOpt(rw_gridsearch_multi)
 
 rwslp_vec <- as.numeric(dimnames(rw_gridsearch_multi[[1]])[[1]])
@@ -76,6 +159,7 @@ auroc_single <- rep(NA, length(rw_gridsearch_multi))
 for(i in 1:length(rw_gridsearch_multi)){
   auroc_single[i] <- rw_gridsearch_multi[[i]][ind_slp, ind_exp, ind_per]
 }
+
 
 
 # MAP PERFORMANCES #############################################################
@@ -434,6 +518,7 @@ gg.rw.slope + gg.rw.auroc + gg.ind.pcm
 ggsave("indv_scatter_rw_pcm_perf.png", dpi = 300, width = 7.5, height = 3.25, units = "in")
 
 # MAP OF INDV PERFORMANCE ######################################################
+
 dflow_df$md <- indv_pcm$pcm_md
 dflow_df$mu <- indv_pcm$pcm_mu
 
@@ -460,4 +545,218 @@ m.pcm_sol <-
 m.pcm_sol
 
 setwd("/home/jason/Scratch/Figures")
-ggsave("map_inv_perf.png", dpi = 300, width = 7.5, height = 6.7, units = "in")
+ggsave("map_inv_opt_param.png", dpi = 300, width = 3.5, height = 6.7, units = "in")
+
+
+# MAP OF RUNOUT ################################################################
+
+setwd("/home/jason/Scratch/GPP_Subcatch_Paper")
+parea_cdf <- raster("cdf_gpp_parea_all_cutoff_0.7.tif")
+parea_cdf <- aggregate(parea_cdf, fact = 6, fun = mean)
+
+# Prep for ggplot
+parea_df <- as.data.frame(parea_cdf, xy = TRUE)
+parea_df <- parea_df[!is.na(parea_df[,3]),]
+
+
+# For close up
+setwd("/home/jason/Data/Chile/")
+
+
+# Load shapefile of sub catchment polygons
+sub_catchments <- readOGR("sub_catchments.shp")
+sub_catchment <- sub_catchments[sub_catchments$ID == 56,]
+
+# Crop hillshade
+hs_sub <- crop(raster("saga_data/hs_filtered_filled.sdat"), sub_catchment)
+hs_sub <- mask(hs_sub, sub_catchment)
+
+# Load and crop source area prediction raster
+parea_sub <- crop(raster("/home/jason/Scratch/GPP_Subcatch_Paper/cdf_gpp_parea_all_cutoff_0.7.tif"),
+                  sub_catchment)
+parea_sub <- mask(parea_sub, sub_catchment)
+
+# Aggregate for quicker mapping
+parea_sub <- aggregate(parea_sub, fact = 2, fun = mean)
+hs_sub <- aggregate(hs_sub, fact = 2, fun = mean)
+
+# Prep for ggplot
+parea_sub_df <- as.data.frame(parea_sub, xy = TRUE)
+parea_sub_df <- parea_sub_df[!is.na(parea_sub_df[,3]),]
+
+hs_sub_df <- as.data.frame(hs_sub, xy = TRUE)
+hs_sub_df <- hs_sub_df[!is.na(hs_sub_df[,3]),]
+
+# Clip river feature
+bnd_sub <- st_as_sf(sub_catchment)
+river_sub <- st_intersection(bnd_sub_sf, rivers)
+
+
+# Load and crop source area prediction raster
+source_pred <- raster("source_pred_gam.tif")
+source_sub <- crop(source_pred, sub_catchment)
+source_sub <- mask(source_sub, sub_catchment)
+
+source_pred <- aggregate(source_pred, fact = 6, fun = mean)
+source_sub <- aggregate(source_sub, fact = 2, fun = mean)
+
+# Prep for ggplot
+source_df <- as.data.frame(source_pred, xy = TRUE)
+source_df <- source_df[!is.na(source_df[,3]),]
+
+source_sub_df <- as.data.frame(source_sub, xy = TRUE)
+source_sub_df <- source_sub_df[!is.na(source_sub_df[,3]),]
+
+# Crop
+
+
+
+# Source area prediction map ###################################################
+
+#
+
+library(ggnewscale)
+library(ggspatial)
+
+map.source <- ggplot() +
+  geom_sf() +
+  geom_raster(data=hillshade_df, aes(x=x, y=y, fill = hs_filtered_filled),
+              show.legend = FALSE) +
+  scale_fill_gradient(high = "black", low = "white", na.value = "#FFFFFF") +
+
+  geom_sf(data = boundary, alpha = 0.4, fill = "white") +
+
+  new_scale("fill") +
+  geom_raster(data=source_df, aes(x=x, y=y, fill = source_pred_gam) ) +
+  scale_fill_viridis_c(name = "Source area\nsusceptibility\n(probability)",  alpha = 0.6, direction = -1) +
+
+  geom_sf(data = rivers, colour = "#85C1E9") +
+  geom_sf(data = water, colour = "#85C1E9", fill = "#85C1E9") +
+  #geom_sf(data = boundary, colour = "#7f8c8d", fill = NA) +
+
+  geom_sf(data = bnd_sub, colour = "#EC7063", fill = NA) +
+
+  xlab("") +
+  ylab("") +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7),
+        axis.text = element_text(size = 7), legend.position = "right")
+
+#map.source
+
+
+# For sub catchment
+
+
+map.source_sub <- ggplot() +
+  geom_sf() +
+  geom_raster(data=hs_sub_df, aes(x=x, y=y, fill = hs_filtered_filled),
+              show.legend = FALSE) +
+  scale_fill_gradient(high = "black", low = "white", na.value = "#FFFFFF") +
+
+  geom_sf(data = bnd_sub, alpha = 0.4, fill = "white") +
+
+  new_scale("fill") +
+  geom_raster(data=source_sub_df, aes(x=x, y=y, fill = source_pred_gam),
+              show.legend = FALSE) +
+  scale_fill_viridis_c(name = "Source area\nsusceptibility\n(probability)",  alpha = 0.6, direction = -1) +
+
+  geom_sf(data = river_sub, colour = "#85C1E9") +
+  #geom_sf(data = water, colour = "#85C1E9", fill = "#85C1E9") +
+  #geom_sf(data = bnd_sub, colour = "#7f8c8d", fill = NA) +
+
+  annotation_scale(aes(style = "ticks", location = "br"), text_family = "Arial", text_cex = 0.6,
+                   bar_cols = "black", line_width = 0.7) +
+
+  xlab("") +
+  ylab("") +
+  theme_void() +
+  theme(text = element_text(family = "Arial", size = 7),
+        axis.text = element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position = "right",
+  )
+
+#map.source_sub
+
+map.source + map.source_sub
+
+setwd("/home/jason/Scratch/Figures")
+ggsave("regional_source_pred_map.png", dpi = 300, width = 7.5, height = 6, units = "in")
+
+
+
+
+# Process area map #############################################################
+
+#
+
+library(ggnewscale)
+library(ggspatial)
+
+map.parea <- ggplot() +
+  geom_sf() +
+  geom_raster(data=hillshade_df, aes(x=x, y=y, fill = hs_filtered_filled),
+              show.legend = FALSE) +
+  scale_fill_gradient(high = "black", low = "white", na.value = "#FFFFFF") +
+
+  geom_sf(data = boundary, alpha = 0.4, fill = "white") +
+
+  new_scale("fill") +
+  geom_raster(data=parea_df, aes(x=x, y=y, fill = cdf_gpp_parea_all_cutoff_0.7) ) +
+  scale_fill_viridis_c(name = "Runout frequency\n(quantiles)",  alpha = 0.6, direction = -1) +
+
+  geom_sf(data = rivers, colour = "#85C1E9") +
+  geom_sf(data = water, colour = "#85C1E9", fill = "#85C1E9") +
+  #geom_sf(data = boundary, colour = "#7f8c8d", fill = NA) +
+
+  geom_sf(data = bnd_sub, colour = "#EC7063", fill = NA) +
+
+  xlab("") +
+  ylab("") +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", size = 7),
+        axis.text = element_text(size = 7), legend.position = "right")
+
+#map.parea
+
+
+# For sub catchment
+
+map.parea_sub <- ggplot() +
+  geom_sf() +
+  geom_raster(data=hs_sub_df, aes(x=x, y=y, fill = hs_filtered_filled),
+              show.legend = FALSE) +
+  scale_fill_gradient(high = "black", low = "white", na.value = "#FFFFFF") +
+
+  geom_sf(data = bnd_sub, alpha = 0.4, fill = "white") +
+
+  new_scale("fill") +
+  geom_raster(data=parea_sub_df, aes(x=x, y=y, fill = cdf_gpp_parea_all_cutoff_0.7),
+              show.legend = FALSE) +
+  scale_fill_viridis_c(name = "Runout frequency\n(quantiles)",  alpha = 0.6, direction = -1) +
+
+  geom_sf(data = river_sub, colour = "#85C1E9") +
+  #geom_sf(data = water, colour = "#85C1E9", fill = "#85C1E9") +
+  geom_sf(data = bnd_sub, colour = "#7f8c8d", fill = NA) +
+
+  xlab("") +
+  ylab("") +
+  theme_void() +
+  annotation_scale(aes(style = "ticks", location = "br"), text_family = "Arial", text_cex = 0.6,
+                  bar_cols = "black", line_width = 0.7) +
+
+
+  theme(text = element_text(family = "Arial", size = 7),
+        axis.text = element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position = "right")
+
+
+#map.parea_sub
+
+map.parea + map.parea_sub
+
+setwd("/home/jason/Scratch/Figures")
+ggsave("regional_runout_impact_map.png", dpi = 300, width = 7.5, height = 6, units = "in")
+
