@@ -8,6 +8,11 @@ library(sf)
 library(ggplot2)
 library(patchwork) # for multiple plots with ggplot
 
+library(Rsagacmd)
+
+# Initiate a SAGA-GIS geoprocessing object
+saga <- saga_gis(opt_lib = "sim_geomorphology")
+
 # LOAD DATA ####################################################################
 
 setwd("/home/jason/Data/Chile/")
@@ -164,8 +169,11 @@ for(i in 1:length(rw_gridsearch_multi)){
 
 # MAP PERFORMANCES #############################################################
 
-dflow_pnt <- gCentroid(slide_poly_vec, byid=TRUE, id = slide_poly_vec$objectid)
+opt_auroc <- auroc_single
+opt_relerr <- relerr_single
 
+
+dflow_pnt <- gCentroid(slide_poly_vec, byid=TRUE, id = slide_poly_vec$objectid)
 
 dflow_data <- data.frame(objectid = 1:100, opt_auroc = opt_auroc,
                          opt_relerr = opt_relerr)
@@ -197,8 +205,8 @@ m.relerr <-  ggplot() +
   xlab("") +
   ylab("") +
   theme_bw() +
-  theme(text = element_text(family = "Arial", size = 10),
-        axis.text = element_text(size = 7), legend.position = "bottom")
+  theme(text = element_text(family = "Arial", size = 7),
+        axis.text = element_text(size = 7), legend.position = "right")
 
 m.auroc <-  ggplot() +
   geom_sf() +
@@ -216,14 +224,14 @@ m.auroc <-  ggplot() +
   xlab("") +
   ylab("") +
   theme_bw() +
-  theme(text = element_text(family = "Arial", size = 10),
-        axis.text = element_text(size = 7), legend.position = "bottom")
+  theme(text = element_text(family = "Arial", size = 7),
+        axis.text = element_text(size = 7), legend.position = "right")
 
 m.perf <- m.auroc + m.relerr
 m.perf
 
 setwd("/home/jason/Scratch/Figures")
-ggsave("map_relerr_auroc_bottom_fnt10.png", dpi = 300, width = 7.5, height = 6.7, units = "in")
+ggsave("map_relerr_auroc_bottom_fnt7.png", dpi = 300, width = 7.5, height = 6.7, units = "in")
 
 
 # CALCULATE DISTANCE ERROR #####################################################
@@ -674,8 +682,7 @@ map.source_sub <- ggplot() +
   theme(text = element_text(family = "Arial", size = 7),
         axis.text = element_blank(),
         axis.ticks.x=element_blank(),
-        legend.position = "right",
-  )
+        legend.position = "right")
 
 #map.source_sub
 
