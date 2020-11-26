@@ -16,7 +16,7 @@ comment = "#>")
 knitr::opts_knit$set(root.dir = "/home/jason/Data/Chile/")
 ```
 
-The runout.opt package was developed for automatic parameter selection for
+The runoptGPP package was developed for automatic parameter selection for
 single event and regional runout modeling using the random walk and PCM components of the [Gravitational 
 Process Path (GPP) Model](https://gmd.copernicus.org/articles/10/3309/2017/) tool in [SAGA-GIS](http://www.saga-gis.org). The optimization procedure uses a two-stage approach,
 where we first optimize the random walk model to find the 'best' simulation of runout path,
@@ -37,7 +37,7 @@ sub catchment boundary, and we create a hillshade model for improving visualizat
 of our results.
 
 ```{r, fig.height=6, fig.width = 6}
-library(runout.opt)
+library(runoptGPP)
 library(raster)
 library(rgdal)
 library(Rsagacmd)

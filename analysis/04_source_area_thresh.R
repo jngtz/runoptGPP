@@ -71,7 +71,7 @@ gppSourceThreshold <- function(sub_catch.id, sub_catch_vec, dem, source_pred, cu
 
 # LOAD PACKAGES AND DATA #######################################################
 
-library(runout.opt)
+library(runoptGPP)
 library(raster)
 library(rgdal)
 library(foreach)

@@ -1,6 +1,6 @@
 # LOAD PACKAGES ################################################################
 
-library(runout.opt)
+library(runoptGPP)
 library(rgdal)
 library(raster)
 library(rgeos)

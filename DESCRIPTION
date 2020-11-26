@@ -1,4 +1,4 @@
-Package: runout.opt
+Package: runoptGPP
 Type: Package
 Title: GPP regional runout model optimization and validation in R
 Version: 0.1.0

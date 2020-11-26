@@ -1,7 +1,7 @@
 
 # LOAD PACKAGES AND DATA #######################################################
 
-library(runout.opt)
+library(runoptGPP)
 library(rgeos)
 library(sperrorest)
 library(raster)

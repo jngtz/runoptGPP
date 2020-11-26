@@ -16,7 +16,7 @@ comment = "#>")
 knitr::opts_knit$set(root.dir = "/home/jason/Data/Chile/")
 ```
 
-The runout.opt package was developed for automatic parameter selection for
+The runoptGPP package was developed for automatic parameter selection for
 single event and regional runout modeling using the random walk and PCM components of the [Gravitational 
 Process Path (GPP) Model](https://gmd.copernicus.org/articles/10/3309/2017/) tool in [SAGA-GIS](http://www.saga-gis.org). The optimization procedure uses a two-stage approach,
 where we first optimize the random walk model to find the 'best' simulation of runout path,
@@ -24,7 +24,7 @@ and then plug-in these values to the PCM model to optimize for runout distance. 
 of the runout path is based on the area under the receiver operating characteristic curve (AUROC),
 and runout distance is based on a measure of relative error.
 
-This vignette provides an example of applying the runout.opt package for
+This vignette provides an example of applying the runoptGPP package for
 selecting optimal parameter sets for a single debris flow event. It also,
 
 * Shows how to measure and visualize GPP runout model performance in R
@@ -32,7 +32,7 @@ selecting optimal parameter sets for a single debris flow event. It also,
 
 ### Load packages and data
 
-To start, we will load all the necessary packages and data. The `runout.opt` functions
+To start, we will load all the necessary packages and data. The `runoptGPP` functions
 are made to work with `RasterLayer`, `SpatialPointsDataFrame` and `SpatialPolygonsDataFrame`
 objects from the `raster` and `sp` packages. 
 
@@ -42,7 +42,7 @@ of many stored in shapefile. So, we select a single runout track, and the corres
 source point for this example.
 
 ```{r}
-library(runout.opt)
+library(runoptGPP)
 library(raster)
 library(rgdal)
 library(sp)
