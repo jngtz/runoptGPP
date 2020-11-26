@@ -10,15 +10,15 @@ tool in [SAGA-GIS](http://www.saga-gis.org/en/index.html).
 
 **Installation**
 
-You can install this development version of runout.opt with:
+You can install this development version of runoptGPP with:
 
 ```r
-devtools::install_github("jngtz/runout.opt")
+devtools::install_github("jngtz/runoptGPP")
 ```
 or 
 
 ```r
-remotes::install_github("jngtz/runout.opt")
+remotes::install_github("jngtz/runoptGPP")
 ```
 
 **Examples**
