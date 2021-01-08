@@ -9,10 +9,10 @@ library(sperrorest)
 setwd("/home/jason/Data/Chile/")
 
 #name of landslide point shapefile
-nm_slidepoint <- "dflow_points_v1_reposition"
+nm_slidepoint <- "debris_flow_source_points"
 
 #name of landslide polygon shapefile
-nm_slidepoly <- "dflow_polygons_v2_reposition"
+nm_slidepoly <- "debris_flow_runout_polys"
 
 #load slide points and polygons
 slide_points <- readOGR(".", nm_slidepoint)
@@ -22,7 +22,7 @@ slide_polys <- readOGR(".", nm_slidepoly)
 slide_polys$value <- 1
 
 #Note Filtered result provides a much more homogenous source zones, but
-# does not work well for runout model.. - 
+# does not work well for runout model.. -
 
 setwd("saga_data/meshdenoise")
 #load raster files
@@ -49,9 +49,7 @@ setwd("../../")
 
 layers[["cslope"]] <- layers[["cslope"]] * 180/pi
 layers[["logcarea"]] <- log10(layers[["carea"]])
-layers[["dist_hydro"]] <- raster("dist_hydro.tif")
 layers[["dist_faults"]] <- raster("dist_faults.tif")
-layers[["landuse"]] <- raster("landuse_sub.tif")
 
 
 
@@ -133,7 +131,7 @@ fml <- landslide ~ elev + slope + logcarea + plan_curv + dist_faults
 model.lr <- glm(formula = fml, family = 'binomial', data = df)
 summary(model.lr)
 
-# to automatically fit a GAM with smoothing functions based on the formula used 
+# to automatically fit a GAM with smoothing functions based on the formula used
 # for the GLM ("fml"), we use the following function
 my.gam <- function(formula, data, family = binomial, k = 5) {
   response.name <- as.character(formula)[2]
@@ -153,8 +151,8 @@ my.gam <- function(formula, data, family = binomial, k = 5) {
 model.gam <- my.gam(fml, df)
 # display gam model formula
 formula(model.gam)
-# visualize smoothing functions in the GAM 
-par(mfrow = c(2,3))
+# visualize smoothing functions in the GAM
+par(mfrow = c(2,3), mar = c(4, 4, 1, 1))
 plot(model.gam, all.terms = TRUE)
 
 
@@ -162,16 +160,16 @@ plot(model.gam, all.terms = TRUE)
 # MODEL VALIDATION AND COMPARISON ##############################################
 
 # to make certain that performance of our model is not by chance,
-# we can perform repeated cross-validation, or in this example, 
+# we can perform repeated cross-validation, or in this example,
 # repated cross-validation based on splitting the data into
 # spatially defined subsets (i.e., spatial cross-validation)
 
 # perform 1000 repeated, 5-fold spatial cv for the generalized additive model
 
 gam.sp.results <- sperrorest(formula = fml, data = df, coords = c("x","y"),
-                          model_fun = my.gam, 
-                          pred_args = list(type="response"), 
-                          smp_fun = partition_kmeans, 
+                          model_fun = my.gam,
+                          pred_args = list(type="response"),
+                          smp_fun = partition_kmeans,
                           smp_args = list(repetition = 1:1000, nfold = 5))
 
 gam.sp.auroc.test <- unlist(summary(gam.sp.results$error_rep,level=1)[,"test_auroc"])
@@ -217,5 +215,5 @@ clusterGAM.pred <- clusterR(newdata.layers, predict, args=list(model=model.gam, 
 endCluster()
 
 # export to a raster format
-writeRaster(clusterGAM.pred, "gam_dflow_v2repo_elv_slp_carea_plcrv_dstflt_meshdenoise.tif", format = "GTiff", overwrite = TRUE)
+writeRaster(clusterGAM.pred, "src_area_pred.tif", format = "GTiff", overwrite = TRUE)
 

@@ -1,4 +1,4 @@
-setwd("/home/jason/R/runout.opt/")
+setwd("/home/jason/R/runoptGPP/")
 
 library(devtools)
 document()
@@ -9,7 +9,7 @@ check(vignettes = FALSE)
 
 
 # Load Packages and Data ####################################################################
-library(runout.opt)
+library(runoptGPP)
 library(raster)
 library(rgdal)
 library(sp)

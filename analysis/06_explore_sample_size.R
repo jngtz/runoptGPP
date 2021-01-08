@@ -9,13 +9,13 @@ library(rgdal)
 
 setwd("/home/jason/Data/Chile/")
 # elevation model
-dem <- raster("dem_alos_12_5m _no sinks.tif")
+dem <- raster("elev_alos_12_5m_no_sinks.tif")
 
 # slide start/source points
-slide_point_vec <- readOGR(".", "dflow_points_v1_reposition")
+slide_point_vec <- readOGR(".", "debris_flow_source_points")
 
 # actual/mapped debris flow polygons
-slide_poly_vec <- readOGR(".", "dflow_polygons_v1_reposition_sample_100")
+slide_poly_vec <- readOGR(".", "debris_flow_polys_sample")
 slide_poly_vec$objectid <- 1:100
 crs(slide_point_vec) <- crs(slide_poly_vec)
 

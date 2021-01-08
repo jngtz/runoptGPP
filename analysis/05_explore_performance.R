@@ -17,13 +17,13 @@ saga <- saga_gis(opt_lib = "sim_geomorphology")
 
 setwd("/home/jason/Data/Chile/")
 # elevation model
-dem <- raster("dem_alos_12_5m _no sinks.tif")
+dem <- raster("elev_alos_12_5m_no_sinks.tif")
 
 # slide start/source points
-slide_point_vec <- readOGR(".", "dflow_points_v1_reposition")
+slide_point_vec <- readOGR(".", "debris_flow_source_points")
 
 # actual/mapped debris flow polygons
-slide_poly_vec <- readOGR(".", "dflow_polygons_v1_reposition_sample_100")
+slide_poly_vec <- readOGR(".", "debris_flow_polys_sample")
 slide_poly_vec$objectid <- 1:100
 
 crs(slide_point_vec) <- crs(slide_poly_vec)
@@ -238,13 +238,15 @@ ggsave("map_relerr_auroc_bottom_fnt7.png", dpi = 300, width = 7.5, height = 6.7,
 
 setwd("/home/jason/Scratch/GPP_PCM_Paper")
 
-geom_gpp <- data.frame(slide_id = 1:100, est_lng = NA, obs_lng = NA, est_wd = NA, obs_wd = NA)
+geom_gpp <- data.frame(slide_id = 1:100, est_lng = NA, obs_lng = NA, est_wd = NA, obs_wd = NA,
+                       obs_area = NA, est_area = NA, obs_surfarea = NA, est_surfarea = NA)
 
 for(i in 1:100){
   print(i)
-  gpp <- pcmPerformance(dem = dem, slide_plys = slide_poly_vec, release_pnts = slide_point_vec,
+  gpp <- pcmPerformance(dem = dem, slide_plys = slide_poly_vec, slide_src = slide_point_vec,
                           slide_id = i, rw_slp = 40, rw_ex = 3, rw_per = 1.9, pcm_mu = 0.11, pcm_md = 40,
-                          buffer_ext = 5000, buffer_source = 50, gpp_iter = 1000, rescale_threshold = 0.5, plot_eval = TRUE, return_features = TRUE)
+                          buffer_ext = 5000, buffer_source = 50, gpp_iter = 1000, predict_threshold = 0.5,
+                          plot_eval = FALSE, return_features = TRUE, saga_lib = saga)
 
   geom_obs <- runoutGeom(gpp$actual.poly, elev = gpp$dem)
 
@@ -259,6 +261,10 @@ for(i in 1:100){
   geom_gpp$obs_lng[i] <- geom_obs$length
   geom_gpp$est_wd[i] <- geom_est$width
   geom_gpp$obs_wd[i] <- geom_obs$width
+  geom_gpp$est_area[i] <- geom_est$area
+  geom_gpp$obs_area[i] <- geom_obs$area
+  geom_gpp$est_surfarea[i] <- geom_est$surfacearea
+  geom_gpp$obs_surfarea[i] <- geom_obs$surfacearea
 
 }
 
@@ -266,9 +272,16 @@ geom_gpp$lng_err <- geom_gpp$est_lng - geom_gpp$obs_lng
 geom_gpp$wd_err <- geom_gpp$est_wd - geom_gpp$obs_wd
 
 
-#save(geom_gpp, file = "obs_est_opt_geom.Rd")
-(load("obs_est_opt_geom.Rd"))
+#save(geom_gpp, file = "obs_est_opt_geom_warea.Rd")
+#(load("obs_est_opt_geom.Rd"))
+(load("obs_est_opt_geom_warea.Rd"))
 
+# Cumulative distributions
+geom_gpp$area_err <- geom_gpp$est_area - geom_gpp$obs_area
+geom_gpp$surfarea_err <- geom_gpp$est_surfarea - geom_gpp$obs_surfarea
+
+plot(sort(geom_gpp$obs_area) , 1-ecdf(geom_gpp$obs_area)(sort(geom_gpp$obs_area) ), pch  = 20, log="xy")
+points(sort(geom_gpp$est_area) , 1-ecdf(geom_gpp$est_area)(sort(geom_gpp$est_area) ), pch = 20, col = "red")
 
 # EXPLORE ERROR PATTERNS #######################################################
 
@@ -693,13 +706,10 @@ ggsave("regional_source_pred_map.png", dpi = 300, width = 7.5, height = 6, units
 
 
 
-
 # Process area map #############################################################
 
 #
 
-library(ggnewscale)
-library(ggspatial)
 
 map.parea <- ggplot() +
   geom_sf() +

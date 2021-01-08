@@ -86,7 +86,7 @@ saga <- saga_gis(opt_lib = "sim_geomorphology")
 setwd("/home/jason/Data/Chile/")
 
 # Load digital elevation model (DEM)
-dem_all <- raster("dem_alos_12_5m _no sinks.tif")
+dem_all <- raster("elev_alos_12_5m_no_sinks.tif")
 
 #load shapefile of subcatchment polygons
 sub_catch.vec = readOGR("sub_catchments.shp")
@@ -97,18 +97,15 @@ source_points <- readOGR(".", "debris_flow_source_points")
 # Load runout track polygons
 runout_polygons <- readOGR(".", "debris_flow_polys_sample")
 
-# Load sampling mask
-mask <- raster("mask_dflow_repo.tif")
-
 # source area prediction [GAM]
-source_pred <- raster("gam_dflow_v2repo_elv_slp_carea_plcrv_dstflt_meshdenoise.tif")
+source_pred <- raster("src_area_pred.tif")
 
 # resample source_pred to dem - seems to be a problem in extent when loading to
 # SAGA
-#source_pred <- resample(source_pred, dem_all, method = "ngb")
-#writeRaster(source_pred, "rsmp_gam_dflow_v2repo_elv_slp_carea_plcrv_dstflt_meshdenoise.tif", format = "GTiff", overwrite = TRUE)
+source_pred <- resample(source_pred, dem_all, method = "ngb")
+writeRaster(source_pred, "rsmp_src_area_pred.tif", format = "GTiff", overwrite = TRUE)
 
-source_pred_all <- raster("rsmp_gam_dflow_v2repo_elv_slp_carea_plcrv_dstflt_meshdenoise.tif")
+source_pred_all <- raster("rsmp_src_area_pred.tif")
 
 
 # LOAD OPTIMAL PARAMETER SET FOR RW AND PCM ####################################

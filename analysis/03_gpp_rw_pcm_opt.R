@@ -13,7 +13,7 @@ saga <- saga_gis(opt_lib = "sim_geomorphology")
 setwd("/home/jason/Data/Chile/")
 
 # Load digital elevation model (DEM)
-dem <- raster("elev_alos_12_5m.tif")
+dem <- raster("elev_alos_12_5m_no_sinks.tif")
 
 # Load runout source points
 source_points <- readOGR(".", "debris_flow_source_points")
@@ -51,7 +51,7 @@ rw_grisearch_multi <-
     rwGridsearch(dem, slide_plys = runout_polygons, slide_src = source_points,
                  slide_id = poly_id, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
                  gpp_iter = 1000, buffer_ext = 500, buffer_source = 50, save_res = TRUE,
-                 plot_eval = FALSE)
+                 plot_eval = FALSE, saga_lib = saga)
 
   }
 
@@ -90,7 +90,8 @@ pcm_gridsearch_multi <-
                   gpp_iter = 1000,
                   buffer_ext = 500, buffer_source = NULL,
                   predict_threshold = 0.5, save_res = TRUE,
-                  plot_eval = FALSE)
+                  plot_eval = FALSE,
+                  saga_lib = saga)
 
   }
 

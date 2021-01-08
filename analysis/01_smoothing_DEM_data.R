@@ -21,7 +21,7 @@ myenv <- rsaga.env()
 setwd("saga_data")
 
 #Convert gtiff to sgrd for processing in SAGA
-geoTiffToSGRD_custom("dem_alos_12_5m.tif",  "dem.sdat")
+geoTiffToSGRD_custom("elev_alos_12_5m.tif",  "dem.sdat")
 
 
 
@@ -40,14 +40,14 @@ rsaga.geoprocessor("grid_filter", "Mesh Denoise", env=myenv,
                       ITER = 70, # Number of iterations for Normal Updating
                       VITER = 100, # Number of iterations for Vertex Updating
                       NB_CV = 0)) # Common vertex
- 
+
 
 
 # FILL SINKS ###################################################################
 #rsaga.get.modules("ta_preprocessor", env=myenv)
 #rsaga.get.usage("ta_preprocessor", "Fill Sinks (Planchon/Darboux, 2001)", env=myenv)
 
-rsaga.geoprocessor("ta_preprocessor", "Fill Sinks (Planchon/Darboux, 2001)", 
+rsaga.geoprocessor("ta_preprocessor", "Fill Sinks (Planchon/Darboux, 2001)",
                    param=list(
                      DEM = "dem_filtered.sgrd",
                      RESULT = "dem_filtered_filled.sgrd"),
