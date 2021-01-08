@@ -1,4 +1,4 @@
-setwd("/home/jason/R/runout.opt/")
+setwd("/home/jason/R/runoutGPP/")
 
 library(devtools)
 build()
