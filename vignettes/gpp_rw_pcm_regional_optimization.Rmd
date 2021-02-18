@@ -114,7 +114,7 @@ cl <- parallel::makeCluster(7)
 doParallel::registerDoParallel(cl)
 
 # Run grid search loop
-rw_grisearch_multi <-
+rw_gridsearch_multi <-
   foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runoptGPP')) %dopar% {
 
     .GlobalEnv$saga <- saga
