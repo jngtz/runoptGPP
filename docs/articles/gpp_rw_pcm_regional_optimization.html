@@ -75,13 +75,13 @@
 
       
 
-      </header><script src="gpp_rw_pcm_regional_optimization_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="gpp_rw_pcm_regional_optimization_files/header-attrs-2.4/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Regionally optimizing and spatially validating runout models</h1>
                         <h4 class="author">Jason Goetz</h4>
             
-            <h4 class="date">2020-11-26</h4>
+            <h4 class="date">2021-02-18</h4>
       
       
       <div class="hidden name"><code>gpp_rw_pcm_regional_optimization.Rmd</code></div>
@@ -170,7 +170,7 @@
 <span class="fu">doParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
 
 <span class="co"># Run grid search loop</span>
-<span class="va">rw_grisearch_multi</span> <span class="op">&lt;-</span>
+<span class="va">rw_gridsearch_multi</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="https://rdrr.io/pkg/foreach/man/foreach.html">foreach</a></span><span class="op">(</span>poly_id<span class="op">=</span><span class="va">polyid_vec</span>, .packages<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'rgdal'</span>,<span class="st">'raster'</span>, <span class="st">'rgeos'</span>, <span class="st">'ROCR'</span>, <span class="st">'Rsagacmd'</span>, <span class="st">'sf'</span>, <span class="st">'runoptGPP'</span><span class="op">)</span><span class="op">)</span> <span class="op">%dopar%</span> <span class="op">{</span>
 
     <span class="va">.GlobalEnv</span><span class="op">$</span><span class="va">saga</span> <span class="op">&lt;-</span> <span class="va">saga</span>

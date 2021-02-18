@@ -75,13 +75,13 @@
 
       
 
-      </header><script src="gpp_rw_pcm_single_optimization_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="gpp_rw_pcm_single_optimization_files/header-attrs-2.4/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Optimizing for a an individual runout event</h1>
                         <h4 class="author">Jason Goetz</h4>
             
-            <h4 class="date">2020-11-26</h4>
+            <h4 class="date">2021-02-18</h4>
       
       
       <div class="hidden name"><code>gpp_rw_pcm_single_optimization.Rmd</code></div>
@@ -156,7 +156,7 @@
                    gpp_iter <span class="op">=</span> <span class="fl">1000</span>, buffer_ext <span class="op">=</span> <span class="fl">500</span>, buffer_source <span class="op">=</span> <span class="fl">50</span>,
                    plot_eval <span class="op">=</span> <span class="cn">TRUE</span>, saga_lib <span class="op">=</span> <span class="va">saga</span><span class="op">)</span></pre></div>
 <p><img src="gpp_rw_pcm_single_optimization_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
-<pre><code>#&gt; [1] 0.9222383</code></pre>
+<pre><code>#&gt; [1] 0.9221828</code></pre>
 </div>
 <div id="gpp-random-walk-grid-search-optimization" class="section level3">
 <h3 class="hasAnchor">
@@ -187,29 +187,29 @@
 <pre><code>#&gt; , , 1.5
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849514 0.6100532 0.6086350
-#&gt; 30 0.6029488 0.8623006 0.9221621
-#&gt; 40 0.7955612 0.9471920 0.9516323
+#&gt; 20 0.5849514 0.6113795 0.6121918
+#&gt; 30 0.6003653 0.8654135 0.9207139
+#&gt; 40 0.8017152 0.9478482 0.9515801
 #&gt; 
 #&gt; , , 1.75
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849405 0.6099749 0.6098690
-#&gt; 30 0.6004440 0.8692605 0.9207820
-#&gt; 40 0.7986865 0.9477010 0.9518075
+#&gt; 20 0.5849470 0.6099123 0.6111292
+#&gt; 30 0.6029113 0.8665210 0.9222910
+#&gt; 40 0.7975208 0.9476366 0.9514711
 #&gt; 
 #&gt; , , 2
 #&gt; 
 #&gt;          1.3      2.15         3
-#&gt; 20 0.5849463 0.6098564 0.6084895
-#&gt; 30 0.6002988 0.8706148 0.9222150
-#&gt; 40 0.7982255 0.9474357 0.9512889</code></pre>
+#&gt; 20 0.5849445 0.6086415 0.6084746
+#&gt; 30 0.5990171 0.8701596 0.9220319
+#&gt; 40 0.8007943 0.9473551 0.9518872</code></pre>
 <p>And find the parameter set that resulted in the highest AUROC score.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit">
 <span class="va">rw_opt_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwGetOpt_single.html">rwGetOpt_single</a></span><span class="op">(</span><span class="va">rw_gridsearch</span><span class="op">)</span>
 <span class="va">rw_opt_single</span></pre></div>
 <pre><code>#&gt;   rw_slp_opt rw_exp_opt rw_per_opt  rw_auroc
-#&gt; 1         40          3       1.75 0.9518075</code></pre>
+#&gt; 1         40          3          2 0.9518872</code></pre>
 </div>
 <div id="gpp-pcm-model-simulation-runout-distance" class="section level3">
 <h3 class="hasAnchor">
@@ -225,7 +225,7 @@
 <div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="co"># Runout distance relative error</span>
 <span class="va">pcm</span><span class="op">$</span><span class="va">length.relerr</span></pre></div>
-<pre><code>#&gt; [1] 0.00686124</code></pre>
+<pre><code>#&gt; [1] 0.01096616</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="co"># Plot GPP PCM runout modelling ouputs</span>
 <span class="va">gpp_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html">stack</a></span><span class="op">(</span><span class="va">pcm</span><span class="op">$</span><span class="va">gpp.parea</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.stop</span>, <span class="va">pcm</span><span class="op">$</span><span class="va">gpp.maxvel</span><span class="op">)</span>
@@ -263,7 +263,7 @@
 <span class="co"># Get optimal parameters</span>
 <span class="fu"><a href="../reference/pcmGetOpt_single.html">pcmGetOpt_single</a></span><span class="op">(</span><span class="va">pcm_gridsearch</span><span class="op">)</span></pre></div>
 <pre><code>#&gt;   pcm_mu pcm_md     relerr     auroc
-#&gt; 1   0.15    100 0.01096616 0.9598082</code></pre>
+#&gt; 1   0.15    100 0.01325091 0.9596156</code></pre>
 </div>
   </div>
 
