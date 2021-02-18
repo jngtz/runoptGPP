@@ -187,8 +187,7 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
     bbDf <- data.frame(fid = 0:(length(runout_plys)-1), id = 1:length(runout_plys),
                        width = NA, length = NA, area = NA, surfacearea = NA,
                        maxelev = NA, minelev = NA, reachangle = NA)
-  }
-  else{
+  } else {
     bbDf <- data.frame(fid = 0:(length(runout_plys)-1), id = NA,
                        width = NA, length = NA, area = NA, surfacearea = NA,
                        maxelev = NA, minelev = NA, reachangle = NA)
