@@ -1,4 +1,4 @@
-setwd("/home/jason/R/runoutGPP/")
+setwd("/home/jason/R/runoptGPP/")
 
 library(devtools)
 document()

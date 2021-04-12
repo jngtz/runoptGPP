@@ -5,6 +5,7 @@ library(runoptGPP)
 library(raster)
 library(rgdal)
 library(Rsagacmd)
+library(foreach)
 
 # Initiate a SAGA-GIS geoprocessing object
 saga <- saga_gis(opt_lib = "sim_geomorphology")
@@ -25,61 +26,23 @@ runout_polygons$objectid <- 1:length(runout_polygons)
 
 # DEFINE RW AND PCM GRID SEARCH SPACE ##########################################
 
-steps <- 11
-rwexp_vec <- seq(1.3, 3, len=steps)
-rwper_vec <- seq(1.5, 2, len=steps)
-rwslp_vec <- seq(20, 40, len=steps)
-
 pcmmd_vec <- seq(20, 150, by=5)
 pcmmu_vec <- seq(0.04, 0.6, by=0.01)
 
 polyid_vec <- 1:100
 
-
-# RW GRIDSEARCH OPTIMIZATION W PARALLELIZATION  ################################
-setwd("/home/jason/Scratch/GPP_RW_Paper")
-
-library(foreach)
-cl <- parallel::makeCluster(4)
-doParallel::registerDoParallel(cl)
-
-rw_gridsearch_multi <-
-  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
-
-    .GlobalEnv$saga <- saga
-
-    rwGridsearch(dem, slide_plys = runout_polygons, slide_src = source_points,
-                 slide_id = poly_id, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
-                 gpp_iter = 1000, buffer_ext = 500, buffer_source = 50, save_res = TRUE,
-                 plot_eval = FALSE, saga_lib = saga)
-
-  }
-
-parallel::stopCluster(cl)
-
-# Get RW optimal parameter set
-rw_opt <- rwGetOpt(rw_gridsearch_multi, measure = median)
-save(rw_opt, file = "rw_opt_params.Rd")
-save(rw_gridsearch_multi, file = "rw_gridsearch_multi.Rd")
-
-
-# RW PARAM VALIDATION W SPATIAL CV #############################################
-
-rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = runout_polygons,
-                  n_folds = 5, repetitions = 1000)
-
-freq_rw <- rwPoolSPCV(rw_spcv, plot_freq = TRUE)
-freq_rw
+setwd("/home/jason/Scratch/NullExt_GPP_RW_Paper")
+(load("rw_opt_params.Rd"))
 
 
 # PCM GRIDSEARCH OPTIMIZATION W PARALLELIZATION  ################################
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_PCM_Paper")
 
-cl <- parallel::makeCluster(4)
+cl <- parallel::makeCluster(32)
 doParallel::registerDoParallel(cl)
 
 pcm_gridsearch_multi <-
-  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
+  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runoptGPP')) %dopar% {
 
     .GlobalEnv$saga <- saga
 
@@ -98,7 +61,7 @@ pcm_gridsearch_multi <-
 parallel::stopCluster(cl)
 
 # Get PCM optimal parameter set
-pcm_opt <- pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE)
+pcm_opt <- pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE, from_save = TRUE)
 save(pcm_opt, file = "pcm_opt_params.Rd")
 save(pcm_gridsearch_multi, file = "pcm_gridsearch_multi.Rd")
 
@@ -111,4 +74,5 @@ pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = runout_polygons,
 freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
 freq_pcm
 
+save(pcm_spcv, file = "pcm_spcv.Rd")
 

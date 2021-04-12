@@ -37,20 +37,20 @@ polyid_vec <- 1:100
 
 
 # RW GRIDSEARCH OPTIMIZATION W PARALLELIZATION  ################################
-setwd("/home/jason/Scratch/GPP_RW_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_RW_Paper")
 
 library(foreach)
-cl <- parallel::makeCluster(4)
+cl <- parallel::makeCluster(32)
 doParallel::registerDoParallel(cl)
 
 rw_gridsearch_multi <-
-  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
+  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runoptGPP')) %dopar% {
 
     .GlobalEnv$saga <- saga
 
     rwGridsearch(dem, slide_plys = runout_polygons, slide_src = source_points,
                  slide_id = poly_id, slp_v = rwslp_vec, ex_v = rwexp_vec, per_v = rwper_vec,
-                 gpp_iter = 1000, buffer_ext = 500, buffer_source = 50, save_res = TRUE,
+                 gpp_iter = 1000, buffer_ext = 0, buffer_source = 50, save_res = TRUE,
                  plot_eval = FALSE, saga_lib = saga)
 
   }
@@ -66,20 +66,21 @@ save(rw_gridsearch_multi, file = "rw_gridsearch_multi.Rd")
 # RW PARAM VALIDATION W SPATIAL CV #############################################
 
 rw_spcv <- rwSPCV(x = rw_gridsearch_multi, slide_plys = runout_polygons,
-                  n_folds = 5, repetitions = 1000)
+                  n_folds = 5, repetitions = 1000, from_save = TRUE)
 
 freq_rw <- rwPoolSPCV(rw_spcv, plot_freq = TRUE)
 freq_rw
 
+save(rw_spcv, file = "rw_spcv.Rd")
 
 # PCM GRIDSEARCH OPTIMIZATION W PARALLELIZATION  ################################
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_PCM_Paper")
 
-cl <- parallel::makeCluster(4)
+cl <- parallel::makeCluster(32)
 doParallel::registerDoParallel(cl)
 
 pcm_gridsearch_multi <-
-  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runout.opt')) %dopar% {
+  foreach(poly_id=polyid_vec, .packages=c('rgdal','raster', 'rgeos', 'ROCR', 'Rsagacmd', 'sf', 'runoptGPP')) %dopar% {
 
     .GlobalEnv$saga <- saga
 
@@ -88,7 +89,7 @@ pcm_gridsearch_multi <-
                   rw_slp = rw_opt$rw_slp_opt, rw_ex = rw_opt$rw_exp_opt, rw_per = rw_opt$rw_per_opt,
                   pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
                   gpp_iter = 1000,
-                  buffer_ext = 500, buffer_source = 50,
+                  buffer_ext = 500, buffer_source = NULL,
                   predict_threshold = 0.5, save_res = TRUE,
                   plot_eval = FALSE,
                   saga_lib = saga)
@@ -111,4 +112,5 @@ pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = runout_polygons,
 freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
 freq_pcm
 
+save(pcm_spcv, file = "pcm_spcv.Rd")
 

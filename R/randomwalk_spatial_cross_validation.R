@@ -124,12 +124,15 @@ rwSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
       ROCwh <- which(rocMedian==max(rocMedian), arr.ind=T)
       ROCwh
 
+      # In ties, take first record
+      if(length(ROCwh > 3)) {ROCwh <- ROCwh[1,]}
+
       #train_auc <- rocMedian[ROCwh]
 
-      train_auc_median <- rocMedian[ROCwh]
-      train_auc_iqr <- rocIQR[ROCwh]
-      train_auc_mean <- rocMean[ROCwh]
-      train_auc_sd <- rocSD[ROCwh]
+      train_auc_median <- rocMedian[ROCwh[1], ROCwh[2], ROCwh[3]]
+      train_auc_iqr <- rocIQR[ROCwh[1], ROCwh[2], ROCwh[3]]
+      train_auc_mean <- rocMean[ROCwh[1], ROCwh[2], ROCwh[3]]
+      train_auc_sd <- rocSD[ROCwh[1], ROCwh[2], ROCwh[3]]
 
       slp_opt <- rwslp_vec[ROCwh[1]]
       exp_opt <- rwexp_vec[ROCwh[2]]
@@ -182,10 +185,10 @@ rwSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
       #test_roc <- do.call(cbind, roc_median)
       #test_roc<- array(test_roc, dim=c(dim(roc_median[[1]]), length(roc_median)))
 
-      test_auc_median <- test_rocMedian[ROCwh]
-      test_auc_iqr <- test_rocIQR[ROCwh]
-      test_auc_mean <- test_rocMean[ROCwh]
-      test_auc_sd <- test_rocSD[ROCwh]
+      test_auc_median <- test_rocMedian[ROCwh[1], ROCwh[2], ROCwh[3]]
+      test_auc_iqr <- test_rocIQR[ROCwh[1], ROCwh[2], ROCwh[3]]
+      test_auc_mean <- test_rocMean[ROCwh[1], ROCwh[2], ROCwh[3]]
+      test_auc_sd <- test_rocSD[ROCwh[1], ROCwh[2], ROCwh[3]]
 
       # result for test dataset
       result_list <- list(

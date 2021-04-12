@@ -23,7 +23,7 @@ remotes::install_github("jngtz/runoptGPP")
 
 **Examples**
 
-[Optimizing for a an individual runout event](https://jngtz.github.io/runoptGPP/articles/gpp_rw_pcm_single_optimization.html)
+[Optimizing an individual runout event](https://jngtz.github.io/runoptGPP/articles/gpp_rw_pcm_single_optimization.html)
 
 [Regionally optimizing and spatially validating runout models](https://jngtz.github.io/runoptGPP/articles/gpp_rw_pcm_regional_optimization.html)
 

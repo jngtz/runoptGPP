@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -60,7 +60,7 @@
       <a href="../articles/gpp_rw_pcm_regional_optimization.html">Regionally optimizing and spatially validating runout models</a>
     </li>
     <li>
-      <a href="../articles/gpp_rw_pcm_single_optimization.html">Optimizing for a an individual runout event</a>
+      <a href="../articles/gpp_rw_pcm_single_optimization.html">Optimizing an individual runout event</a>
     </li>
   </ul>
 </li>
@@ -75,13 +75,13 @@
 
       
 
-      </header><script src="gpp_rw_pcm_regional_optimization_files/header-attrs-2.4/header-attrs.js"></script><div class="row">
+      </header><script src="gpp_rw_pcm_regional_optimization_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Regionally optimizing and spatially validating runout models</h1>
                         <h4 class="author">Jason Goetz</h4>
             
-            <h4 class="date">2021-02-18</h4>
+            <h4 class="date">2021-04-12</h4>
       
       
       <div class="hidden name"><code>gpp_rw_pcm_regional_optimization.Rmd</code></div>
@@ -103,8 +103,8 @@
 <a href="#load-packages-and-data" class="anchor"></a>Load packages and data</h3>
 <p>To start, we will load all the necessary packages and data. The <code>runoptGPP</code> functions are made to work with <code>RasterLayer</code>, <code>SpatialPointsDataFrame</code> and <code>SpatialPolygonsDataFrame</code> objects from the <code>raster</code> and <code>sp</code> packages.</p>
 <p>We are using an 12.5 m spatial resolution DEM. The debris-flow runout track and source point that we will use for runout model optimization are one of many stored in shapefile. So, we select a single runout track, and the corresponding source point for this example.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">runoptGPP</span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">runoptGPP</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster">raster</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://rgdal.r-forge.r-project.org">rgdal</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edzer/sp/">sp</a></span><span class="op">)</span>
@@ -114,53 +114,53 @@
 <span class="va">dem</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html">raster</a></span><span class="op">(</span><span class="st">"elev_alos_12_5m.tif"</span><span class="op">)</span>
 
 <span class="co"># Load runout source points</span>
-<span class="va">source_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/readOGR.html">readOGR</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"debris_flow_source_points"</span><span class="op">)</span></pre></div>
+<span class="va">source_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/readOGR.html">readOGR</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"debris_flow_source_points"</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt; OGR data source with driver: ESRI Shapefile 
 #&gt; Source: "/home/jason/Data/Chile", layer: "debris_flow_source_points"
 #&gt; with 541 features
 #&gt; It has 17 fields</code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="co"># Load runout track polygons and assign object ID based on row number</span>
-<span class="va">runout_polygons</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/readOGR.html">readOGR</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"debris_flow_polys_sample"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Load runout track polygons and assign object ID based on row number</span>
+<span class="va">runout_polygons</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/readOGR.html">readOGR</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"debris_flow_polys_sample"</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt; OGR data source with driver: ESRI Shapefile 
 #&gt; Source: "/home/jason/Data/Chile", layer: "debris_flow_polys_sample"
 #&gt; with 100 features
 #&gt; It has 9 fields</code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">runout_polygons</span><span class="op">$</span><span class="va">objectid</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">runout_polygons</span><span class="op">)</span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">runout_polygons</span><span class="op">$</span><span class="va">objectid</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">runout_polygons</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">dem</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">runout_polygons</span>, add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">runout_polygons</span>, add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="gpp_rw_pcm_regional_optimization_files/figure-html/unnamed-chunk-1-1.png" width="576"></p>
 </div>
 <div id="initiate-a-saga-gis-geoprocessor-object" class="section level3">
 <h3 class="hasAnchor">
 <a href="#initiate-a-saga-gis-geoprocessor-object" class="anchor"></a>Initiate a SAGA-GIS geoprocessor object</h3>
 <p>The runout simulation is computed in SAGA-GIS. To do this, we are coupling R with SAGA-GIS using the <a href="https://github.com/stevenpawley/Rsagacmd"><code>Rsagacmd</code></a> package. Each time we load this package we need to initiate a SAGA-GIS geoprocessor object, which generates functions in R to SAGA-GIS libraries and tools. We only need to load the Geomorphology library (i.e., sim_geomorphology) to access the GPP tool. This is also faster than loading all of the SAGA-GIS libraries (e.g., <code><a href="https://rdrr.io/pkg/Rsagacmd/man/saga_gis.html">saga_gis()</a></code>)</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">saga</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Rsagacmd/man/saga_gis.html">saga_gis</a></span><span class="op">(</span>opt_lib <span class="op">=</span> <span class="st">"sim_geomorphology"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">saga</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Rsagacmd/man/saga_gis.html">saga_gis</a></span><span class="op">(</span>opt_lib <span class="op">=</span> <span class="st">"sim_geomorphology"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="regional-gpp-random-walk-grid-search-optimziation-runout-path" class="section level3">
 <h3 class="hasAnchor">
 <a href="#regional-gpp-random-walk-grid-search-optimziation-runout-path" class="anchor"></a>Regional GPP random walk grid search optimziation (runout path)</h3>
 <p>In our first stage of optimization, we will set up vectors to define our grid search space for the random walk runout path model component. This is an exhaustive list of the parameters that will be tested.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="va">steps</span> <span class="op">&lt;-</span> <span class="fl">11</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">steps</span> <span class="op">&lt;-</span> <span class="fl">11</span>
 <span class="va">rwexp_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1.3</span>, <span class="fl">3</span>, len<span class="op">=</span><span class="va">steps</span><span class="op">)</span>
 <span class="va">rwper_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2</span>, len<span class="op">=</span><span class="va">steps</span><span class="op">)</span>
 <span class="va">rwslp_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, len<span class="op">=</span><span class="va">steps</span><span class="op">)</span>
 
-<span class="va">rwexp_vec</span></pre></div>
+<span class="va">rwexp_vec</span></code></pre></div>
 <pre><code>#&gt;  [1] 1.30 1.47 1.64 1.81 1.98 2.15 2.32 2.49 2.66 2.83 3.00</code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="va">rwper_vec</span></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rwper_vec</span></code></pre></div>
 <pre><code>#&gt;  [1] 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90 1.95 2.00</code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="va">rwslp_vec</span></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rwslp_vec</span></code></pre></div>
 <pre><code>#&gt;  [1] 20 22 24 26 28 30 32 34 36 38 40</code></pre>
 <p>We will use parallelization to speed up our computations using the <code>foreach</code> package. This loop will compute performances for all possible parameter combinations for each runout polygon and store them as a list. In our case, this is our <code>rw_grid_search_multi</code> object. Depending on the number of runout events and the grid search space size, this computation can take some time. The <code>rwGridsearch</code> function has an option <code>save_res = TRUE</code> that allows us to save the grid search results for each runout individually. This is useful in the case where processing fails since it avoids the need to re-run the grid search for all runout events.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/foreach">foreach</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/foreach">foreach</a></span><span class="op">)</span>
 
 <span class="co"># Define which runout polygons are used for optimization</span>
 <span class="va">polyid_vec</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">100</span>
@@ -182,12 +182,12 @@
 
   <span class="op">}</span>
 
-<span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></pre></div>
+<span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt; [1] "rw_gridsearch_multi"</code></pre>
 <p>To find the optimal parameter set, we will aggregate the performance values of each runout event across grid search space using the median value.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="va">rw_opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwGetOpt.html">rwGetOpt</a></span><span class="op">(</span><span class="va">rw_gridsearch_multi</span>, measure <span class="op">=</span> <span class="va">median</span><span class="op">)</span>
-<span class="va">rw_opt</span></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rw_opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwGetOpt.html">rwGetOpt</a></span><span class="op">(</span><span class="va">rw_gridsearch_multi</span>, measure <span class="op">=</span> <span class="va">median</span><span class="op">)</span>
+<span class="va">rw_opt</span></code></pre></div>
 <pre><code>#&gt;   rw_slp_opt rw_exp_opt rw_per_opt  rw_auroc
 #&gt; 1         40          3        1.9 0.9339073</code></pre>
 </div>
@@ -196,14 +196,14 @@
 <a href="#validate-random-walk-parameters-transferability-using-spatial-cross-validation" class="anchor"></a>Validate random walk parameters’ transferability using spatial cross validation</h3>
 <p>We can perform spatial cross-validation to test the transferability of optimal parameter sets. This is done using the k-means partitioning approach from the <a href="https://github.com/cran/sperrorest"><code>sperrorest</code></a> package. In our example, we will perform 5-fold spatial cross-validation with 10 repetitions.</p>
 <p>Additionally, we can visualize (<code>plot_freq = TRUE</code>) the relative frequency of optimal parameter sets from all spatial cross-validation iterations.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit">
-<span class="va">rw_spcv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwSPCV.html">rwSPCV</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">rw_gridsearch_multi</span>, slide_plys <span class="op">=</span> <span class="va">runout_polygons</span>,
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rw_spcv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwSPCV.html">rwSPCV</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">rw_gridsearch_multi</span>, slide_plys <span class="op">=</span> <span class="va">runout_polygons</span>,
                   n_folds <span class="op">=</span> <span class="fl">5</span>, repetitions <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
 
-<span class="va">freq_rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwPoolSPCV.html">rwPoolSPCV</a></span><span class="op">(</span><span class="va">rw_spcv</span>, plot_freq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<span class="va">freq_rw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rwPoolSPCV.html">rwPoolSPCV</a></span><span class="op">(</span><span class="va">rw_spcv</span>, plot_freq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="gpp_rw_pcm_regional_optimization_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit">
-<span class="va">freq_rw</span></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">freq_rw</span></code></pre></div>
 <pre><code>#&gt;   slp  per  exp freq rel_freq median_auroc   iqr_auroc
 #&gt; 1  40 1.95 2.66    3        6    0.8849232 0.000000000
 #&gt; 2  40 2.00 2.83    1        2    0.9422294 0.000000000
@@ -216,22 +216,22 @@
 <h3 class="hasAnchor">
 <a href="#regional-gpp-pcm-model-grid-search-optimzation-runout-distance" class="anchor"></a>Regional GPP PCM model grid search optimzation (runout distance)</h3>
 <p>We can now plug-in the random walk optimal parameter set, and optimize for runout distance using the PCM model component.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit">
-<span class="co"># Define PCM model grid seach space</span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Define PCM model grid seach space</span>
 <span class="va">pcmmd_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">150</span>, by<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co"># mass-to-drag ratio (m)</span>
 <span class="va">pcmmu_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.6</span>, by<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span> <span class="co"># sliding friction coefficient </span>
 
-<span class="va">pcmmd_vec</span></pre></div>
+<span class="va">pcmmd_vec</span></code></pre></div>
 <pre><code>#&gt;  [1]  20  25  30  35  40  45  50  55  60  65  70  75  80  85  90  95 100 105 110
 #&gt; [20] 115 120 125 130 135 140 145 150</code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit">
-<span class="va">pcmmu_vec</span></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pcmmu_vec</span></code></pre></div>
 <pre><code>#&gt;  [1] 0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18
 #&gt; [16] 0.19 0.20 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.30 0.31 0.32 0.33
 #&gt; [31] 0.34 0.35 0.36 0.37 0.38 0.39 0.40 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48
 #&gt; [46] 0.49 0.50 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.60</code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit">
-<span class="co"># Run using parallelization</span>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Run using parallelization</span>
 <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>
 <span class="fu">doParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
 
@@ -251,11 +251,11 @@
 
   <span class="op">}</span>
 
-<span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></pre></div>
+<span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt; [1] "pcm_gridsearch_multi"</code></pre>
 <p>Next, we apply the <code>pcmGetOpt</code> function to find the regionally optimal PCM model parameters. In our example, we are looking for the parameter set that results in the lowest median relative error across all runout events. The median model performances across grid search space can be visualized using <code>plot_opt=TRUE</code>.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit">
-<span class="fu"><a href="../reference/pcmGetOpt.html">pcmGetOpt</a></span><span class="op">(</span><span class="va">pcm_gridsearch_multi</span>, performance <span class="op">=</span> <span class="st">"relerr"</span>, measure <span class="op">=</span> <span class="st">"median"</span>, plot_opt <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/pcmGetOpt.html">pcmGetOpt</a></span><span class="op">(</span><span class="va">pcm_gridsearch_multi</span>, performance <span class="op">=</span> <span class="st">"relerr"</span>, measure <span class="op">=</span> <span class="st">"median"</span>, plot_opt <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="gpp_rw_pcm_regional_optimization_files/figure-html/unnamed-chunk-11-1.png" width="576"></p>
 <pre><code>#&gt;   pcm_mu pcm_md median_relerr median_auroc
 #&gt; 1   0.11     40    0.09532434    0.9333633</code></pre>
@@ -264,14 +264,14 @@
 <h3 class="hasAnchor">
 <a href="#validate-pcm-model-parameters-transferability-using-spatial-cross-validation" class="anchor"></a>Validate PCM model parameters’ transferability using spatial cross validation</h3>
 <p>Similar to the random walk model, we can explore the spatial transferability of optimal parameters for the PCM model, and visualize the results.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit">
-<span class="va">pcm_spcv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pcmSPCV.html">pcmSPCV</a></span><span class="op">(</span><span class="va">pcm_gridsearch_multi</span>, slide_plys <span class="op">=</span> <span class="va">runout_polygons</span>,
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pcm_spcv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pcmSPCV.html">pcmSPCV</a></span><span class="op">(</span><span class="va">pcm_gridsearch_multi</span>, slide_plys <span class="op">=</span> <span class="va">runout_polygons</span>,
                     n_folds <span class="op">=</span> <span class="fl">5</span>, repetitions <span class="op">=</span> <span class="fl">10</span>, from_save <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="va">freq_pcm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pcmPoolSPCV.html">pcmPoolSPCV</a></span><span class="op">(</span><span class="va">pcm_spcv</span>, plot_freq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<span class="va">freq_pcm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pcmPoolSPCV.html">pcmPoolSPCV</a></span><span class="op">(</span><span class="va">pcm_spcv</span>, plot_freq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="gpp_rw_pcm_regional_optimization_files/figure-html/unnamed-chunk-12-1.png" width="576"></p>
-<div class="sourceCode" id="cb29"><pre class="downlit">
-<span class="va">freq_pcm</span></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">freq_pcm</span></code></pre></div>
 <pre><code>#&gt;     mu md freq rel_freq    rel_err iqr_relerr
 #&gt; 1 0.09 20    4        8 0.21564103 0.03192351
 #&gt; 2 0.10 20    1        2 0.19328148 0.00000000
