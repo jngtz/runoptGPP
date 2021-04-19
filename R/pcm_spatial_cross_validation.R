@@ -29,6 +29,9 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
   pcm_md_vec <- as.numeric(colnames(x[[1]][[1]]))
   pcm_mu_vec <- as.numeric(rownames(x[[1]][[1]]))
 
+  tie_cnt <- list()
+  brk_cnt <- list()
+
   rep_spcv_pcm <- list()
 
   for(n in 1:repetitions){
@@ -40,31 +43,52 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
     spcv_results <- list()
 
     spcv_pcm <- list()
+    fold_ties <- rep(NA, times = n_folds)
+    brk_ties <- rep(NA, times = n_folds)
+
     # Folds ###############
     for(k in 1:n_folds){
 
       train_relerr_list <- list()
+      train_roc_list <- list()
+
 
       polyid_train.vec <- which(fold_labels != k)
       polyid_test.vec <- which(fold_labels == k)
 
       for(i in 1:length(polyid_train.vec)){
         obj.id <- polyid_train.vec[i]
-        res <- x[[obj.id]][['relerr']]
-        train_relerr_list[[i]] <- res
+        err <- x[[obj.id]][['relerr']]
+        roc <- x[[obj.id]][['auroc']]
+        train_relerr_list[[i]] <- err
+        train_roc_list[[i]] <- roc
       }
 
 
-      rel_err <- apply(simplify2array(train_relerr_list), 1:2, median)
+      train_rel_err <- apply(simplify2array(train_relerr_list), 1:2, median)
       iqr_relerr<- apply(simplify2array(train_relerr_list), 1:2, IQR)
 
-      rel_err_wh <- which(rel_err==min(rel_err), arr.ind=T)
-      rel_err_wh # an arrayInd() ...
-      rel_err[rel_err_wh]
+      train_roc <- apply(simplify2array(train_roc_list), 1:2, median)
 
-      #In case two optimal params found, take first
+      rel_err_wh <- which(train_rel_err==min(train_rel_err), arr.ind=T)
+      rel_err_wh # an arrayInd() ...
+      train_rel_err[rel_err_wh]
+      train_roc[rel_err_wh]
+
+      # Use AUROC for tie breaking
+      fold_ties[k] <- 0
+      brk_ties[k] <- 0
+
+      if(length(rel_err_wh) > 2){
+        rel_err_wh <- rel_err_wh[which(train_roc[rel_err_wh]==max(train_roc[rel_err_wh]), arr.ind=TRUE),]
+        fold_ties[k] <- 1
+      }
+
+      # If still no tie break, take first one...
       if(length(rel_err_wh) > 2){
         rel_err_wh <- rel_err_wh[1,]
+        fold_ties[k] <- 1
+        brk_ties[k] <- 1
       }
 
       opt_md <- pcm_md_vec[rel_err_wh[2]]
@@ -75,8 +99,8 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 
       for(i in 1:length(polyid_test.vec)){
         obj.id <- polyid_test.vec[i]
-        res <- x[[obj.id]][['relerr']]
-        test_relerr_list[[i]] <- res
+        err <- x[[obj.id]][['relerr']]
+        test_relerr_list[[i]] <- err
         # calc median for these using apply
 
       }
@@ -105,11 +129,17 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 
     rep_spcv_pcm[[n]] <- spcv_pcm_folds
 
+    tie_cnt[[n]] <- fold_ties
+    brk_cnt[[n]] <- brk_ties
+
   }
 
   rep_spcv_pcm$settings <- list(pcm_md_vec = pcm_md_vec, pcm_mu_vec = pcm_mu_vec)
 
-  rep_spcv_pcm
+  rep_spcv_pcm$ties <- list(n_ties = as.numeric(sum(sapply(tie_cnt, FUN = sum))),
+                            n_brks = as.numeric(sum(sapply(brk_cnt, FUN = sum))))
+
+  return(rep_spcv_pcm)
 
 
 }
@@ -131,7 +161,7 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
 
 pcmPoolSPCV<- function(x, plot_freq = FALSE){
 
-  pool_pcm <- do.call(rbind, x[1:(length(x) - 1)])
+  pool_pcm <- do.call(rbind, x[1:(length(x) - 2)])
 
   pcm_md_vec <- x$settings$pcm_md_vec
   pcm_mu_vec <- x$settings$pcm_mu_vec
