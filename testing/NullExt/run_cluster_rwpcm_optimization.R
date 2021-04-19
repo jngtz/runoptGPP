@@ -2,7 +2,7 @@
 mySourceScript <- function(x)
 
 {
-  source("/home/jason/R/runoptGPP/testing/Null_extent_03_gpp_pcm_opt.R")
+  source("/home/jason/R/runoptGPP/testing/NullExt/NullExt_04_source_area_thresh.R")
 }
 
 #mySourceScript()
@@ -16,10 +16,15 @@ clustermq::Q(fun = mySourceScript,
                              memory = 120000,
                              partition = "all",
                              log_file = "/home/jason/R/sedconnect/clustermq_debug.log", # adapt here
-                             job_name = "GrdOpt")
+                             job_name = "SrcAre")
 )
 
 Sys.time()
+
+
+
+
+
 
 fx = function(x) {
   library(doParallel)

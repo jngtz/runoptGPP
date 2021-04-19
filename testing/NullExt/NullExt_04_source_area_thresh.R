@@ -88,11 +88,11 @@ setwd("/home/jason/Data/Chile/")
 # Load digital elevation model (DEM)
 dem_all <- raster("elev_alos_12_5m_no_sinks.tif")
 
-#Sample mask
-mask <- raster("mask_dflow_repo.tif")
-
 #load shapefile of subcatchment polygons
 sub_catch.vec = readOGR("sub_catchments.shp")
+
+#Sample mask
+mask <- raster("mask_dflow_repo.tif")
 
 # Load runout source points
 source_points <- readOGR(".", "debris_flow_source_points")
@@ -100,8 +100,9 @@ source_points <- readOGR(".", "debris_flow_source_points")
 # Load runout track polygons
 runout_polygons <- readOGR(".", "debris_flow_polys_sample")
 
+
 # source area prediction [GAM]
-source_pred <- raster("src_area_pred.tif")
+source_pred <- raster("source_pred_gam.tif")
 
 # resample source_pred to dem - seems to be a problem in extent when loading to
 # SAGA
@@ -113,16 +114,16 @@ source_pred_all <- raster("rsmp_src_area_pred.tif")
 
 # LOAD OPTIMAL PARAMETER SET FOR RW AND PCM ####################################
 
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_PCM_Paper")
 (load("pcm_opt_params.Rd"))
 
-setwd("/home/jason/Scratch/GPP_RW_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_RW_Paper")
 (load("rw_opt_params.Rd"))
 
 # RUN RW PCM MODEL FOR DIFFERENT SOURCE THRESHOLDS #############################
 
 # By catchment area for parallel processing
-setwd("/home/jason/Scratch/GPP_Subcatch_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_Subcatch_Paper")
 sub_catch.ids <- as.numeric(sub_catch.vec$OBJECTID)
 
 cl <- parallel::makeCluster(32)
@@ -148,7 +149,7 @@ parallel::stopCluster(cl)
 # MERGE PROCESS AREAS ##########################################################
 sub_catch.ids <- as.numeric(sub_catch.vec$OBJECTID)
 
-cutoffs = seq(.5,.9, by=0.05)
+cutoffs = seq(.5,.95, by=0.05)
 gpp_raster <- list()
 
 # Determine if runout raster exits...
@@ -192,7 +193,7 @@ gpp_raster
 
 # LOAD RUNOUT FROM DIFFERENT SOURCE THRESHOLDS #################################
 
-setwd("/home/jason/Scratch/GPP_Subcatch_Paper")
+setwd("/home/jason/Scratch/NullExt_GPP_Subcatch_Paper")
 sub_catch.ids <- as.numeric(sub_catch.vec$OBJECTID)
 
 # Define thresholds (cutoffs) that were used for runout simulation
@@ -214,8 +215,18 @@ gpp_raster
 auroc_cutoffs <- rep(NA, length(cutoffs))
 area_cutoffs <- rep(NA, length(cutoffs))
 
+
+
 # Convert runout polygons to raster for sampling
+
+
+setwd("/home/jason/Data/Chile/")
+#runout_polygons <- readOGR(".", "debris_flow_polys_sample")
+runout_polygons <- readOGR(".", "debris_flow_runout_polys")
+setwd("/home/jason/Scratch/NullExt_GPP_Subcatch_Paper")
+
 runout_area <- rasterize(runout_polygons, dem_all, field=1, background = NA)
+
 
 for(i in 1:length(cutoffs)){
   print(cutoffs[i])
@@ -229,15 +240,14 @@ cutoffs_df <- data.frame(cutoffs = cutoffs, auroc = auroc_cutoffs,
 
 cutoffs_df
 
-#save(cutoffs_df, file="performance_sourcearea_thresholds_all.Rd")
-save(cutoffs_df, file="performance_sourcearea_thresholds.Rd")
-(load("performance_sourcearea_thresholds.Rd"))
+save(cutoffs_df, file="performance_sourcearea_thresholds_all.Rd")
+
 
 # PLOT RESULTS #################################################################
 
-setwd("/home/jason/Scratch/Figures")
+setwd("/home/jason/Scratch/NullExt_Figures")
 
-
+(load("performance_sourcearea_thresholds.Rd"))
 
 png(filename="src_area_auroc_threshold.png", res = 300, width = 7.5, height = 3,
     units = "in", pointsize = 11)

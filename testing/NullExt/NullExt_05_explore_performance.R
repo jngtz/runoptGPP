@@ -365,9 +365,7 @@ for(i in 2:length(rw_gridsearch_multi)){
   indv_rw <- rbind(indv_rw, rwGetOpt_single(rw_gridsearch_multi[[i]]))
 }
 
-
-
-
+indv_rw
 
 opt_sets <- data.frame(slp = indv_rw$rw_slp_opt, per = indv_rw$rw_per_opt, exp = indv_rw$rw_exp_opt)
 freq_sets <- table(opt_sets)
@@ -403,10 +401,9 @@ for(i in 1:length(set_id)){
 indv_pcm <- pcmGetOpt_single(pcm_gridsearch_multi[[1]])
 
 for(i in 2:length(pcm_gridsearch_multi)){
+  print(i)
   indv_pcm <- rbind(indv_pcm, pcmGetOpt_single(pcm_gridsearch_multi[[i]]))
 }
-
-
 
 df_pcm <- data.frame(mu = indv_pcm$pcm_mu, md = indv_pcm$pcm_md)
 
@@ -437,52 +434,6 @@ for(i in 1:length(pair_id)){
   pairs$iqr_relerr[i] <- IQR(relerr_i, na.rm = TRUE)
 
 }
-
-
-
-
-# Histogram of RW parameter selections
-par(mfrow = c(2,3))
-
-hist(indv_rw$rw_slp_opt,  xlab = "Slope threshold", main = "")
-hist(indv_rw$rw_exp_opt, xlab  = "Exponent of divergence", main = "")
-hist(indv_rw$rw_per_opt, xlab = "Persistence", main = "")
-
-boxplot(geom_gpp$obs_area ~ as.factor(indv_rw$rw_slp_opt), ylab = "Runout area",
-        xlab = "Slope threshold", varwidth = TRUE)
-
-boxplot(geom_gpp$obs_area ~ as.factor(indv_rw$rw_exp_opt), ylab = "Runout area",
-        xlab = "Exponent of divergence", varwidth = TRUE)
-
-boxplot(geom_gpp$obs_area ~ as.factor(indv_rw$rw_per_opt), ylab = "Runout area",
-        xlab = "Persistence factor",varwidth = TRUE)
-
-cor(indv_rw$rw_exp_opt, geom_gpp$obs_area, method = "spearman")
-cor(indv_rw$rw_slp_opt, geom_gpp$obs_area, method = "spearman")
-cor(indv_rw$rw_per_opt, geom_gpp$obs_area, method = "spearman")
-
-
-
-par(mfrow = c(1,1))
-
-# Histogram of PCM parameter selections
-#par(mfrow = c(4,1))
-
-nf <- layout(matrix(c(1,2,3,3, 4, 4), ncol = 2, byrow = TRUE))
-
-hist(indv_pcm$pcm_mu,  xlab = "Sliding friction coefficient", main = "", breaks = length(pcm_mu_vec) )
-hist(indv_pcm$pcm_md,  xlab  = "Mass-to-drag ratio", main = "", breaks = length(pcm_md_vec))
-
-boxplot(geom_gpp$obs_lng ~ as.factor(indv_pcm$pcm_mu), ylab = "Observed runout length",
-        xlab = "Sliding friction coefficient", varwidth = TRUE)
-
-boxplot(geom_gpp$obs_lng ~ as.factor(indv_pcm$pcm_md), ylab = "Observed runout length",
-        xlab = "Mass-to-drag ratio", varwidth = TRUE)
-
-cor(indv_pcm$pcm_mu, geom_gpp$obs_lng, method = "spearman")
-cor(indv_pcm$pcm_md, geom_gpp$obs_lng, method = "spearman")
-
-
 
 
 # Plot results
@@ -616,120 +567,6 @@ m.pcm_sol
 
 setwd("/home/jason/Scratch/Figures")
 ggsave("map_inv_opt_param.png", dpi = 300, width = 3.5, height = 6.7, units = "in")
-
-
-# NUMBER OF SOLUTIONS ##########################################################
-
-setwd("/home/jason/Scratch/GPP_PCM_Paper")
-
-(load("gridsearch_pcm_settings.Rd"))
-
-polyid.vec <- 1:pcm_settings$n_train
-pcmmu.vec <- pcm_settings$vec_pcmmu
-pcmmd.vec <- pcm_settings$vec_pcmmd
-
-opt_list <- list() # list of optimal parameters per landslides
-
-for(i in 1:pcm_settings$n_train){
-
-  res_relerr <- pcm_gridsearch_multi[[i]]$relerr
-  res_auroc <- pcm_gridsearch_multi[[i]]$auroc
-
-  # Get optimal paramters per landslide
-
-  err_wh <- which(res_relerr==min(res_relerr), arr.ind = TRUE)
-  print(paste(i, "---"))
-  print(err_wh)
-
-  if(length(err_wh) > 2){
-    err_wh <- err_wh[which(res_auroc[err_wh]==max(res_auroc[err_wh]), arr.ind=TRUE),]
-  }
-
-  print(paste("---"))
-  print(err_wh)
-  print("=============")
-  #if(length(err_wh) > 2){
-  #  err_wh <- err_wh[1,]
-  #}
-
-  if(length(err_wh) > 2){
-    mu_opt <- pcmmu.vec[err_wh[,1]]
-    md_opt <- pcmmd.vec[err_wh[,2]]
-  } else {
-    mu_opt <- pcmmu.vec[err_wh[1]]
-    md_opt <- pcmmd.vec[err_wh[2]]
-  }
-
-
-  df_opt <- data.frame(mu = mu_opt, md = md_opt, relerr = min(res_relerr))
-
-  opt_list[[i]] <- df_opt
-  # calc median for these using apply
-
-}
-
-
-#In case two optimal params found, take first
-sel_opt <- function(x){
-  if(nrow(x) > 1){
-    opt_comb <- x[1,]
-  } else {
-    opt_comb <- x
-  }
-
-  return(opt_comb)
-}
-
-
-opt_sel_list <- lapply(opt_list, sel_opt)
-
-df_sol <- data.frame(slide_id = 1:pcm_settings$n_train)
-df_sol <- cbind(df_sol, do.call("rbind", opt_sel_list))
-
-# summarize optimal parameters across landslides
-
-df_pcm <- data.frame(mu = df_sol$mu, md = df_sol$md)
-
-# Number of optimal solutions/slide
-
-freq_pairs <- table(df_pcm)
-freq_pairs != 0
-
-mu_nm <- as.numeric(rownames(freq_pairs))
-md_nm <- as.numeric(colnames(freq_pairs))
-
-# Get array index of pairs
-pair_ind <- which(freq_pairs !=0, arr.ind = TRUE)
-pairs <- data.frame(mu = mu_nm[pair_ind[,1]],
-                    md = md_nm[pair_ind[,2]],
-                    freq = freq_pairs[pair_ind])
-pairs$rel_freq <- pairs$freq/nrow(df_sol) * 100
-
-# find relative error
-pair_id <- paste(pairs$mu, pairs$md)
-df_sol$pair_id <- paste(df_sol$mu, df_sol$md)
-
-df_sol$n_solutions <- sapply(opt_list, nrow)
-
-
-# Histogram of number of solutions
-t_nsol <- table(df_sol$n_solutions)
-t_nsol
-
-png(filename="hist_no_solutions.png", res = 300, width = 7.5, height = 6,
-    units = "in", pointsize = 11)
-
-par(family = "Arial", mfrow = c(1,1), mar = c(4, 3, 0.5, 0.5),
-    mgp = c(2, 0.75, 0))
-
-hist(df_sol$n_solutions, xlab = "No. of PCM model solutions", main = "", breaks = c(as.numeric(names(t_nsol))))
-
-
-dev.off()
-
-setwd("/home/jason/Scratch/Figures")
-
-
 
 
 # MAP OF RUNOUT ################################################################

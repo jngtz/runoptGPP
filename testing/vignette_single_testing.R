@@ -73,7 +73,7 @@ plot(mask_slp)
 plot(source_point, add = TRUE)
 
 
-flow_pth <- flowPath(fd, coordinates(source_point))
+flow_pth <- flowPath(crop_fd, coordinates(source_point))
 
 xy <- xyFromCell(fd, flow_pth)
 plot(crop_dem)
@@ -92,6 +92,44 @@ crs(sp_line) <- crs(runout_polygon)
 
 ll_sp_line <- spTransform(sp_line, CRS("+proj=longlat +datum=WGS84"))
 SpatialLinesLengths(ll_sp_line, longlat = TRUE)
+
+# Try least cost path...
+
+library(leastcostpath)
+#https://cran.r-project.org/web/packages/leastcostpath/vignettes/leastcostpath-1.html
+
+cell_max <- which.max(mask_dem)
+cell_min <- which.min(mask_dem)
+start_cell <- SpatialPoints(xyFromCell(mask_dem, cell_max))
+end_cell <- SpatialPoints(xyFromCell(mask_dem, cell_min))[1,]
+
+plot(mask_dem)
+plot(start_cell, add = TRUE)
+plot(end_cell, add = TRUE)
+
+neigh <- 4
+
+slope_cs <- leastcostpath::create_slope_cs(dem = mask_dem, cost_function = "tobler", neighbours = neigh)
+plot(raster(slope_cs), col = grey.colors(100))
+
+A = start_cell
+B = end_cell
+
+altitude_cs <- leastcostpath::create_barrier_cs(raster = mask_dem, barrier = altitude, neighbours = neigh, field = 0, background = 1)
+
+# multiplying the two cost surfaces ensures that barriers continue to completely inhibit movement (i.e. slope_cs values * 0 = 0)
+slope_altitude_cs <- slope_cs * altitude_cs
+
+lcp <- leastcostpath::create_lcp(cost_surface = slope_altitude_cs, origin = A, destination = B, directional = FALSE)
+
+plot(raster(slope_altitude_cs), col = grey.colors(100))
+plot(A, add = T, col = "black")
+plot(B, add = T, col = "black")
+# LCP from A-to-B
+plot(lcp[1,], add = T, col = "red")
+# LCP from B-to-A
+plot(lcp[2,], add = T, col = "blue")#https://github.com/AntoniusGolly/cmgo
+
 
 # GPP random walk simulation ################################
 

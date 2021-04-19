@@ -89,7 +89,7 @@ pcm_gridsearch_multi <-
                   rw_slp = rw_opt$rw_slp_opt, rw_ex = rw_opt$rw_exp_opt, rw_per = rw_opt$rw_per_opt,
                   pcm_mu_v = pcmmu_vec, pcm_md_v = pcmmd_vec,
                   gpp_iter = 1000,
-                  buffer_ext = 500, buffer_source = NULL,
+                  buffer_ext = 500, buffer_source = 50,
                   predict_threshold = 0.5, save_res = TRUE,
                   plot_eval = FALSE,
                   saga_lib = saga)
@@ -99,7 +99,7 @@ pcm_gridsearch_multi <-
 parallel::stopCluster(cl)
 
 # Get PCM optimal parameter set
-pcm_opt <- pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE)
+pcm_opt <- pcmGetOpt(pcm_gridsearch_multi, performance = "relerr", measure = "median", plot_opt = TRUE, from_save = TRUE)
 save(pcm_opt, file = "pcm_opt_params.Rd")
 save(pcm_gridsearch_multi, file = "pcm_gridsearch_multi.Rd")
 
@@ -107,7 +107,7 @@ save(pcm_gridsearch_multi, file = "pcm_gridsearch_multi.Rd")
 # PCM PARAM VALIDATION W SPATIAL CV #############################################
 
 pcm_spcv <- pcmSPCV(pcm_gridsearch_multi, slide_plys = runout_polygons,
-                    n_folds = 5, repetitions = 1000, from_save = FALSE)
+                    n_folds = 5, repetitions = 1000, from_save = TRUE)
 
 freq_pcm <- pcmPoolSPCV(pcm_spcv, plot_freq = TRUE)
 freq_pcm
