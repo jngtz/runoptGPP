@@ -165,7 +165,7 @@ for(i in 1:length(rw_gridsearch_multi)){
   auroc_single[i] <- rw_gridsearch_multi[[i]][ind_slp, ind_exp, ind_per]
 }
 
-
+which(relerr_single > .8)
 
 # MAP PERFORMANCES #############################################################
 
@@ -461,7 +461,9 @@ cor(indv_rw$rw_exp_opt, geom_gpp$obs_area, method = "spearman")
 cor(indv_rw$rw_slp_opt, geom_gpp$obs_area, method = "spearman")
 cor(indv_rw$rw_per_opt, geom_gpp$obs_area, method = "spearman")
 
-
+table(indv_rw$rw_slp_opt)
+table(indv_rw$rw_exp_opt)
+table(indv_rw$rw_per_opt)
 
 par(mfrow = c(1,1))
 
@@ -630,6 +632,8 @@ pcmmd.vec <- pcm_settings$vec_pcmmd
 
 opt_list <- list() # list of optimal parameters per landslides
 
+tie_cnt <- rep(0, pcm_settings$n_train)
+
 for(i in 1:pcm_settings$n_train){
 
   res_relerr <- pcm_gridsearch_multi[[i]]$relerr
@@ -643,6 +647,7 @@ for(i in 1:pcm_settings$n_train){
 
   if(length(err_wh) > 2){
     err_wh <- err_wh[which(res_auroc[err_wh]==max(res_auroc[err_wh]), arr.ind=TRUE),]
+    tie_cnt[i] <- 1
   }
 
   print(paste("---"))
@@ -652,9 +657,12 @@ for(i in 1:pcm_settings$n_train){
   #  err_wh <- err_wh[1,]
   #}
 
+
+
   if(length(err_wh) > 2){
     mu_opt <- pcmmu.vec[err_wh[,1]]
     md_opt <- pcmmd.vec[err_wh[,2]]
+    tie_cnt[i] <- 1
   } else {
     mu_opt <- pcmmu.vec[err_wh[1]]
     md_opt <- pcmmd.vec[err_wh[2]]
@@ -715,6 +723,7 @@ df_sol$n_solutions <- sapply(opt_list, nrow)
 # Histogram of number of solutions
 t_nsol <- table(df_sol$n_solutions)
 t_nsol
+sum(tie_cnt)
 
 png(filename="hist_no_solutions.png", res = 300, width = 7.5, height = 6,
     units = "in", pointsize = 11)
