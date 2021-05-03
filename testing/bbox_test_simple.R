@@ -47,9 +47,9 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
     #maxElev <- max(elevPly)
 
 
-    plot(bb$box)
-    points(pnts)
-    text(bb$box, labels=1:4 , cex=3, font=2)
+    #plot(bb$box)
+    #points(pnts)
+    #text(bb$box, labels=1:4 , cex=3, font=2)
   #}
 
     elevExt <- raster::extract(elev, bb$box[1:4,])

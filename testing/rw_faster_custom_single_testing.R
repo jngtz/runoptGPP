@@ -93,14 +93,9 @@ for(k in 1:reps){
 
   while(n == 0){
 
-
-
     i = i + 1
 
-
-
     ngh_cells <- adjacent(dem, cntr_cell, directions = 8, pairs = FALSE, id = TRUE)
-
 
     if(length(ngh_cells) < 8){
       break
@@ -111,54 +106,50 @@ for(k in 1:reps){
     elv_ngh <- elv_values[1:8]
     elv_cntr <- elv_values[9]
 
-    lower_elv <- elv_ngh < elv_cntr
+    lower_elv <- elv_ngh <= elv_cntr
     # get elevations
     #elv_ngh <- extract(dem, ngh_cells)
     #elv_cntr <- extract(dem, cntr_cell)
 
 
-
     if(!any(lower_elv)){
-      break
+      break # stop if no lower elevations
     }
+
 
     # compute slope/beta (in degrees)
     beta_ngh <-  atan( (elv_cntr - elv_ngh)  / cell_dist) * 180/pi
 
+    #beta_ngh <- extract(slope, ngh_cells)
 
     if(anyNA(beta_ngh)){
       break
     }
 
-    df <- data.frame(cell = ngh_cells,
-                     elv = elv_ngh,
-                     beta = beta_ngh,
-                     lower = elv_ngh < elv_cntr)
 
-
-    # compute gamma
-    df$gamma <- tan(df$beta*pi/180) / tan(beta_thres*pi/180)
-
-    df$f <- 1
+    f <- rep(1, 8)
 
     if(prv_pos < 9){
-      df$f[prv_pos] <- p
+      f[prv_pos] <- p
     }
 
-    fj <- df$f * tan(df$beta*pi/180)
+    f <- f[lower_elv]
+    cells <- ngh_cells[lower_elv]
+    beta_ngh <- beta_ngh[lower_elv]
 
-    df$prob <-  df$f*tan(df$beta*pi/180) / sum(fj[df$lower])
+    gamma_i <- tan(beta_ngh*pi/180) / tan(beta_thres*pi/180)
 
-    #df$prob[df$prob < 0] <- 0
-    df$prob <- df$prob/sum(df$prob[df$lower])
+    fj <- f * tan(beta_ngh*pi/180)
 
-    df <- df[df$lower,]
-    gamma_max <- max(df$gamma)
+    prob <-  f*tan(beta_ngh*pi/180) / sum(fj)
+    prob <- prob/sum(prob)
+
+    gamma_max <- max(gamma_i)
 
 
     if(gamma_max > 1){
       # if gamma > select only steepest neighbor - can have ties
-      N <- df$cell[gamma_max == df$gamma]
+      N <- cells[gamma_max == gamma_i]
 
       if(length(N) > 1){
         nxt_cell <- sample(N, size = 1)
@@ -170,11 +161,11 @@ for(k in 1:reps){
 
     } else {
       # otherwise mfdf criterion
-      N <- df$cell[df$gamma >= gamma_max^alpha]
-      prob <- df$prob[df$gamma >= gamma_max^alpha]
+      N <- cells[gamma_i >= gamma_max^alpha]
+      trans_prob <- prob[gamma_i >= gamma_max^alpha]
 
       if(length(N) > 1){
-        nxt_cell <- sample(N, size = 1, prob = prob)
+        nxt_cell <- sample(N, size = 1, prob = trans_prob)
         prv_pos <- which(nxt_cell == ngh_cells)
       } else {
         nxt_cell <- N
@@ -194,13 +185,14 @@ for(k in 1:reps){
 }
 
 # Merge paths
-r_sims <- setValues(dem, value = 0)
+r_blank <- setValues(dem, value = 0)
+r_sims <- r_blank
 
 for(k in 1:reps){
-  r_path <- setValues(dem, value = 0)
+  r_path <- r_blank
   r_path[sim_paths[[k]]] <- 1
 
-  r_sims <- r_path + r_sims
+    r_sims <- r_path + r_sims
 }
 
 print(Sys.time() - start_time )
