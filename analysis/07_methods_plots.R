@@ -130,10 +130,10 @@ gppC <- pretty_PCM_example(dem, runout_polygon, source_point,
 library(ggplot2)
 library(patchwork)
 
-#(load("gpp_example_opt_plot.Rd"))
-#(load("gppA_example_opt_plot.Rd"))
-#(load("gppB_example_opt_plot.Rd"))
-#(load("gppC_example_opt_plot.Rd"))
+(load("gpp_example_opt_plot.Rd"))
+(load("gppA_example_opt_plot.Rd"))
+(load("gppB_example_opt_plot.Rd"))
+(load("gppC_example_opt_plot.Rd"))
 
 
 # define plot limits
@@ -294,13 +294,13 @@ m.muC <- ggplot() +
 
   scale_color_manual(name = "", values = c("black", "black", "red"),
                      labels = c("Est. min. area\nbounding box",
-                                "Obs. min. area\nbounding box",
-                                "Obs. debris flow\nrunout")) +
+                                "Obs. debris flow\nrunout",
+                                "Obs. min. area\nbounding box")) +
 
   scale_linetype_manual(name = "", values = c("solid", "dotdash", "dashed"),
                         labels = c("Est. min. area\nbounding box",
-                                   "Obs. min. area\nbounding box",
-                                   "Obs. debris flow\nrunout")) +
+                                   "Obs. debris flow\nrunout",
+                                   "Obs. min. area\nbounding box")) +
 
   ggtitle(paste("Sliding friction coefficient:", gppC$mu,
                 "\nRelative error:", round(gppC$length.relerr, digits = 2),

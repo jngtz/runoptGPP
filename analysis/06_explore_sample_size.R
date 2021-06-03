@@ -419,6 +419,69 @@ for(i in 1:length(n_smps)) {
 
 points(n_smps, mean_relerr, pch = 16)
 
+
+
+smp_size_pcm_df <- data.frame(smp_size = n_smps, test_median_relerr = NA,
+                              test_iqr_relerr = NA, opt_mu = NA, opt_md = NA, opt_relfreq = NA,
+                              opt_median_mu = NA, opt_iqr_mu = NA,
+                              opt_median_md = NA, opt_iqr_md = NA)
+
+pairs_pcm <- list()
+
+
+for(SMP in 1:length(n_smps)){
+  pool_pcm <- do.call(rbind, smp_sizes_pcm[[SMP]])
+
+
+  smp_size_pcm_df$test_median_relerr[SMP] <- median(pool_pcm$test_relerr)
+  smp_size_pcm_df$test_iqr_relerr[SMP] <- IQR(pool_pcm$test_relerr)
+
+  # Relative frequency of parameter combinations
+  opt_pairs <- data.frame(mu = pool_pcm$pcm_mu, md = pool_pcm$pcm_md)
+  freq_pairs <- table(opt_pairs)
+  freq_pairs != 0
+
+  mu_nm <- as.numeric(rownames(freq_pairs))
+  md_nm <- as.numeric(colnames(freq_pairs))
+
+  # Get array index of pairs
+  pair_ind <- which(freq_pairs !=0, arr.ind = TRUE)
+  pairs <- data.frame(mu = mu_nm[pair_ind[,1]],
+                      md = md_nm[pair_ind[,2]],
+                      freq = freq_pairs[pair_ind])
+  pairs$rel_freq <- pairs$freq/nrow(pool_pcm) * 100
+
+
+  #Find relative error values
+  pair_id <- paste(pairs$mu, pairs$md)
+  pool_pcm$pair_id <- paste(pool_pcm$pcm_mu, pool_pcm$pcm_md)
+
+  for(i in 1:length(pair_id)){
+
+    relerr_i <- pool_pcm$test_relerr[which(pool_pcm$pair_id == pair_id[i])]
+    pairs$rel_err[i] <- median(relerr_i)
+    pairs$iqr_relerr[i] <- IQR(relerr_i, na.rm = TRUE)
+
+  }
+
+  pairs_pcm[[SMP]] <- pairs
+
+  opt_pool <- pairs[pairs$rel_freq == max(pairs$rel_freq),]
+
+  smp_size_pcm_df$opt_mu[SMP] <- opt_pool$mu
+  smp_size_pcm_df$opt_md[SMP] <- opt_pool$md
+  smp_size_pcm_df$opt_relfreq[SMP] <- opt_pool$rel_freq
+
+  smp_size_pcm_df$opt_median_mu[SMP] <- median(pool_pcm$pcm_mu)
+  smp_size_pcm_df$opt_median_md[SMP] <- median(pool_pcm$pcm_md)
+
+  smp_size_pcm_df$opt_iqr_mu[SMP] <- IQR(pool_pcm$pcm_mu)
+  smp_size_pcm_df$opt_iqr_md[SMP] <- IQR(pool_pcm$pcm_md)
+
+}
+
+
+
 # PLOT RW AND PCM RESULTS ######################################################
 
 setwd("/home/jason/Scratch/Figures")
@@ -519,5 +582,5 @@ ggplot(pairs_pcm_df, aes(x=md, y=mu)) +
     size = guide_legend(order = 2))
 
 ggsave("sample_size_scatter_opt_pcm.png", dpi = 300, width = 5.5, height = 3.25, units = "in")
-
+ggsave("sample_size_scatter_opt_pcmw7h4.png", dpi = 300, width = 7.5, height =4.5, units = "in")
 

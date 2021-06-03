@@ -214,16 +214,12 @@ rwPerformance_test <- function(dem, slide_plys, slide_src,
   #buff_slide <- raster::buffer(slide_poly_single, width = 200)
   #rescale_process_area <- raster::mask(rescale_process_area, buff_slide)
 
-  # Down sampling negatives
-
-  plot(dem_grid)
-  max_elv <- max(getValues(raster::mask(dem_grid, source_grid)), na.rm = TRUE)
-  mask_elv <- dem_grid
-  mask_elv[mask_elv > max_elv] <- NA
 
 
   pred_values <- raster::getValues(rescale_process_area)
   pred_values[is.na(pred_values)] <- 0
+  #test below
+  pred_values[pred_values > 0 ] <- 1
 
   slide_area <- raster::rasterize(slide_poly_single, rescale_process_area, field=1, background = 0)
   #slide_area <- raster::mask(slide_area, buff_slide)
@@ -351,7 +347,14 @@ rwGridsearch_test <- function(dem, slide_plys, slide_src,
 }
 
 
+rwPerformance_test(dem, slide_plys = runout_poly, slide_src = source_point,
+                   slp = 38, ex =  2.32 , per = 1.7,
+                   gpp_iter = 1000, buffer_ext = 500, buffer_source = 50,
+                   measure = "auroc", plot_eval = TRUE, saga_lib = saga)
 
+
+
+#### COMPARE PLOTS ##############
 setwd("/home/jason/Scratch/NullExt_GPP_Compare")
 
 
@@ -387,7 +390,7 @@ for(i in 1:length(runout_polygons)){
 steps <- 3
 rwexp_vec <- seq(1.3, 3, len=2)
 rwper_vec <- seq(1.5, 2, len=2)
-rwslp_vec <- seq(30, 60, len=5)
+rwslp_vec <- seq(20, 40, len=5)
 
 gs_auroc <- rwGridsearch_test(dem, slide_plys = runout_polygon, slide_src = source_point,
                            #Input random walk grid search space

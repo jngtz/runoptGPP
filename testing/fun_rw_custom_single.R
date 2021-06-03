@@ -168,7 +168,7 @@ randomWalk <- function(dem, source_point, slp_thresh = 30, exp_div = 3, per_fct 
 
 start_time <- Sys.time()
 
-r_sim <- randomWalk(crop_dem, source_point, reps = 100)
+r_sims <- randomWalk(crop_dem, source_point, reps = 100)
 
 print(Sys.time() - start_time )
 
