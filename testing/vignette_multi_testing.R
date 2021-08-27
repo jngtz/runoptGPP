@@ -1,7 +1,7 @@
 setwd("/home/jason/R/runoptGPP/")
 
 library(devtools)
-document()
+#document()
 build()
 install()
 

@@ -210,6 +210,11 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
     elevExt <- raster::extract(elev, bb$box[1:4,])
     dElev12 <- sqrt( (elevExt[1] - elevExt[2])^2)
     dElev14 <- sqrt( (elevExt[1] - elevExt[4])^2)
+
+    if(is.na(dElev14)){
+      #If bounding box node extends beyond dem (e.g. in NA area)
+      dElev14 <- sqrt( (elevExt[2] - elevExt[3])^2)
+    }
     #Determine (and calculate) the length and width based on delta elevation
 
      if(dElev12 > dElev14) {

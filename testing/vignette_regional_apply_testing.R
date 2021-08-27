@@ -2,7 +2,7 @@ setwd("/home/jason/R/runoptGPP/")
 
 library(devtools)
 document()
-build()
+build(vignettes = FALSE)
 install()
 
 pkgdown::build_site()
