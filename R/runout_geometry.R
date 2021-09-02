@@ -217,7 +217,12 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
     }
     #Determine (and calculate) the length and width based on delta elevation
 
-     if(dElev12 > dElev14) {
+    if(is.na(dElev12)){
+      #If bounding box node extends beyond dem (e.g. in NA area)
+      dElev12 <- sqrt( (elevExt[4] - elevExt[3])^2)
+    }
+
+    if(dElev12 > dElev14) {
       length <- EuclDist(bb$box[1,1], bb$box[1,2], bb$box[2,1], bb$box[2,2])
       width <- EuclDist(bb$box[1,1], bb$box[1,2], bb$box[4,1], bb$box[4,2])
     } else {
