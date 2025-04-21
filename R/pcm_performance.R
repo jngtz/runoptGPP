@@ -87,8 +87,18 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
                              pcm_mu = 0.3, pcm_md = 75,
                              buffer_ext = 500, buffer_source = 50, gpp_iter = 1000,
                              predict_threshold = 0.5, plot_eval = FALSE,
-                             return_features = FALSE, saga_lib)
+                             return_features = FALSE, saga_lib = NULL)
 {
+
+
+  # Coerce to spatial "sp" object
+  if(class(slide_plys)[1] == "sf"){
+    slide_plys = sf::as_Spatial(slide_plys)
+  }
+
+  if(class(slide_src)[1] == "sf"){
+    slide_src = sf::as_Spatial(slide_src)
+  }
 
   # If single runout polygon as input, assign slide_id value of 1
   if(length(slide_plys) == 1){
@@ -102,7 +112,6 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
   # Crop dem to slide polygon
   dem_grid <- raster::crop(dem, raster::extent(slide_poly_single) + buffer_ext)
 
-
   if(class(slide_src) == "SpatialPointsDataFrame"){
     # Subset corresponding source/start point of runout
     sel_over_start_point  <- sp::over(slide_src, slide_poly_single)
@@ -110,7 +119,7 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
 
     if(!is.null(buffer_source)){
       # Create a buffer around source point to create a source/release area
-      source_buffer <- rgeos::gBuffer(sel_start_point, width = buffer_source)
+      source_buffer <- sf::st_buffer(sf::st_as_sf(sel_start_point), dist = buffer_source)
       source_grid <- raster::rasterize(source_buffer, dem_grid, field=1 )
       source_grid <- raster::mask(source_grid, slide_poly_single )
       source_plot <- raster::rasterToPolygons(source_grid)
@@ -130,33 +139,76 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
   }
 
 
-
-
   # Run runout model using Rsagacmd (faster than RSAGA)
-  gpp <- saga_lib$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
-                                                                 #friction_mu_grid = mu.grid,
-                                                                 process_path_model = 1,
-                                                                 rw_slope_thres = rw_slp,
-                                                                 rw_exponent = rw_ex,
-                                                                 rw_persistence = rw_per,
-                                                                 gpp_iterations = gpp_iter,
-                                                                 friction_model = 5,
-                                                                 friction_mu = pcm_mu,
-                                                                 friction_mass_to_drag = pcm_md)
+  if(is.null(saga_lib)){
+
+    dem_terra <- terra::rast(dem_grid)
+
+    if(!length(slide_plys) == 1){
+
+      # Many source points
+      source_l <- raster::xyFromCell(source_grid, which(raster::values(source_grid) == 1))
+      source_l <- lapply(1:nrow(source_l), function(i) matrix(source_l[i, ], nrow = 1, ncol = 2))
+
+      rw_paths <- lapply(source_l, function(x) {
+        runoutSim::runoutSim(dem = dem_terra, xy = x, mu = pcm_mu, md = pcm_md,
+                  slp_thresh = rw_slp, exp_div = rw_ex, per_fct = rw_per, walks = gpp_iter,
+                  source_connect = FALSE)})
+
+    } else {
+
+      # One source point
+      source_plot <- sel_start_point
+      source_l <- sp::coordinates(slide_src)
+      source_grid <- raster::rasterize(matrix(sp::coordinates(sel_start_point)[1:2], ncol = 2), dem_grid, field = 1)
+
+      rw_paths = runoutSim::runoutSim(dem = dem_terra, xy=source_l, mu = pcm_mu, md = pcm_md,
+                           slp_thresh = rw_slp, exp_div = rw_ex, per_fct = rw_per, walks = gpp_iter,
+                           source_connect = FALSE)
+
+    }
+
+    rw_grid <- runoutSim::walksToRaster(x = rw_paths, dem = dem_terra)
+    #rw_grid <- rw_grid/gpp_iter
+    #plot(rw_grid)
+    rw_grid <- raster::raster(rw_grid)
+
+    pred_values <- terra::values(rw_grid)
+    pred_values[is.na(pred_values)] <- 0
+
+  } else {
+
+    gpp <- saga_lib$sim_geomorphology$gravitational_process_path_model(dem = dem_grid, release_areas = source_grid,
+                                                                       #friction_mu_grid = mu.grid,
+                                                                       process_path_model = 1,
+                                                                       rw_slope_thres = rw_slp,
+                                                                       rw_exponent = rw_ex,
+                                                                       rw_persistence = rw_per,
+                                                                       gpp_iterations = gpp_iter,
+                                                                       friction_model = 5,
+                                                                       friction_mu = pcm_mu,
+                                                                       friction_mass_to_drag = pcm_md)
 
 
-  # Rescale to values from 0 to 1
-  rescale_process_area <- rasterCdf(gpp$process_area)
+
+    rw_grid <- rasterCdf(gpp$process_area)
+
+  }
 
   # AUROC
-  pred_values <- raster::getValues(rescale_process_area)
+  pred_values <- raster::getValues(rw_grid)
   pred_values[is.na(pred_values)] <- 0
 
-  slide_area <- raster::rasterize(slide_poly_single, gpp$process_area, field=1, background = 0)
+  slide_area <- raster::rasterize(slide_poly_single, rw_grid, field=1, background = 0)
 
-  pred_thres <- rescale_process_area
-  pred_thres[pred_thres >= predict_threshold] = 1
-  pred_thres[pred_thres < predict_threshold] = NA
+  pred_thres <- rw_grid
+
+  if(!is.null(predict_threshold)){
+    pred_thres[pred_thres >= predict_threshold] = 1
+    pred_thres[pred_thres < predict_threshold] = NA
+  } else {
+    pred_thres[!is.na(pred_thres)] <- 1
+  }
 
   pred_area <- ROCR::prediction(predictions = pred_values, labels = raster::getValues(slide_area))
   perf_area <- ROCR::performance(pred_area, "tpr", "fpr")
@@ -174,14 +226,32 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
 
   # Plot evaluation results
   if(plot_eval){
-    sp::plot(rescale_process_area,
+    sp::plot(rw_grid,
          main = paste("id", slide_id,
                       "roc", round(roc, digits=2), "\n",
-                      "err.L", round(length_relerr, digits = 2),
-                      "Ex", rw_ex, "Pr", rw_per, "Mu", pcm_mu, "Md", pcm_md),
+                      "err_m", round(length_error, digits = 2),
+                      "rel_err", round(length_relerr, digits = 2),
+                      "Slp", rw_slp, "Ex", rw_ex, "Pr", rw_per,
+                      "Mu", pcm_mu, "Md", pcm_md),
          cex.main = 0.7, cex.axis = 0.7, cex=0.7)
     sp::plot(slide_poly_single, add=TRUE)
     sp::plot(source_plot, add = TRUE)
+
+    # plot bbox
+    bbox_obs <- minBBoxSpatialPolygons(slide_poly_single)
+
+    pred_plot <- raster::rasterToPolygons(pred_thres, n = 4, dissolve = TRUE, na.rm=TRUE)
+    pred_pnts <- getVertices(pred_plot)
+    #Calculate minimum area rectangle
+    bbox_pred <- minbb(pred_pnts)
+    #Create and add to a list of polygons
+    bbox_pred <- sp::Polygons(list(sp::Polygon(bbox_pred$box)), ID = "1")
+
+    # Wrap the Polygons object in a SpatialPolygons object
+    bbox_pred <- sp::SpatialPolygons(list(bbox_pred))
+    sp::plot(bbox_obs, add=TRUE)
+    sp::plot(bbox_pred, add = TRUE, lty = 3)
+
   }
 
 
@@ -196,9 +266,9 @@ pcmPerformance <- function(dem, slide_plys, slide_src, slide_id = 1,
            actual.poly = slide_poly_single,
            source.pnt = sel_start_point,
            source.area = source_grid,
-           gpp.parea = gpp$process_area,
-           gpp.stop = gpp$stop_positions,
-           gpp.maxvel = gpp$max_velocity))
+           gpp.parea = rw_grid))
+           #gpp.stop = gpp$stop_positions,
+           #gpp.maxvel = gpp$max_velocity))
   } else {
     return(
       list(id =  slide_id,

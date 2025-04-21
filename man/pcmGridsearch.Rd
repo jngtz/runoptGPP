@@ -20,7 +20,7 @@ pcmGridsearch(
   predict_threshold = 0.5,
   save_res = FALSE,
   plot_eval = FALSE,
-  saga_lib
+  saga_lib = NULL
 )
 }
 \arguments{

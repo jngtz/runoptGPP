@@ -17,7 +17,7 @@ rwGridsearch(
   buffer_source = NULL,
   save_res = FALSE,
   plot_eval = FALSE,
-  saga_lib
+  saga_lib = NULL
 )
 }
 \arguments{

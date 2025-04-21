@@ -20,7 +20,7 @@ pcmPerformance(
   predict_threshold = 0.5,
   plot_eval = FALSE,
   return_features = FALSE,
-  saga_lib
+  saga_lib = NULL
 )
 }
 \arguments{

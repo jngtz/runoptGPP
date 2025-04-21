@@ -124,13 +124,6 @@ getVertices <- function(x){
 #' Determines min. area bounding box for a single or set of spatial polygons
 #' @param x A SpatialPolygonsDataFrame
 #' @return A SpatialPolygonsDataFrame with corresponding bounding boxes
-#' @examples
-#' file_nm <- system.file("extdata/dflow_runout_ply.shp", package="runout.opt")
-#' slide_plys <- rgdal::readOGR(file_nm)
-#' minbb <- minBBoxSpatialPolygons(slide_plys)
-#'
-#' sp::plot(slide_plys)
-#' sp::plot(minbb, add = TRUE)
 
 minBBoxSpatialPolygons <- function(x) {
 
@@ -171,18 +164,20 @@ minBBoxSpatialPolygons <- function(x) {
 #' @param ID NOT SURE...
 #' @return A data frame containing runout geometries
 #' @examples
+#' \dontrun{
 #' # Load elevation model (DEM)
-#' dem <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
-#'
-#' # Load runout polygons
-#' file_nm <- system.file("extdata/dflow_runout_ply.shp", package="runout.opt")
-#' slide_plys <- rgdal::readOGR(file_nm)
 #'
 #' slide_geom <- runoutGeom(slide_plys, dem)
 #' slide_geom
+#' }
 
 runoutGeom <- function(runout_plys, elev, ID = NULL) {
   #Create a dataframe to store the ID, length, width and (landslide) area
+
+  if(class(runout_plys)[1] == "sf"){
+    runout_plys = sf::as_Spatial(runout_plys)
+  }
+
   if(is.null(ID)){
     bbDf <- data.frame(fid = 0:(length(runout_plys)-1), id = 1:length(runout_plys),
                        width = NA, length = NA, area = NA, surfacearea = NA,
@@ -232,8 +227,8 @@ runoutGeom <- function(runout_plys, elev, ID = NULL) {
 
     bbDf[i,]$length <- length #planar
     bbDf[i,]$width <- width #planar
-    bbDf[i,]$area <- rgeos::gArea(runout_ply) #area of landslide (*not area of bbox) {Rgeos}
-
+    #bbDf[i,]$area <- rgeos::gArea(runout_ply) #area of landslide (*not area of bbox) {Rgeos}
+    bbDf[i,]$area <- as.numeric(sf::st_area(sf::st_as_sf(runout_ply)))
 
     #Calculate the 'true' surface area
     elevCrop <- raster::crop(elev, runout_ply) #crop and mask used to speed up calculation

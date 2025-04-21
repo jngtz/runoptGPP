@@ -13,7 +13,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
 comment = "#>")
-knitr::opts_knit$set(root.dir = "/home/jason/Data/Chile/")
+knitr::opts_knit$set(root.dir = "C:\\sda\\Landslides\\Chile\\upper_maipo_river\\data")
 ```
 
 The runoptGPP package was developed for automatic parameter selection for

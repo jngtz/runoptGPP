@@ -13,7 +13,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
 comment = "#>")
-knitr::opts_knit$set(root.dir = "/home/jason/Data/Chile/")
+knitr::opts_knit$set(root.dir = "C:\\sda\\Landslides\\Chile\\upper_maipo_river\\data")
 ```
 
 The runoptGPP package was developed for automatic parameter selection for
@@ -39,17 +39,17 @@ of our results.
 ```{r, fig.height=6, fig.width = 6}
 library(runoptGPP)
 library(raster)
-library(rgdal)
 library(Rsagacmd)
 library(ggplot2) # Plotting maps
 library(patchwork) # Tile multiple maps together
 library(ggnewscale) # Allow multiple scales in a map
 
 # Initiate a SAGA-GIS geoprocessing object
-saga <- saga_gis(opt_lib = "sim_geomorphology")
+env <- Rsagacmd:::saga_env(saga_bin = "C:/Program Files/SAGA/saga_cmd.exe")
+saga <- saga_gis(saga_bin = env, opt_lib = "sim_geomorphology")
 
 # Load shapefile of sub catchment polygons
-sub_catchments <- readOGR("sub_catchments.shp")
+sub_catchments <- st_read("sub_catchments.shp")
 
 # Load and crop DEM for a single sub catchment
 dem <- raster("elev_alos_12_5m.tif")

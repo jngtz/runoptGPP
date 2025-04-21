@@ -23,15 +23,22 @@
 #' @return the area under the receiver operating characteristic
 #' @details Runout is either simulated from a single source point or a buffered
 #'      area round the source point.
-#' @examples
-
 
 rwGridsearch <- function(dem, slide_plys, slide_src,
                       slide_id = NULL, slp_v, ex_v, per_v,
                       gpp_iter = 1000, buffer_ext = 500, buffer_source = NULL,
-                      save_res = FALSE, plot_eval = FALSE, saga_lib)
+                      save_res = FALSE, plot_eval = FALSE, saga_lib = NULL)
 
 {
+
+  # Coerce to spatial "sp" object
+  if(class(slide_plys)[1] == "sf"){
+    slide_plys = sf::as_Spatial(slide_plys)
+  }
+
+  if(class(slide_src)[1] == "sf"){
+    slide_src = sf::as_Spatial(slide_src)
+  }
 
   if(is.null(slide_id)){
     slide_id = 1

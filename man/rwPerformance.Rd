@@ -16,7 +16,7 @@ rwPerformance(
   buffer_ext = 500,
   buffer_source = NULL,
   plot_eval = FALSE,
-  saga_lib
+  saga_lib = NULL
 )
 }
 \arguments{
