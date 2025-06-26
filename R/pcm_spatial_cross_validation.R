@@ -116,7 +116,7 @@ pcmSPCV <- function(x, slide_plys, n_folds, repetitions, from_save = FALSE){
         n_test = length(polyid_test.vec),
         pcm_mu = opt_mu,
         pcm_md = opt_md,
-        train_relerr = rel_err[rel_err_wh[1], rel_err_wh[2]],
+        train_relerr = train_rel_err[rel_err_wh[1], rel_err_wh[2]],
         test_relerr = test_rel_err[rel_err_wh[1], rel_err_wh[2]]
       )
 
