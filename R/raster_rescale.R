@@ -4,9 +4,11 @@
 #' @param x A RasterLayer object
 #' @return RasterLayer
 #' @examples
+#' \dontrun{
 #' r <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
 #' r_ecdf <- rasterCdf(r)
 #' raster::plot(r_ecdf)
+#' }
 
 rasterCdf <- function(x){
 
@@ -24,9 +26,11 @@ rasterCdf <- function(x){
 #' @param x A RasterLayer object
 #' @return RasterLayer
 #' @examples
+#' \dontrun{
 #' r <- raster::raster(system.file("extdata/elev_12_5m.tif", package="runout.opt"))
 #' r_minmax <- rasterMinMaxRescale(r)
 #' raster::plot(r_minmax)
+#' }
 
 rasterMinMaxRescale <- function(x){
 
