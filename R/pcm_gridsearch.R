@@ -13,7 +13,7 @@
 #' @param rw_per Random walk persistence factor to weight flow direction consistency
 #' @param pcm_mu_v A vector of PCM model sliding friction coefficients
 #' @param pcm_md_v A vector of PCM model mass-to-drag ratios (m)
-#' @param gpp_iter Number of model iterations
+#' @param gpp_iter Number of random walks
 #' @param buffer_ext (Optional) Defines buffer distance (in meters) around runout polygon
 #'      to crop source DEM. This helps to reduce computational time when working
 #'      with large regions.
@@ -40,12 +40,12 @@ pcmGridsearch <- function(dem,
   if(class(slide_plys)[1] == "sf"){
     slide_plys = sf::as_Spatial(slide_plys)
   }
-  
+
   if(class(slide_src)[1] == "sf"){
     slide_src = sf::as_Spatial(slide_src)
   }
-  
-  
+
+
   if(is.null(slide_id)){
     slide_id = 1
   }
