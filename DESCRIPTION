@@ -8,7 +8,7 @@ Description: Automatic parameter selection and validation tools for the
     random walk and PCM components of the Gravitational Process Path (GPP) model in SAGA-GIS.
 License: GPL-3
 Encoding: UTF-8
-Imports: raster, terra, sf, ggplot2, reshape2, ROCR, sperrorest, Rsagacmd, sp, methods, runoutSim
+Imports: raster, terra, sf, ggplot2, reshape2, ROCR, sperrorest, Rsagacmd, sp, methods
 LazyData: true
 RoxygenNote: 7.3.2
 Suggests: knitr, rmarkdown, patchwork, ggnewscale
