@@ -116,7 +116,7 @@ rwPerformance <- function(dem, slide_plys, slide_src,
       source_l <- lapply(1:nrow(source_l), function(i) matrix(source_l[i, ], nrow = 1, ncol = 2))
 
       rw_paths <- lapply(source_l, function(x) {
-        runoutSim::runoutSim(dem = dem_terra, xy = x, mu = 0.00001, md = 500,
+        runoutSIM::runoutSim(dem = dem_terra, xy = x, mu = 0.00001, md = 500,
                   slp_thresh = slp, exp_div = ex, per_fct = per, walks = gpp_iter,
                   source_connect = FALSE)})
 
@@ -127,13 +127,13 @@ rwPerformance <- function(dem, slide_plys, slide_src,
       source_l <- sp::coordinates(slide_src)
       source_grid <- raster::rasterize(matrix(sp::coordinates(sel_start_point)[1:2], ncol = 2), dem_grid, field = 1)
 
-      rw_paths = runoutSim::runoutSim(dem = dem_terra, xy=source_l, mu = 0.08, md = 140,
+      rw_paths = runoutSIM::runoutSim(dem = dem_terra, xy=source_l, mu = 0.08, md = 140,
                            slp_thresh = slp, exp_div = ex, per_fct = per, walks = gpp_iter,
                            source_connect = FALSE)
 
     }
 
-    rw_grid <- runoutSim::walksToRaster(x = rw_paths, dem = dem_terra)
+    rw_grid <- runoutSIM::walksToRaster(x = rw_paths, dem = dem_terra)
     #rw_grid <- rw_grid/gpp_iter
     #plot(rw_grid)
     rw_grid <- raster::raster(rw_grid)
