@@ -10,7 +10,16 @@
 
 errMinBboxLength <- function(obs_poly, pred_raster, dem){
   #Calculates the relative error b/w bbox length estimates of slides
-  sp.pred <- raster::rasterToPolygons(pred_raster, n = 4, dissolve = TRUE, na.rm=TRUE)
+  if (!inherits(pred_raster, "SpatRaster")) {
+    pred_raster <- terra::rast(pred_raster)
+  }
+
+  # Assign value of 1 to all
+  pred_raster[!is.na(pred_raster)] <- 1
+
+  sp.pred <- terra::as.polygons(pred_raster, aggregate = TRUE, na.rm = TRUE)
+  #sp.pred <- raster::rasterToPolygons(pred_raster, n = 4, dissolve = TRUE, na.rm=TRUE) # old slow!!
+  sp.pred <- as(sp.pred, "Spatial")
   geom_pred <- runoutGeom(sp.pred, elev = dem)
   geom_act <- runoutGeom(obs_poly, elev = dem)
 
